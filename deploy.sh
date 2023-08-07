@@ -12,7 +12,7 @@
  echo "> new app deploy"
 
  cd /home/ubuntu/deploy
- JAR_NAME=$(ls | grep 'gist-competition' | tail -n 1)
+ JAR_NAME=$(ls | grep 'jar' | tail -n 1)
  echo "> JAR Name: $JAR_NAME"
  
  # 현재 폴더에 nohup폴더 만들기 -p는 폴더가 없으면 만들고 있으면 안 만들고
