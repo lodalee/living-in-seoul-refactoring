@@ -5,11 +5,14 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.gavoza.backend.domain.post.dto.PostRequestDto;
-import com.gavoza.backend.domain.post.dto.PostResponseDto;
+import com.gavoza.backend.domain.post.entity.LocationTag;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.entity.PostImg;
+import com.gavoza.backend.domain.post.entity.PurposeTag;
+import com.gavoza.backend.domain.post.repository.LocationTagRepository;
 import com.gavoza.backend.domain.post.repository.PostImgRepository;
 import com.gavoza.backend.domain.post.repository.PostRepository;
+import com.gavoza.backend.domain.post.repository.PurposeTagRepository;
 import com.gavoza.backend.global.exception.MessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,8 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,8 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostImgRepository postImgRepository;
+    private final LocationTagRepository locationTagRepository;
+    private final PurposeTagRepository purposeTagRepository;
 
 
     //upload
@@ -57,32 +62,58 @@ public class PostService {
                     new PutObjectRequest(bucketName, bucketFilePath, photo.getInputStream(), objectMetadata)
                             .withCannedAcl(CannedAccessControlList.PublicRead)
             );
-            // Create a new PostImg instance and add it to the list
+
+            //PostImg 저장
             PostImg postImg = new PostImg(fileName, null);
             postImgList.add(postImg);
 
         }
+        //locationTag 처리
+        LocationTag locationTag = processLocationTag(requestDto.getLocationTag());
+
+        // purposeTag 처리
+        PurposeTag purposeTag = processPurposeTag(requestDto.getPurposeTag());
+
 
         //post 저장
         Post post = new Post(requestDto);
+        post.setLocationTag(locationTag);
+        post.setPurposeTag(purposeTag);
         postRepository.save(post);
 
-        // Connect the PostImg instances to the saved post and save them
+
+        // PostImg 인스턴스를 저장된 게시물에 연결하여 저장
         for (PostImg postImg : postImgList) {
             postImg.setPost(post);
             postImgRepository.save(postImg);
         }
-
         return new MessageResponseDto("파일 저장 성공");
     }
-
-    //게시글 전체 조회
-    public List<PostResponseDto> getPosts() {
-        return postRepository.findAll()
-                .stream()
-                .map(post-> new PostResponseDto(post,"전체 조회 성공"))
-                .collect(Collectors.toList());
+    private LocationTag processLocationTag(String locationTagName) {
+        if (locationTagName == null || locationTagName.isEmpty()) {
+            return null;
+        }
+        Optional<LocationTag> existingLocationTag = locationTagRepository.findByLocationTag(locationTagName);
+        return existingLocationTag.orElseGet(() -> locationTagRepository.save(new LocationTag(locationTagName)));
     }
+
+    private PurposeTag processPurposeTag(String purposeTagName) {
+        if (purposeTagName == null || purposeTagName.isEmpty()) {
+            return null;
+        }
+        Optional<PurposeTag> existingPurposeTag = purposeTagRepository.findByPurposeTag(purposeTagName);
+        return existingPurposeTag.orElseGet(() -> purposeTagRepository.save(new PurposeTag(purposeTagName)));
+    }
+
+
+//    //게시글 전체 조회
+//    public AllPostResponse getPosts() {
+//        Long size = 5L;
+//
+//        Page<Post> posts = postRepository.findAll();
+//        return new AllPostResponse("전체 조회 성공", (long) posts.getTotalPages(),
+//                posts.getTotalElements(), size, posts.map(post->post).stream().toList());
+//    }
 }
 
 

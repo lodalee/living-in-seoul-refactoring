@@ -19,10 +19,15 @@ public class PostInfoResponseDto {
     private LocalDateTime modifiedAt;
 
     public PostInfoResponseDto(Post post) {
-        this.postId = post.getPostId();
+        this.postId = post.getId();
         this.title = post.getTitle();
-        this.locationTag = post.getLocationTag();
-        this.purposeTag = post.getPurposeTag();
+        if (post.getLocationTag() != null) {
+            this.locationTag = post.getLocationTag().getLocationTag();
+        }
+
+        if (post.getPurposeTag() != null) {
+            this.purposeTag = post.getPurposeTag().getPurposeTag();
+        }
         this.content = post.getContent();
         this.postImg = post.getPostImgList();
         this.createdAt = post.getCreatedAt();

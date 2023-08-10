@@ -1,7 +1,9 @@
 package com.gavoza.backend.domain.post.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gavoza.backend.domain.post.dto.PostRequestDto;
+import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.config.Auditing;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -19,31 +21,34 @@ public class Post extends Auditing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
-    private Long postId;
+    private Long Id;
 
-//    @Column(nullable = false)
-//    private String nickname;
-
-    @Column(nullable = false, length = 500)
+    @Column(nullable = false)
     private String content;
 
-    @Column(name = "title", nullable = false, length = 100)
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "location_tag")
-    private String locationTag;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "l_tag_id")
+    private LocationTag locationTag;
 
-    @Column(name = "purpose_tag")
-    private String purposeTag;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "p_tag_id")
+    private PurposeTag purposeTag;
+
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE})
     private List<PostImg> postImgList = new ArrayList<>();
 
+
     public Post(PostRequestDto requestDto) {
         this.content = requestDto.getContent();
         this.title = requestDto.getTitle();
-        this.locationTag = requestDto.getLocationTag();
-        this.purposeTag = requestDto.getPurposeTag();
     }
 }

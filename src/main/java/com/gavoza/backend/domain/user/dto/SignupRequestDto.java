@@ -1,5 +1,6 @@
 package com.gavoza.backend.domain.user.dto;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -11,7 +12,6 @@ import lombok.ToString;
 @Setter
 
 public class SignupRequestDto {
-
     @Email(message = "유효하지 않은 이메일 형식입니다.")
     @NotBlank(message = "이메일을 입력 해주세요")
     private String email;

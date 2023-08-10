@@ -10,5 +10,4 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     Optional<Location> findByGuAndDong(String gu, String dong);
 
     List<Location> findByGu(String gu);
-
 }
