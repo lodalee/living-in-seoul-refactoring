@@ -1,5 +1,7 @@
-package com.gavoza.backend.domain.post.entity;
+package com.gavoza.backend.domain.tag.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.gavoza.backend.domain.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +18,13 @@ public class PurposeTag {
     @Column(nullable = true)
     private String purposeTag;
 
-    public PurposeTag(String purposeTagName) {
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private Post post;
+
+    public PurposeTag(String purposeTagName, Post post) {
         this.purposeTag = purposeTagName;
+        this.post = post;
     }
 }

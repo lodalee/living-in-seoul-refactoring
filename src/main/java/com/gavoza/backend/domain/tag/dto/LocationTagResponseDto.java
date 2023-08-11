@@ -1,4 +1,4 @@
-package com.gavoza.backend.domain.post.dto;
+package com.gavoza.backend.domain.tag.dto;
 
 import lombok.Getter;
 

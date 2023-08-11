@@ -5,14 +5,14 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.gavoza.backend.domain.post.dto.PostRequestDto;
-import com.gavoza.backend.domain.post.entity.LocationTag;
+import com.gavoza.backend.domain.tag.entity.LocationTag;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.entity.PostImg;
-import com.gavoza.backend.domain.post.entity.PurposeTag;
-import com.gavoza.backend.domain.post.repository.LocationTagRepository;
+import com.gavoza.backend.domain.tag.entity.PurposeTag;
+import com.gavoza.backend.domain.tag.repository.LocationTagRepository;
 import com.gavoza.backend.domain.post.repository.PostImgRepository;
 import com.gavoza.backend.domain.post.repository.PostRepository;
-import com.gavoza.backend.domain.post.repository.PurposeTagRepository;
+import com.gavoza.backend.domain.tag.repository.PurposeTagRepository;
 import com.gavoza.backend.global.exception.MessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,17 +68,32 @@ public class PostService {
             postImgList.add(postImg);
 
         }
-        //locationTag 처리
-        LocationTag locationTag = processLocationTag(requestDto.getLocationTag());
+
+        Post post = new Post(requestDto);
+
+        // locationTag 처리
+        String[] locationTagList = requestDto.getLocationTag().split("#");
+        ArrayList<LocationTag> locationTags = new ArrayList<>();
+        for (String locationTag : locationTagList){
+            if (locationTag.equals("")){
+                continue;
+            }
+            locationTags.add(processLocationTag("#"+locationTag, post));
+        }
 
         // purposeTag 처리
-        PurposeTag purposeTag = processPurposeTag(requestDto.getPurposeTag());
-
+        String[] purposeTagList = requestDto.getPurposeTag().split("#");
+        ArrayList<PurposeTag> purposeTags = new ArrayList<>();
+        for (String purposeTag: purposeTagList){
+            if (purposeTag.equals("")){
+                continue;
+            }
+            purposeTags.add(processPurposeTag("#"+purposeTag, post));
+        }
 
         //post 저장
-        Post post = new Post(requestDto);
-        post.setLocationTag(locationTag);
-        post.setPurposeTag(purposeTag);
+        post.setLocationTag(locationTags);
+        post.setPurposeTag(purposeTags);
         postRepository.save(post);
 
 
@@ -89,20 +104,19 @@ public class PostService {
         }
         return new MessageResponseDto("파일 저장 성공");
     }
-    private LocationTag processLocationTag(String locationTagName) {
+
+    private LocationTag processLocationTag(String locationTagName, Post post) {
         if (locationTagName == null || locationTagName.isEmpty()) {
             return null;
         }
-        Optional<LocationTag> existingLocationTag = locationTagRepository.findByLocationTag(locationTagName);
-        return existingLocationTag.orElseGet(() -> locationTagRepository.save(new LocationTag(locationTagName)));
+        return locationTagRepository.save(new LocationTag(locationTagName, post));
     }
 
-    private PurposeTag processPurposeTag(String purposeTagName) {
+    private PurposeTag processPurposeTag(String purposeTagName, Post post) {
         if (purposeTagName == null || purposeTagName.isEmpty()) {
             return null;
         }
-        Optional<PurposeTag> existingPurposeTag = purposeTagRepository.findByPurposeTag(purposeTagName);
-        return existingPurposeTag.orElseGet(() -> purposeTagRepository.save(new PurposeTag(purposeTagName)));
+        return purposeTagRepository.save(new PurposeTag(purposeTagName, post));
     }
 
 

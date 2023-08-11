@@ -3,6 +3,8 @@ package com.gavoza.backend.domain.post.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gavoza.backend.domain.post.dto.PostRequestDto;
+import com.gavoza.backend.domain.tag.entity.LocationTag;
+import com.gavoza.backend.domain.tag.entity.PurposeTag;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.config.Auditing;
 import jakarta.persistence.*;
@@ -29,13 +31,13 @@ public class Post extends Auditing {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "l_tag_id")
-    private LocationTag locationTag;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE})
+    private List<LocationTag> locationTag;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "p_tag_id")
-    private PurposeTag purposeTag;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE})
+    private List<PurposeTag> purposeTag;
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
