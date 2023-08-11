@@ -39,7 +39,6 @@ public class Post extends Auditing {
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE})
     private List<PurposeTag> purposeTag;
 
-    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -49,8 +48,9 @@ public class Post extends Auditing {
     private List<PostImg> postImgList = new ArrayList<>();
 
 
-    public Post(PostRequestDto requestDto) {
+    public Post(PostRequestDto requestDto, User user) {
         this.content = requestDto.getContent();
         this.title = requestDto.getTitle();
+        this.user = user;
     }
 }

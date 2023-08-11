@@ -3,9 +3,12 @@ package com.gavoza.backend.domain.post.controller;
 import com.gavoza.backend.domain.post.dto.PostRequestDto;
 import com.gavoza.backend.domain.post.response.AllPostResponse;
 import com.gavoza.backend.domain.post.service.PostService;
+import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.exception.MessageResponseDto;
+import com.gavoza.backend.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,9 +28,11 @@ public class PostController {
     @ResponseStatus(HttpStatus.OK)
     public MessageResponseDto uploadFile(
             @RequestPart("post") PostRequestDto requestDto,
-            @RequestPart("photos") List<MultipartFile> photos
+            @RequestPart("photos") List<MultipartFile> photos,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
           ) throws IOException {
-        return postService.upload(requestDto, photos);
+        User user = userDetails.getUser();
+        return postService.upload(requestDto, photos, user);
     }
 
 //    //게시글 전체 조회(커뮤티니)

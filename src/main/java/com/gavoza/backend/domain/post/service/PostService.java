@@ -13,6 +13,7 @@ import com.gavoza.backend.domain.tag.repository.LocationTagRepository;
 import com.gavoza.backend.domain.post.repository.PostImgRepository;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.tag.repository.PurposeTagRepository;
+import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.exception.MessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -43,9 +43,10 @@ public class PostService {
 
 
     //upload
-    public MessageResponseDto upload(PostRequestDto requestDto, List<MultipartFile> photos) throws IOException {
+    public MessageResponseDto upload(PostRequestDto requestDto, List<MultipartFile> photos, User user) throws IOException {
         List<PostImg> postImgList = new ArrayList<>();
 
+        //S3에 이미지 저장
         for (MultipartFile photo : photos) {
             long size = photo.getSize();
 
@@ -66,10 +67,9 @@ public class PostService {
             //PostImg 저장
             PostImg postImg = new PostImg(fileName, null);
             postImgList.add(postImg);
-
         }
 
-        Post post = new Post(requestDto);
+        Post post = new Post(requestDto, user);
 
         // locationTag 처리
         String[] locationTagList = requestDto.getLocationTag().split("#");
