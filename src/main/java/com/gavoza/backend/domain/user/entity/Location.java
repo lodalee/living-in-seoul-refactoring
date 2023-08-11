@@ -10,16 +10,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Location {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "location_id")
     private long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String gu;
 
     @Column(nullable = false, unique = true)
     private String dong;
-
 }
+

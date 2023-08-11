@@ -7,7 +7,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserResponseDto {
+    private String nickname;
     private String email;
-    private String password;
+
+    public UserResponseDto(User user) {
+        this.nickname = user.getNickname();
+        this.email = user.getEmail();
     }
+}
 
