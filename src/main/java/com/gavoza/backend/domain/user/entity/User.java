@@ -1,5 +1,8 @@
 package com.gavoza.backend.domain.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.gavoza.backend.domain.post.entity.Post;
+import com.gavoza.backend.domain.tag.entity.LocationTag;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.management.relation.Role;
+import java.util.List;
 
 @ToString
 @Entity
@@ -39,6 +43,10 @@ public class User {
 
     @Column(nullable = false)
     private String movedDate;
+
+//    @JsonManagedReference
+//    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
+//    private List<Post> post;
 
     public User(String email, String nickname, String password, String hometown, Location location, String movedDate) {
         this.email = email;
