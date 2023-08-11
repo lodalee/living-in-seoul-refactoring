@@ -1,15 +1,20 @@
 package com.gavoza.backend.domain.user.service;
 
+import com.gavoza.backend.domain.user.dto.LoginRequestDto;
 import com.gavoza.backend.domain.user.dto.SignupRequestDto;
 import com.gavoza.backend.domain.user.entity.Location;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.domain.user.repository.LocationRepository;
 import com.gavoza.backend.domain.user.repository.UserRepository;
+import com.gavoza.backend.global.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +33,15 @@ public class UserService {
         String gu = requestDto.getGu();
         String dong = requestDto.getDong();
         String hometown = requestDto.getHometown();
+        String movedDate = requestDto.getMovedDate();
 
+        // movedDate 유효성 검증
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+            LocalDate.parse(movedDate, formatter); //객체로 파싱
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("상경 날짜는 연도-월-일 형식이여야 합니다.");
+        }
 
         //회원 중복확인
         Optional<User> checkNickname = userRepository.findByNickname(nickname);
@@ -48,18 +61,14 @@ public class UserService {
             throw new IllegalArgumentException("유효하지 않은 구입니다.");
         }
 
-
         //구가 있으면 동이 그 구에 해당하는지 확인
         Location guDong = locationRepository.findByGuAndDong(gu, dong)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 동입니다."));
 
-
         String encodedPassword = passwordEncoder.encode(password);
 
-        User user = new User(email, nickname, encodedPassword, hometown, guDong);
+        User user = new User(email, nickname, encodedPassword, hometown, guDong, movedDate);
 
         userRepository.save(user);
-
     }
-
 }

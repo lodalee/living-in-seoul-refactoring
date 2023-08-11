@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.management.relation.Role;
+
 @ToString
 @Entity
 @Getter
@@ -35,11 +37,15 @@ public class User {
     @Column(nullable = false)
     private String hometown;
 
-    public User(String email, String nickname, String password, String hometown, Location location) {
+    @Column(nullable = false)
+    private String movedDate;
+
+    public User(String email, String nickname, String password, String hometown, Location location, String movedDate) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.hometown = hometown;
         this.location = location;
+        this.movedDate = movedDate;
     }
 }

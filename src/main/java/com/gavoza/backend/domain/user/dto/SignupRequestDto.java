@@ -22,7 +22,15 @@ public class SignupRequestDto {
     @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;
 
+    @NotBlank(message = "현재 거주중인 구를 입력해주세요.")
     private String gu;
+
+    @NotBlank(message = "현재 거주중인 동을 입력해주세요.")
     private String dong;
+
+    @NotBlank(message = "출신 지역을 입력해주세요.")
     private String hometown;
-}
+
+    @NotBlank(message = "상경 날짜를 입력해주세요.")
+    private String movedDate;
+    }
