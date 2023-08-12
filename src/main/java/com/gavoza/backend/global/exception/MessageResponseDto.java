@@ -1,12 +1,15 @@
 package com.gavoza.backend.global.exception;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
-public class MessageResponseDto {
-    private String msg;
+@Setter
 
-    public MessageResponseDto(String msg){
-        this.msg = msg;
+public class MessageResponseDto {
+    private String message;
+
+    public MessageResponseDto(String message) {
+        this.message = message;
     }
 }

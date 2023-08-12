@@ -22,6 +22,9 @@ public class SignupRequestDto {
     @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;
 
+    @NotBlank(message = "성별을 입력해주세요.")
+    private String gender;
+
     @NotBlank(message = "현재 거주중인 구를 입력해주세요.")
     private String gu;
 
@@ -33,4 +36,6 @@ public class SignupRequestDto {
 
     @NotBlank(message = "상경 날짜를 입력해주세요.")
     private String movedDate;
-    }
+}
+
+
