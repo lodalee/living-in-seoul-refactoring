@@ -1,24 +1,22 @@
 package com.gavoza.backend.domain.user.service;
 
+import com.gavoza.backend.domain.user.dto.LoginRequestDto;
 import com.gavoza.backend.domain.user.dto.SignupRequestDto;
 import com.gavoza.backend.domain.user.entity.Location;
-import com.gavoza.backend.domain.user.entity.RefreshToken;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.domain.user.repository.LocationRepository;
-import com.gavoza.backend.domain.user.repository.RefreshTokenRepository;
 import com.gavoza.backend.domain.user.repository.UserRepository;
+import com.gavoza.backend.global.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +24,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
     public void signup(SignupRequestDto requestDto) {
@@ -37,12 +34,11 @@ public class UserService {
         String dong = requestDto.getDong();
         String hometown = requestDto.getHometown();
         String movedDate = requestDto.getMovedDate();
-        String gender = requestDto.getGender();
 
         // movedDate 유효성 검증
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-            LocalDate.parse(movedDate, formatter);
+            LocalDate.parse(movedDate, formatter); //객체로 파싱
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("상경 날짜는 연도-월-일 형식이여야 합니다.");
         }
@@ -71,65 +67,8 @@ public class UserService {
 
         String encodedPassword = passwordEncoder.encode(password);
 
-        if (!gender.equalsIgnoreCase("남자") && !gender.equalsIgnoreCase("여자")) {
-            throw new IllegalArgumentException("성별은 남자 혹은 여자이여야합니다.");
-        }
+        User user = new User(email, nickname, encodedPassword, hometown, guDong, movedDate);
 
-        User user = new User(email, nickname, encodedPassword, hometown, guDong, movedDate, gender);
         userRepository.save(user);
     }
-
-
-    @Transactional
-    public RefreshToken createAndSaveRefreshToken(String userEmail) {
-        Optional<RefreshToken> existingRefreshToken = refreshTokenRepository.findByUserEmail(userEmail);
-
-        if (existingRefreshToken.isPresent()) {
-            RefreshToken refreshToken = existingRefreshToken.get();
-            refreshToken.updateToken(UUID.randomUUID().toString());
-            LocalDateTime expiryDate = LocalDateTime.now().plusDays(7);
-            refreshToken.updateExpiryDate(expiryDate);
-
-            refreshTokenRepository.save(refreshToken);
-
-            return refreshToken;
-        } else {
-            String refreshTokenValue = UUID.randomUUID().toString();
-            LocalDateTime expiryDate = LocalDateTime.now().plusDays(7);
-
-            RefreshToken refreshToken = new RefreshToken(refreshTokenValue, userEmail, expiryDate);
-            refreshTokenRepository.save(refreshToken);
-
-            return refreshToken;
-        }
-    }
-
-
-    public String validateRefreshTokenAndReturnEmail(String refreshTokenValue) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenValue)
-                .orElseThrow(() -> new IllegalArgumentException("토큰이 유효하지 않습니다."));
-        LocalDateTime now = LocalDateTime.now();
-
-        if (now.isAfter(refreshToken.getExpiryDate())) {
-            refreshTokenRepository.delete(refreshToken);
-            throw new IllegalArgumentException("토큰이 만료되었습니다.");
-        }
-
-        return refreshToken.getUserEmail();
-    }
-
-
-    public String login(String email, String password) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("이메일이 존재하지 않습니다."));
-
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
-
-        return user.getEmail();
-    }
-
-
 }
-
