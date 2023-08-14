@@ -34,12 +34,19 @@ public class UserService {
         String gender = requestDto.getGender();
         String birthDate = requestDto.getBirthDate();
 
+        // hometown 유효성 검증
+        if (hometown != null && !hometown.equals("안동시")) {
+            throw new IllegalArgumentException("허용되지 않는 지역입니다.");
+        }
+
         // movedDate 유효성 검증
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-            LocalDate.parse(movedDate, formatter); //객체로 파싱
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("상경 날짜는 연도-월-일 형식이여야 합니다.");
+        if (movedDate != null) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                LocalDate.parse(movedDate, formatter); //객체로 파싱
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("상경 날짜는 연도-월-일 형식이여야 합니다.");
+            }
         }
 
         //회원 중복확인
@@ -55,24 +62,27 @@ public class UserService {
         }
 
         // birthDate 유효성 검증
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-            LocalDate.parse(birthDate, formatter); //객체로 파싱
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("생년월일은 연도-월-일 형식이여야 합니다.");
+        if (birthDate != null) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                LocalDate.parse(birthDate, formatter); //객체로 파싱
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("생년월일은 연도-월-일 형식이여야 합니다.");
+            }
         }
 
         // 성별 유효성 검증
-        if (!"여자".equals(gender) && !"남자".equals(gender)) {
-            throw new IllegalArgumentException("성별은 '여자' 또는 '남자'만 입력 가능합니다.");
+        if (gender != null && !("여성".equals(gender) || "남성".equals(gender))) {
+            throw new IllegalArgumentException("성별은 '여성' 또는 '남성'만 입력 가능합니다.");
         }
 
         String encodedPassword = passwordEncoder.encode(password);
 
-        User user = new User(email, nickname, encodedPassword, hometown, movedDate, birthDate, gender);
+        User user = new User(email, nickname, encodedPassword, hometown, movedDate, gender, birthDate);
 
         userRepository.save(user);
     }
+
 
     @Transactional
     public RefreshToken createAndSaveRefreshToken(String userEmail) {
