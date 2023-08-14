@@ -3,10 +3,9 @@ package com.gavoza.backend.domain.user.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
+public class RefreshTokenRequestDto {
 
-public class LoginRequestDto {
-    private String email;
-    private String password;
+    private String refreshToken;
 }

@@ -8,6 +8,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,12 +32,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         String tokenValue = jwtUtil.getTokenFromRequest(req);
 
         if (StringUtils.hasText(tokenValue)) {
-            // JWT 토큰 substring
             tokenValue = jwtUtil.substringToken(tokenValue);
             log.info(tokenValue);
 
@@ -61,15 +61,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     // 인증 처리
     public void setAuthentication(String username) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = createAuthentication(username);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);
-    }
-
-    // 인증 객체 생성
-    private Authentication createAuthentication(String username) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }

@@ -1,14 +1,10 @@
 package com.gavoza.backend.domain.user.entity;
 
-import com.gavoza.backend.domain.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @ToString
 @Entity
@@ -20,7 +16,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "user")
     private Long Id;
 
     @Column(unique = true, nullable = false)
@@ -32,29 +28,25 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id")
-    private Location location;
-
     @Column(nullable = false)
     private String hometown;
 
     @Column(nullable = false)
     private String movedDate;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
-    private List<Post> postList = new ArrayList<>();
+    @Column(nullable = false)
+    private String gender;
 
-//    @JsonManagedReference
-//    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
-//    private List<Post> post;
+    @Column(nullable = false)
+    private String birthDate;
 
-    public User(String email, String nickname, String password, String hometown, Location location, String movedDate) {
+    public User(String email, String nickname, String password, String hometown, String movedDate, String gender, String birthDate) {
         this.email = email;
-        this.password = password;
         this.nickname = nickname;
+        this.password = password;
         this.hometown = hometown;
-        this.location = location;
         this.movedDate = movedDate;
+        this.gender = gender;
+        this.birthDate = birthDate;
     }
 }

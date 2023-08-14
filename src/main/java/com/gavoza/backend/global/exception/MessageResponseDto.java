@@ -4,9 +4,11 @@ import lombok.Getter;
 
 @Getter
 public class MessageResponseDto {
-    private String msg;
 
-    public MessageResponseDto(String msg){
-        this.msg = msg;
+    private final String message;
+
+    public MessageResponseDto(String message) {
+        this.message = message;
+
     }
 }
