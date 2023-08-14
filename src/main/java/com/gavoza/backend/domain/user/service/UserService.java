@@ -1,12 +1,10 @@
 package com.gavoza.backend.domain.user.service;
 
-import com.gavoza.backend.domain.user.dto.LoginRequestDto;
 import com.gavoza.backend.domain.user.dto.SignupRequestDto;
 import com.gavoza.backend.domain.user.entity.Location;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.domain.user.repository.LocationRepository;
 import com.gavoza.backend.domain.user.repository.UserRepository;
-import com.gavoza.backend.global.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

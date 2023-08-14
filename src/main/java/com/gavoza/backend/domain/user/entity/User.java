@@ -1,15 +1,13 @@
 package com.gavoza.backend.domain.user.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gavoza.backend.domain.post.entity.Post;
-import com.gavoza.backend.domain.tag.entity.LocationTag;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.management.relation.Role;
+import java.util.ArrayList;
 import java.util.List;
 
 @ToString
@@ -43,6 +41,9 @@ public class User {
 
     @Column(nullable = false)
     private String movedDate;
+
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
+    private List<Post> postList = new ArrayList<>();
 
 //    @JsonManagedReference
 //    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})

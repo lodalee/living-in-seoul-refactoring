@@ -4,19 +4,25 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.gavoza.backend.domain.Like.repository.PostLikeRepository;
+import com.gavoza.backend.domain.post.dto.PostInfoResponseDto;
 import com.gavoza.backend.domain.post.dto.PostRequestDto;
-import com.gavoza.backend.domain.tag.entity.LocationTag;
+import com.gavoza.backend.domain.post.dto.PostResultDto;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.entity.PostImg;
-import com.gavoza.backend.domain.tag.entity.PurposeTag;
-import com.gavoza.backend.domain.tag.repository.LocationTagRepository;
 import com.gavoza.backend.domain.post.repository.PostImgRepository;
 import com.gavoza.backend.domain.post.repository.PostRepository;
-import com.gavoza.backend.domain.tag.repository.PurposeTagRepository;
+import com.gavoza.backend.domain.post.response.PostListResponse;
+import com.gavoza.backend.domain.post.response.PostResponse;
+import com.gavoza.backend.domain.user.dto.UserResponseDto;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.exception.MessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,8 +44,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostImgRepository postImgRepository;
-    private final LocationTagRepository locationTagRepository;
-    private final PurposeTagRepository purposeTagRepository;
+    private final PostLikeRepository postLikeRepository;
 
 
     //upload
@@ -70,30 +75,6 @@ public class PostService {
         }
 
         Post post = new Post(requestDto, user);
-
-        // locationTag 처리
-        String[] locationTagList = requestDto.getLocationTag().split("#");
-        ArrayList<LocationTag> locationTags = new ArrayList<>();
-        for (String locationTag : locationTagList){
-            if (locationTag.equals("")){
-                continue;
-            }
-            locationTags.add(processLocationTag("#"+locationTag, post));
-        }
-
-        // purposeTag 처리
-        String[] purposeTagList = requestDto.getPurposeTag().split("#");
-        ArrayList<PurposeTag> purposeTags = new ArrayList<>();
-        for (String purposeTag: purposeTagList){
-            if (purposeTag.equals("")){
-                continue;
-            }
-            purposeTags.add(processPurposeTag("#"+purposeTag, post));
-        }
-
-        //post 저장
-        post.setLocationTag(locationTags);
-        post.setPurposeTag(purposeTags);
         postRepository.save(post);
 
 
@@ -105,29 +86,70 @@ public class PostService {
         return new MessageResponseDto("파일 저장 성공");
     }
 
-    private LocationTag processLocationTag(String locationTagName, Post post) {
-        if (locationTagName == null || locationTagName.isEmpty()) {
-            return null;
+    //post 수정
+    public void updatePost(Long postId, PostRequestDto requestDto, User user) {
+        Post post = findPost(postId);
+        if (!(post.getUser().getNickname().equals(user.getNickname()))) {
+            throw new IllegalArgumentException("해당 게시글의 작성자가 아닙니다.");
         }
-        return locationTagRepository.save(new LocationTag(locationTagName, post));
+        String title = requestDto.getTitle();
+        String content = requestDto.getContent();
+
+        post.update(title, content);
     }
 
-    private PurposeTag processPurposeTag(String purposeTagName, Post post) {
-        if (purposeTagName == null || purposeTagName.isEmpty()) {
-            return null;
+    //post 삭제
+    public void deletePost(Long postId, User user) {
+        Post post = findPost(postId);
+
+        if (!(post.getUser().getNickname().equals(user.getNickname()))) {
+            throw new IllegalArgumentException("해당 게시글의 작성자가 아닙니다.");
         }
-        return purposeTagRepository.save(new PurposeTag(purposeTagName, post));
+
+        postRepository.delete(post);
+    }
+
+    //게시물 상세 조회
+    public PostResponse getOnePost(Long postId, User user) {
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시물은 존재하지 않습니다."));
+
+        findPost.increaseViewCount();
+        boolean hasLikedPost = false;
+
+        if (postLikeRepository.existsLikeByPostAndUser(findPost, user)){
+            hasLikedPost = true;
+        }
+
+        UserResponseDto userResponseDto = new UserResponseDto(user);
+        PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(findPost);
+
+        return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto),hasLikedPost);
+    }
+
+    //커뮤니티 전체조회
+    public PostListResponse getPost(int page, int size) {
+        // 페이지 및 사이즈 계산
+        Pageable pageable = PageRequest.of(page,size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<Post> postPages = postRepository.findAll(pageable);
+        List<PostResultDto> postResultDtos = new ArrayList<>();
+
+        for (Post post : postPages) {
+            UserResponseDto userResponseDto = new UserResponseDto(post.getUser());
+            PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
+            postResultDtos.add(new PostResultDto(userResponseDto, postInfoResponseDto));
+        }
+        return new PostListResponse("검색 조회 성공",postPages.getTotalPages(),postPages.getTotalElements(), size, postResultDtos);
     }
 
 
-//    //게시글 전체 조회
-//    public AllPostResponse getPosts() {
-//        Long size = 5L;
-//
-//        Page<Post> posts = postRepository.findAll();
-//        return new AllPostResponse("전체 조회 성공", (long) posts.getTotalPages(),
-//                posts.getTotalElements(), size, posts.map(post->post).stream().toList());
-//    }
+
+    private Post findPost(Long postId) {
+        return postRepository.findById(postId).orElseThrow(() ->
+                new IllegalArgumentException("선택한 게시글은 존재하지 않습니다.")
+        );
+    }
 }
 
 
