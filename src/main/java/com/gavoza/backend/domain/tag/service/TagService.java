@@ -1,17 +1,12 @@
 package com.gavoza.backend.domain.tag.service;
 
+import com.gavoza.backend.domain.post.entity.Post;
+import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.tag.dto.LocationPostResponseDto;
 import com.gavoza.backend.domain.tag.dto.LocationTagResponseDto;
 import com.gavoza.backend.domain.tag.dto.PurposePostResponseDto;
 import com.gavoza.backend.domain.tag.dto.PurposeTagResponseDto;
-import com.gavoza.backend.domain.tag.entity.LocationTag;
-import com.gavoza.backend.domain.post.entity.Post;
-import com.gavoza.backend.domain.tag.entity.PurposeTag;
-import com.gavoza.backend.domain.tag.repository.LocationTagRepository;
-import com.gavoza.backend.domain.post.repository.PostRepository;
-import com.gavoza.backend.domain.tag.repository.PurposeTagRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +18,6 @@ import java.util.*;
 public class TagService {
 
     private final PostRepository postRepository;
-    private final LocationTagRepository locationTagRepository;
-    private final PurposeTagRepository purposeTagRepository;
 
     //인기 순위 태그 조회(위치)
     public List<LocationTagResponseDto> rankNumber() {
@@ -34,13 +27,17 @@ public class TagService {
 
         List<Post> postList = postRepository.findAll();
         for (Post post : postList) {
-            if(Objects.isNull(post.getLocationTag())){
+            if (Objects.isNull(post.getLocationTag())) {
                 continue;
             }
 
-            List<LocationTag> locationTagList = post.getLocationTag();
-            for (LocationTag locationTag: locationTagList){
-                idFrequencyMap.put(locationTag.getLocationTag(), idFrequencyMap.getOrDefault(locationTag.getLocationTag(), 0) + 1);
+            String locationTag = post.getLocationTag(); //#안녕#시바견
+            String[] locationTagList = locationTag.split("#");
+            for (String tagName : locationTagList) {
+                if (tagName == "") {
+                    continue;
+                }
+                idFrequencyMap.put(tagName, idFrequencyMap.getOrDefault(tagName, 0) + 1);
             }
         }
 
@@ -53,8 +50,8 @@ public class TagService {
             rankedIds.add(entry.getKey());
         }
 
-        for (int i = 0 ; i < rankedIds.size(); i++) {
-            if(i >= 6){
+        for (int i = 0; i < rankedIds.size(); i++) {
+            if (i >= 6) {
                 break;
             }
             locationTagResponseDtos.add(new LocationTagResponseDto(rankedIds.get(i)));
@@ -69,17 +66,21 @@ public class TagService {
 
         List<Post> postList = postRepository.findAll();
         for (Post post : postList) {
-            if(Objects.isNull(post.getPurposeTag())){
+            if (Objects.isNull(post.getPurposeTag())) {
                 continue;
             }
-            List<PurposeTag> purposeTagList = post.getPurposeTag();
-            for (PurposeTag purposeTag: purposeTagList) {
-                idFrequencyMap.put(purposeTag.getPurposeTag(), idFrequencyMap.getOrDefault(purposeTag.getPurposeTag(), 0)+1);
+            String purposeTag = post.getPurposeTag();
+            String[] purposeTagList = purposeTag.split("#");
+            for (String tagName : purposeTagList) {
+                if (tagName == "") {
+                    continue;
+                }
+                idFrequencyMap.put(tagName, idFrequencyMap.getOrDefault(tagName, 0) + 1);
             }
         }
 
         //뽑아낸 <태그이름 , 빈도수> 를 정렬
-        List<Map.Entry<String,Integer>> sortedEntries = new ArrayList<>(idFrequencyMap.entrySet());
+        List<Map.Entry<String, Integer>> sortedEntries = new ArrayList<>(idFrequencyMap.entrySet());
         sortedEntries.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
 
         List<String> rankedIds = new ArrayList<>();
@@ -89,8 +90,8 @@ public class TagService {
         }
 
         //6개의 태그 이름들만 인기 순대로 보낸다.
-        for (int i = 0 ; i < rankedIds.size(); i++) {
-            if(i >= 6){
+        for (int i = 0; i < rankedIds.size(); i++) {
+            if (i >= 6) {
                 break;
             }
             purposeTagResponseDtos.add(new PurposeTagResponseDto(rankedIds.get(i)));
@@ -102,24 +103,25 @@ public class TagService {
     public List<LocationPostResponseDto> locationPostResponseDtos(int limit, String locationTagName) {
         List<LocationPostResponseDto> locationPostResponseDtos = new ArrayList<>();
 
-        List<LocationTag> locationTag = locationTagRepository.findByLocationTag(locationTagName);
+        List<Post> postList = postRepository.findAllByLocationTagContaining(locationTagName);
 
-        if(locationTag == null){
+        if (postList == null) {
             throw new IllegalArgumentException("존재하지 않는 태그입니다.");
         }
-        List<Post> postList = new ArrayList<>();
+        for (Post checkLocationTagName : postList) {
+            String[] checkLocationTagNames = checkLocationTagName.getLocationTag().split("#");
 
-        for (int i = 0; i < locationTag.size(); i++){
-            postList.add(postRepository.findAllByLocationTag(Sort.by("createdAt").descending(), locationTag.get(i)).get());
-        }
-
-        for (int i = 0; i < postList.size(); i++) {
-            if (i >= limit) {
+            //이제 확인해
+            for (int i = 0; i < checkLocationTagNames.length; i++) {
+                if (locationTagName.equals(checkLocationTagNames[i])) {
+                    locationPostResponseDtos.add(new LocationPostResponseDto(checkLocationTagName, locationTagName));
+                    break;
+                }
+            }
+            if (locationPostResponseDtos.size() >= limit) {
                 break;
             }
-            locationPostResponseDtos.add(new LocationPostResponseDto(postList.get(i)));
         }
-
         return locationPostResponseDtos;
     }
 
@@ -127,24 +129,25 @@ public class TagService {
     public List<PurposePostResponseDto> purposePostResponseDtos(int limit, String purposeTagName) {
         List<PurposePostResponseDto> purposePostResponseDtos = new ArrayList<>();
 
-        List<PurposeTag> purposeTag = purposeTagRepository.findByPurposeTag(purposeTagName);
+        List<Post> postList = postRepository.findAllByPurposeTagContaining(purposeTagName);
 
-        if(purposeTag == null){
+        if (postList == null) {
             throw new IllegalArgumentException("존재하지 않는 태그입니다.");
         }
-        List<Post> postList = new ArrayList<>();
 
-        for (int i = 0; i < purposeTag.size(); i++){
-            postList.add(postRepository.findAllByPurposeTag(Sort.by("createdAt").descending(), purposeTag.get(i)).get());
-        }
+        for (Post checkPurposeTagName : postList) {
+            String[] checkPurposeTagNames = checkPurposeTagName.getPurposeTag().split("#");
 
-        for (int i = 0; i < postList.size(); i++) {
-            if (i >= limit) {
+            for (int i = 0; i < checkPurposeTagNames.length; i++) {
+                if (purposeTagName.equals(checkPurposeTagNames[i])) {
+                    purposePostResponseDtos.add(new PurposePostResponseDto(checkPurposeTagName, purposeTagName));
+                    break;
+                }
+            }
+            if (purposePostResponseDtos.size() >= limit) {
                 break;
             }
-            purposePostResponseDtos.add(new PurposePostResponseDto(postList.get(i)));
         }
-
         return purposePostResponseDtos;
     }
 }

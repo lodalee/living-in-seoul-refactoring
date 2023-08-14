@@ -1,13 +1,13 @@
 package com.gavoza.backend.domain.user.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gavoza.backend.domain.user.dto.SignupRequestDto;
 import com.gavoza.backend.domain.user.service.UserService;
 import com.gavoza.backend.global.exception.MessageResponseDto;
-import com.gavoza.backend.global.jwt.JwtUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
