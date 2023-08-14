@@ -1,26 +1,18 @@
 package com.gavoza.backend.domain.post.response;
 
-import com.gavoza.backend.domain.post.dto.PostInfoResponseDto;
-import com.gavoza.backend.domain.user.dto.UserResponseDto;
+import com.gavoza.backend.domain.post.dto.PostResultDto;
 import lombok.Getter;
 
 @Getter
-public class PostResponse {
+public class PostResponse{
     private String msg;
-    private Result result;
+    private PostResultDto result;
+    private boolean hasLiked;
 
-    PostResponse(String msg, UserResponseDto userResponseDto, PostInfoResponseDto postInfoResponseDto){
+    public PostResponse(String msg, PostResultDto postResultDto, boolean hasLikedPost){
         this.msg = msg;
-        this.result = new Result(userResponseDto, postInfoResponseDto);
+        this.result = postResultDto;
+        this.hasLiked = hasLikedPost;
     }
 
-    private class Result {
-        UserResponseDto user;
-        PostInfoResponseDto post;
-
-        Result(UserResponseDto userResponseDto, PostInfoResponseDto postInfoResponseDto){
-            this.user = userResponseDto;
-            this.post = postInfoResponseDto;
-        }
-    }
 }
