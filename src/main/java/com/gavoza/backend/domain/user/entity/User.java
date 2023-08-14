@@ -13,7 +13,6 @@ import lombok.ToString;
 @NoArgsConstructor
 public class User {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user")
@@ -28,16 +27,16 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String hometown;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String movedDate;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String gender;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String birthDate;
 
     public User(String email, String nickname, String password, String hometown, String movedDate, String gender, String birthDate) {
