@@ -116,6 +116,10 @@ public class TagService {
         if (postList == null) {
             throw new IllegalArgumentException("존재하지 않는 태그입니다.");
         }
+
+        // createdAt을 기준으로 내림차순 정렬
+        Collections.sort(postList, (post1, post2) -> post2.getCreatedAt().compareTo(post1.getCreatedAt()));
+
         for (Post checkLocationTagName : postList) {
             String[] checkLocationTagNames = checkLocationTagName.getLocationTag().split("#");
 
@@ -142,6 +146,9 @@ public class TagService {
         if (postList == null) {
             throw new IllegalArgumentException("존재하지 않는 태그입니다.");
         }
+
+        // createdAt을 기준으로 내림차순 정렬
+        Collections.sort(postList, (post1, post2) -> post2.getCreatedAt().compareTo(post1.getCreatedAt()));
 
         for (Post checkPurposeTagName : postList) {
             String[] checkPurposeTagNames = checkPurposeTagName.getPurposeTag().split("#");
