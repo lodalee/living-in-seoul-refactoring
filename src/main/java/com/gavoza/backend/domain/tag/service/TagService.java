@@ -1,12 +1,20 @@
 package com.gavoza.backend.domain.tag.service;
 
+import com.gavoza.backend.domain.post.dto.PostInfoResponseDto;
+import com.gavoza.backend.domain.post.dto.PostResultDto;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
+import com.gavoza.backend.domain.post.response.PostListResponse;
 import com.gavoza.backend.domain.tag.dto.LocationPostResponseDto;
 import com.gavoza.backend.domain.tag.dto.LocationTagResponseDto;
 import com.gavoza.backend.domain.tag.dto.PurposePostResponseDto;
 import com.gavoza.backend.domain.tag.dto.PurposeTagResponseDto;
+import com.gavoza.backend.domain.user.dto.UserResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -149,5 +157,61 @@ public class TagService {
             }
         }
         return purposePostResponseDtos;
+    }
+
+    //커뮤니티 전체조회(위치 태그)
+    public PostListResponse getLocationPost(int page, int size, String locationTagName) {
+        // 페이지 요청을 생성하고, 날짜를 기준으로 내림차순 정렬 설정
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        // 입력된 위치 태그를 포함하는 게시물을 페이지네이션하여 조회
+        Page<Post> postPages = postRepository.findAllByLocationTagContaining(locationTagName, pageable);
+
+        if (postPages.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 태그입니다.");
+        }
+
+        // 조회 결과를 담을 리스트 초기화
+        List<PostResultDto> postResultDtos = new ArrayList<>();
+
+        // 조회된 게시물 페이지를 순회
+        for (Post post : postPages) {
+            // 게시물의 위치 태그를 '#' 문자를 기준으로 분리
+            String[] checkLocationTagNames = post.getLocationTag().split("#");
+
+            // 분리된 태그들 중 입력된 위치 태그와 일치하는지 확인
+            if (Arrays.asList(checkLocationTagNames).contains(locationTagName)) {
+                UserResponseDto userResponseDto = new UserResponseDto(post.getUser());
+                PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
+                postResultDtos.add(new PostResultDto(userResponseDto, postInfoResponseDto));
+            }
+        }
+
+        // 최종적으로 검색 결과와 페이징 정보를 담은 응답을 생성하여 반환
+        return new PostListResponse("검색 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
+    }
+
+    //커뮤니티 전체조회(목적 태그)
+    public PostListResponse getPurposePost(int page, int size, String purposeTagName) {
+        Pageable pageable= PageRequest.of(page,size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<Post> postPages = postRepository.findAllByPurposeTagContaining(purposeTagName, pageable);
+
+        if (postPages == null) {
+            throw new IllegalArgumentException("존재하지 않는 태그입니다.");
+        }
+
+        List<PostResultDto> postResultDtos = new ArrayList<>();
+
+        for (Post post : postPages) {
+            String[] checkPurposeNames = post.getPurposeTag().split("#");
+
+            if (Arrays.asList(checkPurposeNames).contains(purposeTagName)) {
+                UserResponseDto userResponseDto = new UserResponseDto(post.getUser());
+                PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
+                postResultDtos.add(new PostResultDto(userResponseDto, postInfoResponseDto));
+            }
+        }
+        return new PostListResponse("검색 조회 성공",postPages.getTotalPages(),postPages.getTotalElements(), size, postResultDtos);
     }
 }

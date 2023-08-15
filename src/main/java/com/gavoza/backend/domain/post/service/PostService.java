@@ -124,7 +124,7 @@ public class PostService {
         UserResponseDto userResponseDto = new UserResponseDto(user);
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(findPost);
 
-        return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto),hasLikedPost);
+        return new PostResponse(findPost,"게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto),hasLikedPost);
     }
 
     //커뮤니티 전체조회
