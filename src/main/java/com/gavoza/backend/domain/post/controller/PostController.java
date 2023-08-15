@@ -7,6 +7,7 @@ import com.gavoza.backend.domain.post.service.PostService;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.exception.MessageResponseDto;
 import com.gavoza.backend.global.security.UserDetailsImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -60,16 +61,16 @@ public class PostController {
     }
 
     //게시글 상세 조회
-    @GetMapping("/{postId}")
+    @GetMapping("/get/{postId}")
     @ResponseStatus(HttpStatus.OK)
     public PostResponse getOnePost(@PathVariable("postId") Long postId,
-                                   @AuthenticationPrincipal UserDetailsImpl userDetails){
-        User user = userDetails.getUser();
+                                   HttpServletRequest request){
+        User user = (User) request.getAttribute("user");
         return postService.getOnePost(postId, user);
     }
 
     //게시글 전체 조회(커뮤티니)
-    @GetMapping()
+    @GetMapping("/get")
     @ResponseStatus(HttpStatus.OK)
     public PostListResponse getPost(@RequestParam int page,
                                     @RequestParam int size){
