@@ -2,9 +2,7 @@ package com.gavoza.backend.domain.tag.controller;
 
 import com.gavoza.backend.domain.post.response.PostListResponse;
 import com.gavoza.backend.domain.tag.dto.LocationPostResponseDto;
-import com.gavoza.backend.domain.tag.dto.LocationTagResponseDto;
 import com.gavoza.backend.domain.tag.dto.PurposePostResponseDto;
-import com.gavoza.backend.domain.tag.dto.PurposeTagResponseDto;
 import com.gavoza.backend.domain.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +19,7 @@ public class TagController {
 
     //인기 순위 태그 조회(위치)
     @GetMapping("/locationTags")
-    public List<LocationTagResponseDto> locationTags(){
+    public List<String> locationTags(){
         return tagService.rankNumber();
     }
 
@@ -36,7 +34,7 @@ public class TagController {
 
     //인기 순위 태그 조회(목적)
     @GetMapping("/purposeTags")
-    public List<PurposeTagResponseDto> purposeTags(){
+    public List<String> purposeTags(){
         return tagService.prankNumber();
     }
 

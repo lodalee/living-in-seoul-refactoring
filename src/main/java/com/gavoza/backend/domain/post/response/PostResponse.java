@@ -10,6 +10,7 @@ public class PostResponse{
     private PostResultDto result;
     private boolean hasLiked;
     private long postViewCount;
+    private String nickName;
 
     public PostResponse(Post post, String msg, PostResultDto postResultDto, boolean hasLikedPost){
         this.msg = msg;
