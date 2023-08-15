@@ -6,9 +6,7 @@ import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.post.response.PostListResponse;
 import com.gavoza.backend.domain.tag.dto.LocationPostResponseDto;
-import com.gavoza.backend.domain.tag.dto.LocationTagResponseDto;
 import com.gavoza.backend.domain.tag.dto.PurposePostResponseDto;
-import com.gavoza.backend.domain.tag.dto.PurposeTagResponseDto;
 import com.gavoza.backend.domain.user.dto.UserResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,10 +26,10 @@ public class TagService {
     private final PostRepository postRepository;
 
     //인기 순위 태그 조회(위치)
-    public List<LocationTagResponseDto> rankNumber() {
+    public List<String> rankNumber() {
 
         Map<String, Integer> idFrequencyMap = new HashMap<>();
-        List<LocationTagResponseDto> locationTagResponseDtos = new ArrayList<>();
+        List<String> locationTagResponseDtos = new ArrayList<>();
 
         List<Post> postList = postRepository.findAll();
         for (Post post : postList) {
@@ -62,15 +60,15 @@ public class TagService {
             if (i >= 6) {
                 break;
             }
-            locationTagResponseDtos.add(new LocationTagResponseDto(rankedIds.get(i)));
+            locationTagResponseDtos.add(rankedIds.get(i));
         }
         return locationTagResponseDtos;
     }
 
     //인기 순위 태그 조회(목적)
-    public List<PurposeTagResponseDto> prankNumber() {
+    public List<String> prankNumber() {
         Map<String, Integer> idFrequencyMap = new HashMap<>();
-        List<PurposeTagResponseDto> purposeTagResponseDtos = new ArrayList<>();
+        List<String> purposeTagResponseDtos = new ArrayList<>();
 
         List<Post> postList = postRepository.findAll();
         for (Post post : postList) {
@@ -102,7 +100,7 @@ public class TagService {
             if (i >= 6) {
                 break;
             }
-            purposeTagResponseDtos.add(new PurposeTagResponseDto(rankedIds.get(i)));
+            purposeTagResponseDtos.add((rankedIds.get(i)));
         }
         return purposeTagResponseDtos;
     }
