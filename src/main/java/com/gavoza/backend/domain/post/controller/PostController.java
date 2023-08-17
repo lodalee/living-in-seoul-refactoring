@@ -26,19 +26,17 @@ public class PostController {
 
     //게시글 생성
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
     public MessageResponseDto uploadFile(
             @RequestPart("post") PostRequestDto requestDto,
-            @RequestPart("photos") List<MultipartFile> photos,
+//            @RequestPart("photos") List<MultipartFile> photos,
             @AuthenticationPrincipal UserDetailsImpl userDetails
           ) throws IOException {
         User user = userDetails.getUser();
-        return postService.upload(requestDto, photos, user);
+        return postService.upload(requestDto,user); //photos);
     }
 
     //게시글 수정
     @PutMapping("/{postId}")
-    @ResponseStatus(HttpStatus.OK)
     public MessageResponseDto updatePost(@PathVariable("postId") Long postId,
                                          @RequestBody PostRequestDto requestDto,
                                          @AuthenticationPrincipal UserDetailsImpl userDetails){
@@ -50,7 +48,6 @@ public class PostController {
 
     //게시글 삭제
     @DeleteMapping("/{postId}")
-    @ResponseStatus(HttpStatus.OK)
     public MessageResponseDto deletePost(@PathVariable("postId") Long postId,
                                          @AuthenticationPrincipal UserDetailsImpl userDetails){
         User user = userDetails.getUser();
@@ -62,16 +59,12 @@ public class PostController {
 
     //게시글 상세 조회
     @GetMapping("/get/{postId}")
-    @ResponseStatus(HttpStatus.OK)
-    public PostResponse getOnePost(@PathVariable("postId") Long postId,
-                                   HttpServletRequest request){
-        User user = (User) request.getAttribute("user");
-        return postService.getOnePost(postId, user);
+    public PostResponse getOnePost(@PathVariable("postId") Long postId){
+        return postService.getOnePost(postId);
     }
 
     //게시글 전체 조회(커뮤티니)
     @GetMapping("/get")
-    @ResponseStatus(HttpStatus.OK)
     public PostListResponse getPost(@RequestParam int page,
                                     @RequestParam int size){
         return postService.getPost(page-1,size);
