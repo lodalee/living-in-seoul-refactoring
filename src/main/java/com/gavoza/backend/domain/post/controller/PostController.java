@@ -27,12 +27,12 @@ public class PostController {
     //게시글 생성
     @PostMapping
     public MessageResponseDto uploadFile(
-            @RequestBody PostRequestDto requestDto,
-//           @RequestPart("photos") List<MultipartFile> photos,
+            @RequestPart("post") PostRequestDto requestDto,
+            @RequestPart("photos") List<MultipartFile> photos,
             @AuthenticationPrincipal UserDetailsImpl userDetails
           ) throws IOException {
         User user = userDetails.getUser();
-        return postService.upload(requestDto,user); //photos);
+        return postService.upload(requestDto,user,photos);
     }
 
     //게시글 수정
