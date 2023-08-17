@@ -50,44 +50,44 @@ public class PostService {
 
 
     //upload
-    public MessageResponseDto upload(PostRequestDto requestDto, User user) throws IOException {
+    public MessageResponseDto upload(PostRequestDto requestDto, User user,List<MultipartFile> photos) throws IOException {
 //        requestDto.validateCategory();
 
-//        List<PostImg> postImgList = new ArrayList<>();
-//
-//        //S3에 이미지 저장
-//        for (MultipartFile photo : photos) {
-//            long size = photo.getSize();
-//
-//            ObjectMetadata objectMetadata = new ObjectMetadata();
-//            objectMetadata.setContentType(photo.getContentType());
-//            objectMetadata.setContentLength(size);
-//            objectMetadata.setContentDisposition("inline");
-//
-//            String prefix = UUID.randomUUID().toString();
-//            String fileName = prefix + "_" + photo.getOriginalFilename();
-//            String bucketFilePath = "photos/" + fileName;
-//
-//            //S3에 업로드
-//            amazonS3Client.putObject(
-//                    new PutObjectRequest(bucketName, bucketFilePath, photo.getInputStream(), objectMetadata)
-//                            .withCannedAcl(CannedAccessControlList.PublicRead)
-//            );
-//
-//            //PostImg 저장
-//            PostImg postImg = new PostImg(fileName, null);
-//            postImgList.add(postImg);
-//        }
+        List<PostImg> postImgList = new ArrayList<>();
+
+        //S3에 이미지 저장
+        for (MultipartFile photo : photos) {
+            long size = photo.getSize();
+
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentType(photo.getContentType());
+            objectMetadata.setContentLength(size);
+            objectMetadata.setContentDisposition("inline");
+
+            String prefix = UUID.randomUUID().toString();
+            String fileName = prefix + "_" + photo.getOriginalFilename();
+            String bucketFilePath = "photos/" + fileName;
+
+            //S3에 업로드
+            amazonS3Client.putObject(
+                    new PutObjectRequest(bucketName, bucketFilePath, photo.getInputStream(), objectMetadata)
+                            .withCannedAcl(CannedAccessControlList.PublicRead)
+            );
+
+            //PostImg 저장
+            PostImg postImg = new PostImg(fileName, null);
+            postImgList.add(postImg);
+        }
 
         Post post = new Post(requestDto, user);
         postRepository.save(post);
 
 
-//        // PostImg 인스턴스를 저장된 게시물에 연결하여 저장
-//        for (PostImg postImg : postImgList) {
-//            postImg.setPost(post);
-//            postImgRepository.save(postImg);
-//        }
+        // PostImg 인스턴스를 저장된 게시물에 연결하여 저장
+        for (PostImg postImg : postImgList) {
+            postImg.setPost(post);
+            postImgRepository.save(postImg);
+        }
         return new MessageResponseDto("파일 저장 성공");
     }
 

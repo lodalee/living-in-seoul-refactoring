@@ -48,7 +48,7 @@ public class Post extends Auditing {
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE})
     private List<Postlike> like = new ArrayList<>();
 
-    private String categories;
+//    private String categories;
 
 
     public Post(PostRequestDto requestDto, User user) {
@@ -57,7 +57,7 @@ public class Post extends Auditing {
         this.locationTag = requestDto.getLocationTag();
         this.purposeTag = requestDto.getPurposeTag();
         this.user = user;
-        this.categories = requestDto.getCategories();
+//        this.categories = requestDto.getCategories();
     }
 
     public void update(String title, String content) {
