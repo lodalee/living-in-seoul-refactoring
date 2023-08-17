@@ -1,6 +1,5 @@
 package com.gavoza.backend.domain.post.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gavoza.backend.domain.Like.entity.Postlike;
 import com.gavoza.backend.domain.post.dto.PostRequestDto;
@@ -49,6 +48,8 @@ public class Post extends Auditing {
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE})
     private List<Postlike> like = new ArrayList<>();
 
+    private String categories;
+
 
     public Post(PostRequestDto requestDto, User user) {
         this.content = requestDto.getContent();
@@ -56,6 +57,7 @@ public class Post extends Auditing {
         this.locationTag = requestDto.getLocationTag();
         this.purposeTag = requestDto.getPurposeTag();
         this.user = user;
+        this.categories = requestDto.getCategories();
     }
 
     public void update(String title, String content) {
