@@ -27,8 +27,8 @@ public class PostController {
     //게시글 생성
     @PostMapping
     public MessageResponseDto uploadFile(
-            @RequestPart("post") PostRequestDto requestDto,
-//            @RequestPart("photos") List<MultipartFile> photos,
+            @RequestBody PostRequestDto requestDto,
+//           @RequestPart("photos") List<MultipartFile> photos,
             @AuthenticationPrincipal UserDetailsImpl userDetails
           ) throws IOException {
         User user = userDetails.getUser();
