@@ -11,6 +11,7 @@ public class PostResponse{
     private boolean hasLiked;
     private long postViewCount;
     private String nickName;
+    //경도, 위도 추가
 
     public PostResponse(Post post, String msg, PostResultDto postResultDto, boolean hasLikedPost){
         this.msg = msg;

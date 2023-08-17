@@ -12,4 +12,9 @@ public class UserResponseDto {
         this.nickname = user.getNickname();
         this.email = user.getEmail();
     }
+
+    public UserResponseDto(String nickname, String email) {
+        this.nickname = nickname;
+        this.email = email;
+    }
 }
