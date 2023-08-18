@@ -9,9 +9,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findAllBycategory(String category);
 
-    List<Post> findAllByHashtagContaining(String hashTagName);
-
     List<Post> findAllByCategoryAndHashtagContainingOrderByPostViewCountDesc(String category, String hashtagName);
 
     List<Post> findAllByCategoryAndHashtagContainingOrderByCreatedAtDesc(String category, String hashtagName);
+
+    List<Post> findAllByHashtagContainingOrderByPostViewCountDesc(String hashtagName);
+    List<Post> findAllByHashtagContainingOrderByCreatedAtDesc(String hashtagName);
+
 }

@@ -30,9 +30,10 @@ public class TagController {
     @GetMapping("/post/All")
     public List<hashtagPostResponseDto> hashtagPostResponseDtos(
             @RequestParam int limit,
-            @RequestParam String hashtagName
+            @RequestParam String hashtagName,
+            @RequestParam String type
     ){
-        return tagService.hashtagPostResponseDtos(limit, hashtagName);
+        return tagService.hashtagPostResponseDtos(limit, hashtagName, type);
     }
 
     //카테고리별 인기 순위 태그 post 조회
