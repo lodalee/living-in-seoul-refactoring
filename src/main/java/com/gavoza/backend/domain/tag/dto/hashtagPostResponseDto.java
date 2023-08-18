@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class hashtagPostResponseDto {
+    private String category;
     private String hashTag;
     private String nickname;
     private String content;
@@ -14,6 +15,7 @@ public class hashtagPostResponseDto {
         this.hashTag = hashTag;
         this.nickname = post.getUser().getNickname();
         this.content = post.getContent();
+        this.category = post.getCategory();
 //        this.userImg = post.getUser();
     }
 }
