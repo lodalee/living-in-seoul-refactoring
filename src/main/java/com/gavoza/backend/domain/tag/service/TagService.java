@@ -105,10 +105,12 @@ public class TagService {
 
 
     //인기 순위 태그별 post 조회(전체)
-    public List<hashtagPostResponseDto> hashtagPostResponseDtos(int limit, String hashtagName) {
+    public List<hashtagPostResponseDto> hashtagPostResponseDtos(int limit, String hashtagName, String type) {
         List<hashtagPostResponseDto> hashtagPostResponseDtos = new ArrayList<>();
 
-        List<Post> postList = postRepository.findAllByHashtagContaining(hashtagName);
+        List<Post> postList = type.equals("popular")
+                    ?postRepository.findAllByHashtagContainingOrderByPostViewCountDesc(hashtagName)
+                    :postRepository.findAllByHashtagContainingOrderByCreatedAtDesc(hashtagName);
 
         if (postList == null) {
             throw new IllegalArgumentException("존재하지 않는 태그입니다.");
