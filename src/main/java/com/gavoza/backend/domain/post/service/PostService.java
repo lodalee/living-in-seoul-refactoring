@@ -49,7 +49,8 @@ public class PostService {
 
     //upload
     public MessageResponseDto upload(PostRequestDto requestDto, User user,List<MultipartFile> photos) throws IOException {
-        //존재하지 않는 카테고리 에러처리
+        
+      //존재하지 않는 카테고리 에러처리
         requestDto.validateCategory();
 
         List<PostImg> postImgList = new ArrayList<>();
