@@ -8,8 +8,9 @@ public class PostResultDto {
     UserResponseDto user;
     PostInfoResponseDto post;
 
-    public PostResultDto(UserResponseDto userResponseDto, PostInfoResponseDto postInfoResponseDto){
+    public PostResultDto(UserResponseDto userResponseDto, PostInfoResponseDto postInfoResponseDto) {
         this.user = userResponseDto;
         this.post = postInfoResponseDto;
+
     }
 }

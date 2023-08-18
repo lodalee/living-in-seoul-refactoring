@@ -1,13 +1,12 @@
 package com.gavoza.backend.domain.user.controller;
 
-import com.gavoza.backend.domain.user.dto.LoginRequestDto;
-import com.gavoza.backend.domain.user.dto.RefreshTokenRequestDto;
-import com.gavoza.backend.domain.user.dto.SignupRequestDto;
-import com.gavoza.backend.domain.user.dto.TokenResponseDto;
+import com.gavoza.backend.domain.user.dto.*;
 import com.gavoza.backend.domain.user.entity.RefreshToken;
+import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.domain.user.service.UserService;
 import com.gavoza.backend.global.exception.MessageResponseDto;
 import com.gavoza.backend.global.jwt.JwtUtil;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -24,26 +23,54 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<MessageResponseDto> signup(@RequestBody SignupRequestDto requestDto) {
-        userService.signup(requestDto);
-        return ResponseEntity.ok(new MessageResponseDto("회원가입에 성공하셨습니다."));
+        try {
+            userService.signup(requestDto);
+            return ResponseEntity.ok(new MessageResponseDto("회원가입에 성공하셨습니다."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(e.getMessage()));
+        }
     }
+
 
 
     @PostMapping("/refresh")
     public ResponseEntity<MessageResponseDto> refreshToken(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
         String refreshTokenValue = refreshTokenRequestDto.getRefreshToken();
 
-        // 유효성 검사 후 이메일 반환
-        String email = userService.validateRefreshTokenAndReturnEmail(refreshTokenValue);
+        try {
+            // 유효성 검사 후 이메일 반환
+            String email = userService.validateRefreshTokenAndReturnEmail(refreshTokenValue);
 
-        // 액세스 토큰 생성
-        String newAccessToken = jwtUtil.createAccessToken(email);
+            // 액세스 토큰 생성
+            String newAccessToken = jwtUtil.createAccessToken(email);
 
-        // 토큰 응답
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.BEARER_PREFIX + newAccessToken);
-        MessageResponseDto messageResponseDto = new MessageResponseDto("Access 토큰 생성 성공");
-        return ResponseEntity.ok().headers(responseHeaders).body(messageResponseDto);
+            // 토큰 응답
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.BEARER_PREFIX + newAccessToken);
+            MessageResponseDto messageResponseDto = new MessageResponseDto("Access 토큰 발급 성공");
+            return ResponseEntity.ok().headers(responseHeaders).body(messageResponseDto);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto("refreshToken이 만료되었습니다."));
+        }
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<ProfileResponseDto> getProfile(@RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String authHeader) {
+
+        String accessToken = jwtUtil.substringToken(authHeader);
+
+        // 토큰에서 사용자 이메일 얻기
+        Claims claims = jwtUtil.getUserInfoFromToken(accessToken);
+        String email = claims.getSubject();
+
+        // 사용자 정보 조회
+        User user = userService.getByEmail(email);
+
+        // 사용자 정보 응답
+        ProfileResponseDto profileUserResponseDto = new ProfileResponseDto(user.getNickname(), user.getEmail(), user.getGender(), user.getHometown(), user.getMovedDate(), user.getBirthDate());
+
+        return ResponseEntity.ok(profileUserResponseDto);
     }
 
 

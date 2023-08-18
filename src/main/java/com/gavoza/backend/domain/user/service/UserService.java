@@ -1,11 +1,13 @@
 package com.gavoza.backend.domain.user.service;
 
 import com.gavoza.backend.domain.user.dto.SignupRequestDto;
+import com.gavoza.backend.domain.user.entity.CityScraper;
 import com.gavoza.backend.domain.user.entity.RefreshToken;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.domain.user.repository.RefreshTokenRepository;
 import com.gavoza.backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +16,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -24,8 +28,15 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
 
+    private final CityScraper cityScraper = new CityScraper();
+    private final Set<String> VALID_HOMETOWNS = new HashSet<>(cityScraper.getCities());
+
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+    }
+
     @Transactional
-    public void signup(SignupRequestDto requestDto) {
+    public void signup(SignupRequestDto requestDto) throws IllegalArgumentException {
         String email = requestDto.getEmail();
         String nickname = requestDto.getNickname();
         String password = requestDto.getPassword();
@@ -35,17 +46,21 @@ public class UserService {
         String birthDate = requestDto.getBirthDate();
 
         // hometown 유효성 검증
-        if (hometown != null && !hometown.equals("안동시")) {
+        if (hometown != null && !VALID_HOMETOWNS.contains(hometown)) {
             throw new IllegalArgumentException("허용되지 않는 지역입니다.");
         }
 
-        // movedDate 유효성 검증
+
+       // movedDate 유효성 검증
         if (movedDate != null) {
-            try {
-                DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-                LocalDate.parse(movedDate, formatter); //객체로 파싱
-            } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException("상경 날짜는 연도-월-일 형식이여야 합니다.");
+            switch (movedDate) {
+                case "~6개월":
+                case "1~2년":
+                case "3~4년":
+                case "5년 이상":
+                    break;
+                default:
+                    throw new IllegalArgumentException("상경 날짜 형식이 올바르지 않습니다.");
             }
         }
 
@@ -106,7 +121,7 @@ public class UserService {
         } else {
             // 새로운 리프레시 토큰 생성
             String refreshTokenValue = UUID.randomUUID().toString();
-            LocalDateTime expiryDate = LocalDateTime.now().plusDays(7); // 예시로 7일 설정
+            LocalDateTime expiryDate = LocalDateTime.now().plusHours(1); // 1시간 설정
 
             RefreshToken refreshToken = new RefreshToken(refreshTokenValue, userEmail, expiryDate);
             refreshTokenRepository.save(refreshToken);

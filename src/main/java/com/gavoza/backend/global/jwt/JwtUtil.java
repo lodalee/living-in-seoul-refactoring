@@ -21,7 +21,8 @@ public class JwtUtil {
     //토큰 데이터
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
-    private final long TOKEN_TIME = 60 * 60 * 1000L;
+    private final long TOKEN_TIME = 2 * 60 * 60 * 1000L;
+ 
 
     @Value("${jwt.secret.key}")
     private void setSecretKey(String secretKey) {
@@ -30,28 +31,26 @@ public class JwtUtil {
 
     private Key key;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-    private static final Logger logger = LoggerFactory.getLogger("JWT 관련 로그");
 
     //토큰생성
     public String createToken(String email) {
         Date date = new Date();
 
-        return BEARER_PREFIX +
-                Jwts.builder()
-                        .setSubject(email) //식별자값(ID)
-                        .setExpiration(new Date(date.getTime() + TOKEN_TIME)) //만료시간
-                        .setIssuedAt(date) //발급일
-                        .signWith(key, signatureAlgorithm) //암호화 알고리즘
-                        .compact();
+        return Jwts.builder()
+                .setSubject(email) //식별자값(ID)
+                .setExpiration(new Date(date.getTime() + TOKEN_TIME)) //만료시간
+                .setIssuedAt(date) //발급일
+                .signWith(key, signatureAlgorithm) //암호화 알고리즘
+                .compact();
     }
+
 
     //토큰 substring
     public String substringToken(String tokenValue) {
         if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
             return tokenValue.substring(7);
         }
-        logger.error("토큰을 찾을 수 없습니다.");
-        throw new NullPointerException("토큰을 찾을 수 없습니다.");
+        throw new JwtException("토큰을 찾을 수 없습니다.");
     }
 
     //토큰 validate
@@ -60,16 +59,17 @@ public class JwtUtil {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
-            logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
+            throw new JwtException("유효하지 않는 JWT 서명 입니다.");
         } catch (ExpiredJwtException e) {
-            logger.error("Expired JWT token, 만료된 JWT token 입니다.");
+            throw new JwtException("만료된 JWT 토큰 입니다.");
         } catch (UnsupportedJwtException e) {
-            logger.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
+            throw new JwtException("지원되지 않는 JWT 토큰 입니다.");
         } catch (IllegalArgumentException e) {
-            logger.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+            throw new JwtException("잘못된 JWT 토큰 입니다.");
         }
-        return false;
     }
+
+
 
     // 토큰에서 사용자 정보 가져오기
     public Claims getUserInfoFromToken(String token) {

@@ -33,7 +33,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain filterChain) throws ServletException, IOException {
-
         String tokenValue = jwtUtil.getTokenFromRequest(req);
 
         if (StringUtils.hasText(tokenValue)) {
@@ -42,6 +41,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             if (!jwtUtil.validateToken(tokenValue)) {
                 log.error("Token Error");
+                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰");
                 return;
             }
 
@@ -51,12 +51,15 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 setAuthentication(info.getSubject());
             } catch (Exception e) {
                 log.error(e.getMessage());
+                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "인증에 실패했습니다.");
                 return;
             }
         }
 
         filterChain.doFilter(req, res);
     }
+
+
 
     // 인증 처리
     public void setAuthentication(String username) {
