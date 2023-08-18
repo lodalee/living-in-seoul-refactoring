@@ -35,15 +35,16 @@ public class TagController {
         return tagService.hashtagPostResponseDtos(limit, hashtagName);
     }
 
-//    //카테고리별 인기 순위 태그 post 조회
-//    @GetMapping("/post/category")
-//    public List<hashtagPostResponseDto> categoryHashtagPostResponseDtos(
-//            @RequestParam int limit,
-//            @RequestParam String hashtagName,
-//            @RequestParam String category
-//    ){
-//        return tagService.categoryHashtagPostResponseDtos(limit, hashtagName, category);
-//    }
+    //카테고리별 인기 순위 태그 post 조회
+    @GetMapping("/post/category")
+    public List<hashtagPostResponseDto> categoryHashtagPostResponseDtos(
+            @RequestParam int limit,
+            @RequestParam String hashtagName,
+            @RequestParam String category,
+            @RequestParam String type
+    ){
+        return tagService.categoryHashtagPostResponseDtos(limit, hashtagName, category,type);
+    }
 //
 //    //게시글 전체 조회
 //    @GetMapping("/locationTagsAll")

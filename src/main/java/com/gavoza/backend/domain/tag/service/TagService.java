@@ -134,37 +134,35 @@ public class TagService {
         return hashtagPostResponseDtos;
     }
 
-//    //카테고리별 인기 순위 태그 post 조회
-//    public List<hashtagPostResponseDto> categoryHashtagPostResponseDtos(int limit, String hashtagName, String category) {
-//
-//        List<hashtagPostResponseDto> hashtagPostResponseDtos = new ArrayList<>();
-//
-//        List<Post> postList = postRepository.findAllByCategoryAndHashtag(category,hashtagName);
-//        System.out.println(postList);
-//
-//        if (postList == null) {
-//            throw new IllegalArgumentException("존재하지 않는 태그 혹은 존재하지 않는 카테고리 입니다.");
-//        }
-//
-//        // createdAt을 기준으로 내림차순 정렬
-//        postList.sort(Comparator.comparing(Post::getCreatedAt).reversed());
-//
-//        for (Post checkhashtagName : postList) {
-//            String[] checkhashTagNames = checkhashtagName.getHashtag().split("#");
-//
-//            //이제 확인해
-//            for (int i = 0; i < checkhashTagNames.length; i++) {
-//                if (hashtagName.equals(checkhashTagNames[i])) {
-//                    hashtagPostResponseDtos.add(new hashtagPostResponseDto(checkhashtagName, hashtagName));
-//                    break;
-//                }
-//            }
-//            if (hashtagPostResponseDtos.size() >= limit) {
-//                break;
-//            }
-//        }
-//        return hashtagPostResponseDtos;
-//    }
+    //카테고리별 인기 순위 태그 post 조회
+    public List<hashtagPostResponseDto> categoryHashtagPostResponseDtos(int limit, String hashtagName, String category, String type) {
+
+        List<hashtagPostResponseDto> hashtagPostResponseDtos = new ArrayList<>();
+
+        List<Post> postList = type.equals("popular")
+                ? postRepository.findAllByCategoryAndHashtagContainingOrderByPostViewCountDesc(category,hashtagName)
+                : postRepository.findAllByCategoryAndHashtagContainingOrderByCreatedAtDesc(category,hashtagName);
+
+        if (postList == null) {
+            throw new IllegalArgumentException("존재하지 않는 태그 혹은 존재하지 않는 카테고리 입니다.");
+        }
+
+        for (Post checkhashtagName : postList) {
+            String[] checkhashTagNames = checkhashtagName.getHashtag().split("#");
+
+            //이제 확인해
+            for (int i = 0; i < checkhashTagNames.length; i++) {
+                if (hashtagName.equals(checkhashTagNames[i])) {
+                    hashtagPostResponseDtos.add(new hashtagPostResponseDto(checkhashtagName, hashtagName));
+                    break;
+                }
+            }
+            if (hashtagPostResponseDtos.size() >= limit) {
+                break;
+            }
+        }
+        return hashtagPostResponseDtos;
+    }
 }
 
 //        //커뮤니티 전체조회
