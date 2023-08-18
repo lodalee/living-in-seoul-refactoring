@@ -9,7 +9,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class PostRequestDto {
-    private String title;
     private String hashtag;
     private String content;
     private String postImg;

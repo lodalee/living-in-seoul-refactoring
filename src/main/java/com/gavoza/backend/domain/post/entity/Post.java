@@ -43,7 +43,6 @@ public class Post extends Auditing {
     private List<Postlike> like = new ArrayList<>();
 
     private String category;
-
     private Long lat;
     private Long lng;
 
