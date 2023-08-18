@@ -26,14 +26,8 @@ public class Post extends Auditing {
     @Column(nullable = false)
     private String content;
 
-    @Column(name = "title", nullable = false)
-    private String title;
-
     @Column
-    private String locationTag;
-
-    @Column
-    private String purposeTag;
+    private String hashtag;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -48,21 +42,24 @@ public class Post extends Auditing {
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE})
     private List<Postlike> like = new ArrayList<>();
 
-//    private String categories;
+    private String category;
+    private Long lat;
+    private Long lng;
 
 
     public Post(PostRequestDto requestDto, User user) {
         this.content = requestDto.getContent();
-        this.title = requestDto.getTitle();
-        this.locationTag = requestDto.getLocationTag();
-        this.purposeTag = requestDto.getPurposeTag();
+        this.hashtag = requestDto.getHashtag();
         this.user = user;
-//        this.categories = requestDto.getCategories();
+        this.category = requestDto.getCategory();
+        this.lat = requestDto.getLat();
+        this.lng = requestDto.getLng();
     }
 
-    public void update(String title, String content) {
-        this.title = title;
+    public void update(String content, long lat, long lng) {
         this.content = content;
+        this.lat = lat;
+        this.lng = lng;
     }
 
     public void increaseViewCount() {

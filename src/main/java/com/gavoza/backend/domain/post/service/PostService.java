@@ -50,7 +50,9 @@ public class PostService {
 
     //upload
     public MessageResponseDto upload(PostRequestDto requestDto, User user,List<MultipartFile> photos) throws IOException {
-//        requestDto.validateCategory();
+        
+      //존재하지 않는 카테고리 에러처리
+        requestDto.validateCategory();
 
         List<PostImg> postImgList = new ArrayList<>();
 
@@ -81,7 +83,6 @@ public class PostService {
         Post post = new Post(requestDto, user);
         postRepository.save(post);
 
-
         // PostImg 인스턴스를 저장된 게시물에 연결하여 저장
         for (PostImg postImg : postImgList) {
             postImg.setPost(post);
@@ -93,13 +94,14 @@ public class PostService {
     //post 수정
     public void updatePost(Long postId, PostRequestDto requestDto, User user) {
         Post post = findPost(postId);
-        if (!(post.getUser().getNickname().equals(user.getNickname()))) {
+        if (!(post.getUser().getNickname().equals(user.getNickname()))){
             throw new IllegalArgumentException("해당 게시글의 작성자가 아닙니다.");
         }
-        String title = requestDto.getTitle();
+        long lat = requestDto.getLat();
+        long lng = requestDto.getLng();
         String content = requestDto.getContent();
 
-        post.update(title, content);
+        post.update(content,lat,lng);
     }
 
     //post 삭제
@@ -109,7 +111,6 @@ public class PostService {
         if (!(post.getUser().getNickname().equals(user.getNickname()))) {
             throw new IllegalArgumentException("해당 게시글의 작성자가 아닙니다.");
         }
-
         postRepository.delete(post);
     }
 

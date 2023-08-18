@@ -2,20 +2,20 @@ package com.gavoza.backend.domain.tag.dto;
 
 import com.gavoza.backend.domain.post.entity.Post;
 import lombok.Getter;
-import org.joda.time.LocalDateTime;
 
 @Getter
-public class LocationPostResponseDto {
-    private String locationTag;
+public class hashtagPostResponseDto {
+    private String category;
+    private String hashTag;
     private String nickname;
     private String content;
     private String userImg;
 
-    public LocationPostResponseDto(Post post, String locationTag){
-        this.locationTag = locationTag;
+    public hashtagPostResponseDto(Post post, String hashTag){
+        this.hashTag = hashTag;
         this.nickname = post.getUser().getNickname();
         this.content = post.getContent();
-//        this.userImg = post.getUser().
+        this.category = post.getCategory();
+//        this.userImg = post.getUser();
     }
-
 }
