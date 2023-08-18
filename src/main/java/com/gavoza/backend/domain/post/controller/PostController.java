@@ -7,9 +7,7 @@ import com.gavoza.backend.domain.post.service.PostService;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.exception.MessageResponseDto;
 import com.gavoza.backend.global.security.UserDetailsImpl;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,11 +26,11 @@ public class PostController {
     @PostMapping
     public MessageResponseDto uploadFile(
             @RequestPart("post") PostRequestDto requestDto,
-//            @RequestPart("photos") List<MultipartFile> photos,
+            @RequestPart("photos") List<MultipartFile> photos,
             @AuthenticationPrincipal UserDetailsImpl userDetails
           ) throws IOException {
         User user = userDetails.getUser();
-        return postService.upload(requestDto,user); //photos);
+        return postService.upload(requestDto,user,photos);
     }
 
     //게시글 수정
