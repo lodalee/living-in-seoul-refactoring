@@ -1,5 +1,6 @@
 package com.gavoza.backend.domain.tag.service;
 
+import com.gavoza.backend.domain.post.dto.LocationResponseDto;
 import com.gavoza.backend.domain.post.dto.PostInfoResponseDto;
 import com.gavoza.backend.domain.post.dto.PostResultDto;
 import com.gavoza.backend.domain.post.entity.Post;
@@ -158,7 +159,8 @@ public class TagService {
             String[] checkhashTagNames = checkhashtagName.getHashtag().split("#");
             UserResponseDto userResponseDto = new UserResponseDto(checkhashtagName.getUser());
             PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(checkhashtagName);
-            postResultDtos.add(new PostResultDto(userResponseDto, postInfoResponseDto));
+            LocationResponseDto locationResponseDto = new LocationResponseDto(checkhashtagName.getGu(),checkhashtagName.getDong(),checkhashtagName.getLat(),checkhashtagName.getLng());
+            postResultDtos.add(new PostResultDto(userResponseDto, postInfoResponseDto,locationResponseDto));
 
 
             for (int i = 0; i < checkhashTagNames.length; i++) {

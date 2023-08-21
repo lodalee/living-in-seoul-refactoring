@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.gavoza.backend.domain.Like.repository.PostLikeRepository;
+import com.gavoza.backend.domain.post.dto.LocationResponseDto;
 import com.gavoza.backend.domain.post.dto.PostInfoResponseDto;
 import com.gavoza.backend.domain.post.dto.PostRequestDto;
 import com.gavoza.backend.domain.post.dto.PostResultDto;
@@ -90,7 +91,7 @@ public class PostService {
             }
         }
 
-            Post post = new Post(requestDto, user, uuidFilePaths);
+            Post post = new Post(requestDto, user);
             postRepository.save(post);
 
             // PostImg 인스턴스를 저장된 게시물에 연결하여 저장
@@ -144,8 +145,9 @@ public class PostService {
         UserResponseDto userResponseDto = new UserResponseDto(findPost.getUser().getNickname(),findPost.getUser()
                 .getEmail());
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(findPost);
+        LocationResponseDto locationResponseDto = new LocationResponseDto(findPost.getGu(),findPost.getDong(),findPost.getLat(),findPost.getLng());
 
-        return new PostResponse(findPost,"게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto),hasLikedPost);
+        return new PostResponse(findPost,"게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto),hasLikedPost);
     }
 
     //커뮤니티 전체조회
@@ -159,7 +161,8 @@ public class PostService {
         for (Post post : postPages) {
             UserResponseDto userResponseDto = new UserResponseDto(post.getUser());
             PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
-            postResultDtos.add(new PostResultDto(userResponseDto, postInfoResponseDto));
+            LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(),post.getDong(),post.getLat(),post.getLng());
+            postResultDtos.add(new PostResultDto(userResponseDto, postInfoResponseDto,locationResponseDto));
         }
         return new PostListResponse("검색 조회 성공",postPages.getTotalPages(),postPages.getTotalElements(), size, postResultDtos);
     }

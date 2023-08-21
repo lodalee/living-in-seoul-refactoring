@@ -15,8 +15,6 @@ public class PostInfoResponseDto {
     private List<PostImg> postImg;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
-    private long lat;
-    private long lng;
     private String category;
     private long likeSize;
     private long postViewCount;
@@ -28,8 +26,6 @@ public class PostInfoResponseDto {
         this.postImg = post.getPostImgList();
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
-        this.lat = post.getLat();
-        this.lng = post.getLng();
         this.category = post.getCategory();
         this.likeSize = post.getLike().size();
         this.postViewCount = post.getPostViewCount();
