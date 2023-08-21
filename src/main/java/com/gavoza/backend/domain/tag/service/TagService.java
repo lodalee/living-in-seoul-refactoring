@@ -36,7 +36,7 @@ public class TagService {
                 continue;
             }
 
-            String hashTag = post.getHashtag(); //#안녕#시바견
+            String hashTag = post.getHashtag();
             String[] hashTagList = hashTag.split("#");
             for (String tagName : hashTagList) {
                 if (tagName == "") {
@@ -45,7 +45,8 @@ public class TagService {
                 idFrequencyMap.put(tagName, idFrequencyMap.getOrDefault(tagName, 0) + 1);
             }
         }
-
+        //엔트리의 값을 내림차순으로 비교합니다. entry2의 값이 entry1의 값보다 크면 양수를 반환하고, 반대의 경우 음수를 반환하며 같으면 0을 반환합니다.
+        //따라서, 이 정렬을 통해 언급 횟수가 큰 엔트리가 리스트의 앞쪽으로 오게 됩니다.
         List<Map.Entry<String, Integer>> sortedEntries = new ArrayList<>(idFrequencyMap.entrySet());
         sortedEntries.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
 
@@ -137,33 +138,37 @@ public class TagService {
     }
 
     //카테고리별 인기 순위 태그 post 조회
-    public List<hashtagPostResponseDto> categoryHashtagPostResponseDtos(int limit, String hashtagName, String category, String type) {
+    public PostListResponse categoryHashtagPostResponseDtos(int size, int page, String hashtagName, String category, String type) {
+        // 페이지 및 사이즈 계산
+        Pageable pageable = PageRequest.of(page,size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         List<hashtagPostResponseDto> hashtagPostResponseDtos = new ArrayList<>();
 
-        List<Post> postList = type.equals("popular")
-                ? postRepository.findAllByCategoryAndHashtagContainingOrderByPostViewCountDesc(category,hashtagName)
-                : postRepository.findAllByCategoryAndHashtagContainingOrderByCreatedAtDesc(category,hashtagName);
+        List<PostResultDto> postResultDtos = new ArrayList<>();
 
-        if (postList == null) {
+        Page<Post> postPage = type.equals("popular")
+                ? postRepository.findAllByCategoryAndHashtagContainingOrderByPostViewCountDesc(category,hashtagName,pageable)
+                : postRepository.findAllByCategoryAndHashtagContainingOrderByCreatedAtDesc(category,hashtagName, pageable);
+
+        if (postPage == null) {
             throw new IllegalArgumentException("존재하지 않는 태그 혹은 존재하지 않는 카테고리 입니다.");
         }
 
-        for (Post checkhashtagName : postList) {
+        for (Post checkhashtagName : postPage) {
             String[] checkhashTagNames = checkhashtagName.getHashtag().split("#");
+            UserResponseDto userResponseDto = new UserResponseDto(checkhashtagName.getUser());
+            PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(checkhashtagName);
+            postResultDtos.add(new PostResultDto(userResponseDto, postInfoResponseDto));
 
-            //이제 확인해
+
             for (int i = 0; i < checkhashTagNames.length; i++) {
                 if (hashtagName.equals(checkhashTagNames[i])) {
                     hashtagPostResponseDtos.add(new hashtagPostResponseDto(checkhashtagName, hashtagName));
                     break;
                 }
             }
-            if (hashtagPostResponseDtos.size() >= limit) {
-                break;
-            }
         }
-        return hashtagPostResponseDtos;
+        return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size , postResultDtos);
     }
 }
 
