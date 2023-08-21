@@ -6,7 +6,6 @@ import lombok.Getter;
 public class LocationResponseDto {
     private long lat;
     private long lng;
-
     private String gu;
     private String dong;
 
