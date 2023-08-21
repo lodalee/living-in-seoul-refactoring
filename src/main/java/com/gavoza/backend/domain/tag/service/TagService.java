@@ -1,5 +1,6 @@
 package com.gavoza.backend.domain.tag.service;
 
+import com.gavoza.backend.domain.post.dto.LocationResponseDto;
 import com.gavoza.backend.domain.post.dto.PostInfoResponseDto;
 import com.gavoza.backend.domain.post.dto.PostResultDto;
 import com.gavoza.backend.domain.post.entity.Post;
@@ -36,7 +37,7 @@ public class TagService {
                 continue;
             }
 
-            String hashTag = post.getHashtag(); //#안녕#시바견
+            String hashTag = post.getHashtag();
             String[] hashTagList = hashTag.split("#");
             for (String tagName : hashTagList) {
                 if (tagName == "") {
@@ -45,7 +46,8 @@ public class TagService {
                 idFrequencyMap.put(tagName, idFrequencyMap.getOrDefault(tagName, 0) + 1);
             }
         }
-
+        //엔트리의 값을 내림차순으로 비교합니다. entry2의 값이 entry1의 값보다 크면 양수를 반환하고, 반대의 경우 음수를 반환하며 같으면 0을 반환합니다.
+        //따라서, 이 정렬을 통해 언급 횟수가 큰 엔트리가 리스트의 앞쪽으로 오게 됩니다.
         List<Map.Entry<String, Integer>> sortedEntries = new ArrayList<>(idFrequencyMap.entrySet());
         sortedEntries.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
 
@@ -105,10 +107,12 @@ public class TagService {
 
 
     //인기 순위 태그별 post 조회(전체)
-    public List<hashtagPostResponseDto> hashtagPostResponseDtos(int limit, String hashtagName) {
+    public List<hashtagPostResponseDto> hashtagPostResponseDtos(int limit, String hashtagName, String type) {
         List<hashtagPostResponseDto> hashtagPostResponseDtos = new ArrayList<>();
 
-        List<Post> postList = postRepository.findAllByHashtagContaining(hashtagName);
+        List<Post> postList = type.equals("popular")
+                    ?postRepository.findAllByHashtagContainingOrderByPostViewCountDesc(hashtagName)
+                    :postRepository.findAllByHashtagContainingOrderByCreatedAtDesc(hashtagName);
 
         if (postList == null) {
             throw new IllegalArgumentException("존재하지 않는 태그입니다.");
@@ -134,37 +138,40 @@ public class TagService {
         return hashtagPostResponseDtos;
     }
 
-//    //카테고리별 인기 순위 태그 post 조회
-//    public List<hashtagPostResponseDto> categoryHashtagPostResponseDtos(int limit, String hashtagName, String category) {
-//
-//        List<hashtagPostResponseDto> hashtagPostResponseDtos = new ArrayList<>();
-//
-//        List<Post> postList = postRepository.findAllByCategoryAndHashtag(category,hashtagName);
-//        System.out.println(postList);
-//
-//        if (postList == null) {
-//            throw new IllegalArgumentException("존재하지 않는 태그 혹은 존재하지 않는 카테고리 입니다.");
-//        }
-//
-//        // createdAt을 기준으로 내림차순 정렬
-//        postList.sort(Comparator.comparing(Post::getCreatedAt).reversed());
-//
-//        for (Post checkhashtagName : postList) {
-//            String[] checkhashTagNames = checkhashtagName.getHashtag().split("#");
-//
-//            //이제 확인해
-//            for (int i = 0; i < checkhashTagNames.length; i++) {
-//                if (hashtagName.equals(checkhashTagNames[i])) {
-//                    hashtagPostResponseDtos.add(new hashtagPostResponseDto(checkhashtagName, hashtagName));
-//                    break;
-//                }
-//            }
-//            if (hashtagPostResponseDtos.size() >= limit) {
-//                break;
-//            }
-//        }
-//        return hashtagPostResponseDtos;
-//    }
+    //카테고리별 인기 순위 태그 post 조회
+    public PostListResponse categoryHashtagPostResponseDtos(int size, int page, String hashtagName, String category, String type) {
+        // 페이지 및 사이즈 계산
+        Pageable pageable = PageRequest.of(page,size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        List<hashtagPostResponseDto> hashtagPostResponseDtos = new ArrayList<>();
+
+        List<PostResultDto> postResultDtos = new ArrayList<>();
+
+        Page<Post> postPage = type.equals("popular")
+                ? postRepository.findAllByCategoryAndHashtagContainingOrderByPostViewCountDesc(category,hashtagName,pageable)
+                : postRepository.findAllByCategoryAndHashtagContainingOrderByCreatedAtDesc(category,hashtagName, pageable);
+
+        if (postPage == null) {
+            throw new IllegalArgumentException("존재하지 않는 태그 혹은 존재하지 않는 카테고리 입니다.");
+        }
+
+        for (Post checkhashtagName : postPage) {
+            String[] checkhashTagNames = checkhashtagName.getHashtag().split("#");
+            UserResponseDto userResponseDto = new UserResponseDto(checkhashtagName.getUser());
+            PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(checkhashtagName);
+            LocationResponseDto locationResponseDto = new LocationResponseDto(checkhashtagName.getGu(),checkhashtagName.getDong(),checkhashtagName.getLat(),checkhashtagName.getLng());
+            postResultDtos.add(new PostResultDto(userResponseDto, postInfoResponseDto,locationResponseDto));
+
+
+            for (int i = 0; i < checkhashTagNames.length; i++) {
+                if (hashtagName.equals(checkhashTagNames[i])) {
+                    hashtagPostResponseDtos.add(new hashtagPostResponseDto(checkhashtagName, hashtagName));
+                    break;
+                }
+            }
+        }
+        return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size , postResultDtos);
+    }
 }
 
 //        //커뮤니티 전체조회

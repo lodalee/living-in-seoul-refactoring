@@ -9,16 +9,13 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-//    List<Post> findAllByHashtagContaining(String hashtag);
-//    List<Post> findAll();
-
-//    Page<Post> findAllByHashtagContaining(String hashtagName, Pageable pageable);
-
-//    List<Post> findAll(String content);
-
     List<Post> findAllBycategory(String category);
 
-    List<Post> findAllByHashtagContaining(String hashTagName);
+    Page<Post> findAllByCategoryAndHashtagContainingOrderByPostViewCountDesc(String category, String hashtagName, Pageable pageable);
 
-    List<Post> findAllByCategoryAndHashtag(String hashtagName, String category);
+    Page<Post> findAllByCategoryAndHashtagContainingOrderByCreatedAtDesc(String category, String hashtagName, Pageable pageable);
+
+    List<Post> findAllByHashtagContainingOrderByPostViewCountDesc(String hashtagName);
+    List<Post> findAllByHashtagContainingOrderByCreatedAtDesc(String hashtagName);
+
 }

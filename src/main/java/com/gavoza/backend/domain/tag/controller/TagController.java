@@ -1,5 +1,6 @@
 package com.gavoza.backend.domain.tag.controller;
 
+import com.gavoza.backend.domain.post.response.PostListResponse;
 import com.gavoza.backend.domain.tag.dto.hashtagPostResponseDto;
 import com.gavoza.backend.domain.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
@@ -30,20 +31,23 @@ public class TagController {
     @GetMapping("/post/All")
     public List<hashtagPostResponseDto> hashtagPostResponseDtos(
             @RequestParam int limit,
-            @RequestParam String hashtagName
+            @RequestParam String hashtagName,
+            @RequestParam String type
     ){
-        return tagService.hashtagPostResponseDtos(limit, hashtagName);
+        return tagService.hashtagPostResponseDtos(limit, hashtagName, type);
     }
 
-//    //카테고리별 인기 순위 태그 post 조회
-//    @GetMapping("/post/category")
-//    public List<hashtagPostResponseDto> categoryHashtagPostResponseDtos(
-//            @RequestParam int limit,
-//            @RequestParam String hashtagName,
-//            @RequestParam String category
-//    ){
-//        return tagService.categoryHashtagPostResponseDtos(limit, hashtagName, category);
-//    }
+    //카테고리별 인기 순위 태그 post 조회
+    @GetMapping("/post/category")
+    public PostListResponse categoryHashtagPostResponseDtos(
+            @RequestParam int size,
+            @RequestParam int page,
+            @RequestParam String hashtagName,
+            @RequestParam String category,
+            @RequestParam String type
+    ){
+        return tagService.categoryHashtagPostResponseDtos(size, page-1, hashtagName, category,type);
+    }
 //
 //    //게시글 전체 조회
 //    @GetMapping("/locationTagsAll")

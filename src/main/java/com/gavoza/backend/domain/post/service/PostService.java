@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.gavoza.backend.domain.Like.repository.PostLikeRepository;
+import com.gavoza.backend.domain.post.dto.LocationResponseDto;
 import com.gavoza.backend.domain.post.dto.PostInfoResponseDto;
 import com.gavoza.backend.domain.post.dto.PostRequestDto;
 import com.gavoza.backend.domain.post.dto.PostResultDto;
@@ -49,46 +50,62 @@ public class PostService {
 
     //upload
     public MessageResponseDto upload(PostRequestDto requestDto, User user,List<MultipartFile> photos) throws IOException {
-        
-      //존재하지 않는 카테고리 에러처리
+
+        //존재하지 않는 카테고리 에러처리
         requestDto.validateCategory();
 
         List<PostImg> postImgList = new ArrayList<>();
 
+        List<String> uuidFilePaths = new ArrayList<>();
+
         //S3에 이미지 저장
-        for (MultipartFile photo : photos) {
-            long size = photo.getSize();
+        //photos 목록이 null이 아니고 비어있지 않을 때만 업로드 작업 수행
+        if (photos != null && !photos.isEmpty()) {
+            for (MultipartFile photo : photos) {
+                long size = photo.getSize();
 
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentType(photo.getContentType());
-            objectMetadata.setContentLength(size);
-            objectMetadata.setContentDisposition("inline");
+                //ObjectMetadata 객체를 생성하여 파일의 메타데이터를 설정합니다.
+                //이 메타데이터에는 파일 크기, 콘텐츠 유형 및 인라인 콘텐츠 디스포지션을 설정합니다.
+                ObjectMetadata objectMetadata = new ObjectMetadata();
+                objectMetadata.setContentType(photo.getContentType());
+                objectMetadata.setContentLength(size);
+                objectMetadata.setContentDisposition("inline");
 
-            String prefix = UUID.randomUUID().toString();
-            String fileName = prefix + "_" + photo.getOriginalFilename();
-            String bucketFilePath = "photos/" + fileName;
+                String prefix = UUID.randomUUID().toString();
+                String fileName = prefix + "_" + photo.getOriginalFilename();
+                String bucketFilePath = "photos/" + fileName;
 
-            //S3에 업로드
-            amazonS3Client.putObject(
-                    new PutObjectRequest(bucketName, bucketFilePath, photo.getInputStream(), objectMetadata)
-                            .withCannedAcl(CannedAccessControlList.PublicRead)
-            );
+                //S3에 업로드
+                //Amazon S3 클라이언트를 사용하여 파일을 지정된 버킷(bucketName) 경로(bucketFilePath)에 업로드합니다.
+                //withCannedAcl은 업로드된 파일을 공개 읽기 권한으로 설정하는 데 사용됩니다.
+                amazonS3Client.putObject(
+                        new PutObjectRequest(bucketName, bucketFilePath, photo.getInputStream(), objectMetadata)
+                                .withCannedAcl(CannedAccessControlList.PublicRead)
+                );
 
-            //PostImg 저장
-            PostImg postImg = new PostImg(fileName, null);
-            postImgList.add(postImg);
+                uuidFilePaths.add(fileName);
+
+                //PostImg 저장
+                PostImg postImg = new PostImg(fileNameToURL(fileName), null);
+                postImgList.add(postImg);
+            }
         }
 
-        Post post = new Post(requestDto, user);
-        postRepository.save(post);
+            Post post = new Post(requestDto, user);
+            postRepository.save(post);
 
-        // PostImg 인스턴스를 저장된 게시물에 연결하여 저장
-        for (PostImg postImg : postImgList) {
-            postImg.setPost(post);
-            postImgRepository.save(postImg);
+            // PostImg 인스턴스를 저장된 게시물에 연결하여 저장
+            for (PostImg postImg : postImgList) {
+                postImg.setPost(post);
+                postImgRepository.save(postImg);
+            }
+            return new MessageResponseDto("파일 저장 성공");
         }
-        return new MessageResponseDto("파일 저장 성공");
+
+    private String fileNameToURL(String fileName){
+        return "https://living-in-seoul.s3.ap-northeast-2.amazonaws.com/photos/" + fileName;
     }
+
 
     //post 수정
     public void updatePost(Long postId, PostRequestDto requestDto, User user) {
@@ -128,8 +145,9 @@ public class PostService {
         UserResponseDto userResponseDto = new UserResponseDto(findPost.getUser().getNickname(),findPost.getUser()
                 .getEmail());
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(findPost);
+        LocationResponseDto locationResponseDto = new LocationResponseDto(findPost.getGu(),findPost.getDong(),findPost.getLat(),findPost.getLng());
 
-        return new PostResponse(findPost,"게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto),hasLikedPost);
+        return new PostResponse(findPost,"게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto),hasLikedPost);
     }
 
     //커뮤니티 전체조회
@@ -143,7 +161,8 @@ public class PostService {
         for (Post post : postPages) {
             UserResponseDto userResponseDto = new UserResponseDto(post.getUser());
             PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
-            postResultDtos.add(new PostResultDto(userResponseDto, postInfoResponseDto));
+            LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(),post.getDong(),post.getLat(),post.getLng());
+            postResultDtos.add(new PostResultDto(userResponseDto, postInfoResponseDto,locationResponseDto));
         }
         return new PostListResponse("검색 조회 성공",postPages.getTotalPages(),postPages.getTotalElements(), size, postResultDtos);
     }
