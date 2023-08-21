@@ -1,6 +1,7 @@
 package com.gavoza.backend.domain.user.service;
 
 import com.gavoza.backend.domain.user.dto.SignupRequestDto;
+import com.gavoza.backend.domain.user.dto.UpdateUserRequestDto;
 import com.gavoza.backend.domain.user.entity.CityScraper;
 import com.gavoza.backend.domain.user.entity.RefreshToken;
 import com.gavoza.backend.domain.user.entity.User;
@@ -98,6 +99,53 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
+    public void updateUser(String userEmail, UpdateUserRequestDto requestDto) throws IllegalArgumentException {
+        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        // hometown 유효성 검사
+        if (requestDto.getHometown() != null && !requestDto.getHometown().isEmpty()) {
+            if (!VALID_HOMETOWNS.contains(requestDto.getHometown())) {
+                throw new IllegalArgumentException("허용되지 않는 지역입니다.");
+            }
+            user.setHometown(requestDto.getHometown());
+        }
+
+        // movedDate 유효성 검사
+        if (requestDto.getMovedDate() != null && !requestDto.getMovedDate().isEmpty()) {
+            switch (requestDto.getMovedDate()) {
+                case "~6개월":
+                case "1~2년":
+                case "3~4년":
+                case "5년 이상":
+                    user.setMovedDate(requestDto.getMovedDate());
+                    break;
+                default:
+                    throw new IllegalArgumentException("이주 날짜 형식이 올바르지 않습니다.");
+            }
+        }
+
+        // 성별 유효성 검사
+        if (requestDto.getGender() != null && !requestDto.getGender().isEmpty()) {
+            if (!("여성".equals(requestDto.getGender()) || "남성".equals(requestDto.getGender()))) {
+                throw new IllegalArgumentException("성별은 '여성' 또는 '남성'만 입력 가능합니다.");
+            }
+            user.setGender(requestDto.getGender());
+        }
+
+        // birthDate 유효성 검사
+        if (requestDto.getBirthDate() != null && !requestDto.getBirthDate().isEmpty()) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                LocalDate.parse(requestDto.getBirthDate(), formatter); //객체로 파싱
+                user.setBirthDate(requestDto.getBirthDate());
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("생년월일은 연도-월-일 형식이여야 합니다.");
+            }
+        }
+
+        userRepository.save(user);
+    }
 
     @Transactional
     public RefreshToken createAndSaveRefreshToken(String userEmail) {
@@ -156,6 +204,8 @@ public class UserService {
 
         return user.getEmail();
     }
+
+
 
 
 }

@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +23,7 @@ public class JwtUtil {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
     private final long TOKEN_TIME = 2 * 60 * 60 * 1000L;
- 
+
 
     @Value("${jwt.secret.key}")
     private void setSecretKey(String secretKey) {
@@ -87,6 +88,22 @@ public class JwtUtil {
     public String createAccessToken(String email) {
         return createToken(email);
 
+    }
+
+    public String getEmailFromAuthHeader(HttpServletRequest request) {
+        String tokenValue = request.getHeader(AUTHORIZATION_HEADER);
+
+        if (tokenValue != null && tokenValue.startsWith(BEARER_PREFIX)) {
+            String jwtToken = substringToken(tokenValue); // 토큰 값을 가져옵니다.
+            if (validateToken(jwtToken)) { // 토큰이 유효한지 확인
+                Claims claims = getUserInfoFromToken(jwtToken);
+                return claims.getSubject(); // subject를 이메일로 저장한 경우 이메일을 반환합니다.
+            } else {
+                throw new JwtException("유효하지 않는 JWT 토큰 입니다.");
+            }
+        } else {
+            throw new IllegalArgumentException("Authorization 헤더를 찾을 수 없거나 올바른 형식이 아닙니다.");
+        }
     }
 
 }
