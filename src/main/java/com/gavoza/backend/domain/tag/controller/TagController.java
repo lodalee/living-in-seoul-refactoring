@@ -17,24 +17,31 @@ public class TagController {
 
     //전체 태그 인기순위
     @GetMapping("/All")
-    public List<String> allRankNumber(){
-        return tagService.allRankNumber();
+    public List<String> allRankNumber( @RequestParam String gu,
+                                       @RequestParam String dong
+    ){
+        return tagService.allRankNumber(gu,dong);
     }
 
     //카테고리별 태그 인기순위
     @GetMapping("/category")
-    public List<String> categoryRankNumer(@RequestParam String category){
-        return tagService.categoryRankNumer(category);
+    public List<String> categoryRankNumer(@RequestParam String category,
+                                          @RequestParam String gu,
+                                          @RequestParam String dong){
+        return tagService.categoryRankNumer(category, gu, dong);
     }
 
     //전체 인기 순위 태그 post 조회
     @GetMapping("/post/All")
-    public List<hashtagPostResponseDto> hashtagPostResponseDtos(
-            @RequestParam int limit,
+    public PostListResponse hashtagPostResponseDtos(
+            @RequestParam int size,
+            @RequestParam int page,
             @RequestParam String hashtagName,
-            @RequestParam String type
+            @RequestParam String type,
+            @RequestParam String gu,
+            @RequestParam String dong
     ){
-        return tagService.hashtagPostResponseDtos(limit, hashtagName, type);
+        return tagService.hashtagPostResponseDtos(size, page-1, hashtagName, type, gu, dong);
     }
 
     //카테고리별 인기 순위 태그 post 조회
@@ -44,19 +51,10 @@ public class TagController {
             @RequestParam int page,
             @RequestParam String hashtagName,
             @RequestParam String category,
-            @RequestParam String type
+            @RequestParam String type,
+            @RequestParam String gu,
+            @RequestParam String dong
     ){
-        return tagService.categoryHashtagPostResponseDtos(size, page-1, hashtagName, category,type);
+        return tagService.categoryHashtagPostResponseDtos(size, page-1, hashtagName, category,type,gu, dong);
     }
-//
-//    //게시글 전체 조회
-//    @GetMapping("/locationTagsAll")
-//    @ResponseStatus(HttpStatus.OK)
-//    public PostListResponse gethashtagPostAll(@RequestParam int page,
-//                                               @RequestParam int size,
-//                                               @RequestParam String hashTagName){
-//        return tagService.gethashtagPost(page-1,size, hashTagName);
-//    }
-
-
 }
