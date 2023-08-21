@@ -2,11 +2,10 @@ package com.gavoza.backend.domain.user.controller;
 
 import com.gavoza.backend.domain.user.dto.*;
 import com.gavoza.backend.domain.user.entity.RefreshToken;
-import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.domain.user.service.UserService;
 import com.gavoza.backend.global.exception.MessageResponseDto;
 import com.gavoza.backend.global.jwt.JwtUtil;
-import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ public class UserController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
-    @PostMapping("/signup")
+    @PostMapping("/signup1")
     public ResponseEntity<MessageResponseDto> signup(@RequestBody SignupRequestDto requestDto) {
         try {
             userService.signup(requestDto);
@@ -33,7 +32,7 @@ public class UserController {
 
 
 
-    @PostMapping("/refresh")
+    @GetMapping("/refresh")
     public ResponseEntity<MessageResponseDto> refreshToken(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
         String refreshTokenValue = refreshTokenRequestDto.getRefreshToken();
 
@@ -55,24 +54,6 @@ public class UserController {
         }
     }
 
-    @GetMapping("/profile")
-    public ResponseEntity<ProfileResponseDto> getProfile(@RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String authHeader) {
-
-        String accessToken = jwtUtil.substringToken(authHeader);
-
-        // 토큰에서 사용자 이메일 얻기
-        Claims claims = jwtUtil.getUserInfoFromToken(accessToken);
-        String email = claims.getSubject();
-
-        // 사용자 정보 조회
-        User user = userService.getByEmail(email);
-
-        // 사용자 정보 응답
-        ProfileResponseDto profileUserResponseDto = new ProfileResponseDto(user.getNickname(), user.getEmail(), user.getGender(), user.getHometown(), user.getMovedDate(), user.getBirthDate());
-
-        return ResponseEntity.ok(profileUserResponseDto);
-    }
-
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
@@ -92,4 +73,22 @@ public class UserController {
 
         return ResponseEntity.ok(tokenResponseDto);
     }
+
+    @PutMapping("/signup2")
+    public ResponseEntity<MessageResponseDto> updateUser(@RequestBody UpdateUserRequestDto requestDto, HttpServletRequest request) {
+        try {
+            String email = jwtUtil.getEmailFromAuthHeader(request);
+            userService.updateUser(email, requestDto);
+            return ResponseEntity.ok(new MessageResponseDto("사용자 정보가 수정되었습니다."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new MessageResponseDto(e.getMessage()));
+        }
+    }
+
+
+
+
+
+
+
 }

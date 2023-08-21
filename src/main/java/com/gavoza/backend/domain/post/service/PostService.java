@@ -14,7 +14,6 @@ import com.gavoza.backend.domain.post.repository.PostImgRepository;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.post.response.PostListResponse;
 import com.gavoza.backend.domain.post.response.PostResponse;
-import com.gavoza.backend.domain.user.dto.ProfileResponseDto;
 import com.gavoza.backend.domain.user.dto.UserResponseDto;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.exception.MessageResponseDto;
