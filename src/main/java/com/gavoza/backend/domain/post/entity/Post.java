@@ -47,13 +47,15 @@ public class Post extends Auditing {
     private Long lng;
 
 
-    public Post(PostRequestDto requestDto, User user) {
+    public Post(PostRequestDto requestDto, User user, List<String> uuidFileNames) {
         this.content = requestDto.getContent();
         this.hashtag = requestDto.getHashtag();
         this.user = user;
         this.category = requestDto.getCategory();
         this.lat = requestDto.getLat();
         this.lng = requestDto.getLng();
+
+
     }
 
     public void update(String content, long lat, long lng) {
