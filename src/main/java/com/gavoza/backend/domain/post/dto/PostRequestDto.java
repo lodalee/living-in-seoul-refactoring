@@ -15,6 +15,8 @@ public class PostRequestDto {
     private String category;
     private Long lat;
     private Long lng;
+    private String gu;
+    private String dong;
 
     public void validateCategory() {
         List<String> validCategories = Arrays.asList("생활정보", "후기", "동향소통");
