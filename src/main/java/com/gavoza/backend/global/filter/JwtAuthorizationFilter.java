@@ -37,11 +37,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(tokenValue)) {
             tokenValue = jwtUtil.substringToken(tokenValue);
-            log.info(tokenValue);
+            log.debug("Token: {}", tokenValue);
 
             if (!jwtUtil.validateToken(tokenValue)) {
                 log.error("Token Error");
-                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰");
+                res.sendError(HttpServletResponse.SC_GATEWAY_TIMEOUT, "유효하지 않은 토큰");
                 return;
             }
 
@@ -51,7 +51,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 setAuthentication(info.getSubject());
             } catch (Exception e) {
                 log.error(e.getMessage());
-                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "인증에 실패했습니다.");
+                res.sendError(HttpServletResponse.SC_HTTP_VERSION_NOT_SUPPORTED, "인증에 실패했습니다.");
                 return;
             }
         }

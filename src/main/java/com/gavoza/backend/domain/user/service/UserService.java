@@ -7,6 +7,7 @@ import com.gavoza.backend.domain.user.entity.RefreshToken;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.domain.user.repository.RefreshTokenRepository;
 import com.gavoza.backend.domain.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -100,7 +101,12 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(String userEmail, UpdateUserRequestDto requestDto) throws IllegalArgumentException {
+    public void updateUser(HttpServletRequest request, UpdateUserRequestDto requestDto) throws IllegalArgumentException {
+        String userEmail = request.getParameter("email");
+        if (userEmail == null || userEmail.isEmpty()) {
+            throw new IllegalArgumentException("이메일이 없습니다.");
+        }
+
         User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         // hometown 유효성 검사
@@ -158,7 +164,7 @@ public class UserService {
             refreshToken.updateToken(UUID.randomUUID().toString());
 
             // 유효기간 설정
-            LocalDateTime expiryDate = LocalDateTime.now().plusDays(7); // 예시로 7일 설정
+            LocalDateTime expiryDate = LocalDateTime.now().plusDays(1);
             // 리프레시 토큰 만료일 업데이트
             refreshToken.updateExpiryDate(expiryDate);
 

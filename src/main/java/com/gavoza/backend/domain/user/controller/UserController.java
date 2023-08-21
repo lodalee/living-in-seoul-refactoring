@@ -77,13 +77,13 @@ public class UserController {
     @PutMapping("/signup2")
     public ResponseEntity<MessageResponseDto> updateUser(@RequestBody UpdateUserRequestDto requestDto, HttpServletRequest request) {
         try {
-            String email = jwtUtil.getEmailFromAuthHeader(request);
-            userService.updateUser(email, requestDto);
+            userService.updateUser(request, requestDto);
             return ResponseEntity.ok(new MessageResponseDto("사용자 정보가 수정되었습니다."));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(e.getMessage()));
         }
     }
+
 
 
 
