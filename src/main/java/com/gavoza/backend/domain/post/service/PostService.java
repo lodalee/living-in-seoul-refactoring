@@ -146,7 +146,6 @@ public class PostService {
                 .getEmail());
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(findPost);
         LocationResponseDto locationResponseDto = new LocationResponseDto(findPost.getGu(),findPost.getDong(),findPost.getLat(),findPost.getLng());
-
         return new PostResponse(findPost,"게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto),hasLikedPost);
     }
 
