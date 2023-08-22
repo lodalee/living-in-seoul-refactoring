@@ -9,18 +9,27 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    List<Post> findAllBycategoryAndGuAndDong(String category, String gu, String dong);
+//    List<Post> findAllBycategoryAndGuAndDong(String category, String gu, String dong);
 
-    Page<Post> findAllByCategoryAndHashtagContainingAndGuAndDongOrderByPostViewCountDesc(String category, String hashtagName, Pageable pageable, String gu, String dong);
+//    Page<Post> findAllByCategoryAndHashtagContainingAndGuAndDongOrderByPostViewCountDesc(String category, String hashtagName, Pageable pageable, String gu, String dong);
+//    Page<Post> findAllByCategoryAndHashtagContainingAndGuAndDongOrderByCreatedAtDesc(String category, String hashtagName, Pageable pageable, String gu, String dong);
 
-    Page<Post> findAllByCategoryAndHashtagContainingAndGuAndDongOrderByCreatedAtDesc(String category, String hashtagName, Pageable pageable, String gu, String dong);
+//    Page<Post> findAllByHashtagContainingAndGuAndDongOrderByPostViewCountDesc(String hashtagName, Pageable pageable,String gu, String dong);
+//    Page<Post> findAllByHashtagContainingAndGuAndDongOrderByCreatedAtDesc(String hashtagName, Pageable pageable, String gu, String dong);
 
-    Page<Post> findAllByHashtagContainingAndGuAndDongOrderByPostViewCountDesc(String hashtagName, Pageable pageable,String gu, String dong);
-    Page<Post> findAllByHashtagContainingAndGuAndDongOrderByCreatedAtDesc(String hashtagName, Pageable pageable, String gu, String dong);
-
-    List<Post> findAllByGuAndDong(String gu, String dong);
+//    List<Post> findAllByGuAndDong(String gu, String dong);
 
     Page<Post> findAllByContentContaining(String keyword, Pageable pageable);
 
     Page<Post> findAllByHashtagContaining(String keyword, Pageable pageable);
+
+    Page<Post> findAllByHashtagContainingOrderByPostViewCountDesc(String hashtagName, Pageable pageable);
+
+    Page<Post> findAllByHashtagContainingOrderByCreatedAtDesc(String hashtagName, Pageable pageable);
+
+    Page<Post> findAllByCategoryAndHashtagContainingOrderByPostViewCountDesc(String category, String hashtagName, Pageable pageable);
+
+    Page<Post> findAllByCategoryAndHashtagContainingOrderByCreatedAtDesc(String category, String hashtagName, Pageable pageable);
+
+    List<Post> findAllBycategory(String category);
 }

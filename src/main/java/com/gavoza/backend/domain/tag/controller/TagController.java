@@ -17,18 +17,14 @@ public class TagController {
 
     //전체 태그 인기순위
     @GetMapping("/All")
-    public List<String> allRankNumber( @RequestParam String gu,
-                                       @RequestParam String dong
-    ){
-        return tagService.allRankNumber(gu,dong);
+    public List<String> allRankNumber(){
+        return tagService.allRankNumber();
     }
 
     //카테고리별 태그 인기순위
     @GetMapping("/category")
-    public List<String> categoryRankNumer(@RequestParam String category,
-                                          @RequestParam String gu,
-                                          @RequestParam String dong){
-        return tagService.categoryRankNumer(category, gu, dong);
+    public List<String> categoryRankNumer(@RequestParam String category){
+        return tagService.categoryRankNumer(category);
     }
 
     //전체 인기 순위 태그 post 조회
@@ -37,11 +33,9 @@ public class TagController {
             @RequestParam int size,
             @RequestParam int page,
             @RequestParam String hashtagName,
-            @RequestParam String type,
-            @RequestParam String gu,
-            @RequestParam String dong
+            @RequestParam String type
     ){
-        return tagService.hashtagPostResponseDtos(size, page-1, hashtagName, type, gu, dong);
+        return tagService.hashtagPostResponseDtos(size, page-1, hashtagName, type);
     }
 
     //카테고리별 인기 순위 태그 post 조회
@@ -51,10 +45,8 @@ public class TagController {
             @RequestParam int page,
             @RequestParam String hashtagName,
             @RequestParam String category,
-            @RequestParam String type,
-            @RequestParam String gu,
-            @RequestParam String dong
+            @RequestParam String type
     ){
-        return tagService.categoryHashtagPostResponseDtos(size, page-1, hashtagName, category,type,gu, dong);
+        return tagService.categoryHashtagPostResponseDtos(size, page-1, hashtagName, category,type);
     }
 }
