@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @Getter
 @Setter
-public class SignupRequestDto {
+public class Signup1RequestDto {
 
     @Email(message = "유효하지 않은 이메일 형식입니다.")
     @NotBlank(message = "이메일을 입력 해주세요")

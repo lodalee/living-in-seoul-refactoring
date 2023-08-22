@@ -5,9 +5,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UpdateUserRequestDto {
+public class UserUpdateRequestDto {
+    private String nickname;
+    private String password;
     private String hometown;
-    private String gender;
     private String movedDate;
+    private String gender;
     private String birthDate;
 }
+

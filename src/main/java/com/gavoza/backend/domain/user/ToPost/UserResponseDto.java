@@ -1,4 +1,4 @@
-package com.gavoza.backend.domain.user.dto;
+package com.gavoza.backend.domain.user.ToPost;
 
 import com.gavoza.backend.domain.user.entity.User;
 import lombok.Getter;

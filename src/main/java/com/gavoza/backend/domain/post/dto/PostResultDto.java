@@ -1,6 +1,6 @@
 package com.gavoza.backend.domain.post.dto;
 
-import com.gavoza.backend.domain.user.dto.UserResponseDto;
+import com.gavoza.backend.domain.user.ToPost.UserResponseDto;
 import lombok.Getter;
 
 @Getter

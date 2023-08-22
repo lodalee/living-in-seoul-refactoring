@@ -7,7 +7,7 @@ import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.post.response.PostListResponse;
 import com.gavoza.backend.domain.tag.dto.hashtagPostResponseDto;
-import com.gavoza.backend.domain.user.dto.UserResponseDto;
+import com.gavoza.backend.domain.user.ToPost.UserResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

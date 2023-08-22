@@ -4,10 +4,12 @@ import com.gavoza.backend.domain.user.dto.*;
 import com.gavoza.backend.domain.user.entity.RefreshToken;
 import com.gavoza.backend.domain.user.service.UserService;
 import com.gavoza.backend.global.exception.MessageResponseDto;
+import com.gavoza.backend.global.exception.TokenResMsgDto;
 import com.gavoza.backend.global.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,9 +23,9 @@ public class UserController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/signup1")
-    public ResponseEntity<MessageResponseDto> signup(@RequestBody SignupRequestDto requestDto) {
+    public ResponseEntity<MessageResponseDto> signup1(@RequestBody Signup1RequestDto requestDto) {
         try {
-            userService.signup(requestDto);
+            userService.signup1(requestDto);
             return ResponseEntity.ok(new MessageResponseDto("회원가입에 성공하셨습니다."));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(e.getMessage()));
@@ -56,32 +58,55 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
-        // 로그인 검사 후 이메일 반환
-        String email = userService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto) {
+        String userEmail = userService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
 
         // 액세스 토큰 생성
-        String accessToken = jwtUtil.createAccessToken(email);
+        String accessToken = jwtUtil.createAccessToken(userEmail);
 
         // 리프레시 토큰 저장 및 생성
-        RefreshToken refreshTokenEntity = userService.createAndSaveRefreshToken(email);
+        RefreshToken refreshTokenEntity = userService.createAndSaveRefreshToken(userEmail);
         String refreshToken = refreshTokenEntity.getToken();
 
         // 토큰 응답
         String message = "로그인에 성공하셨습니다.";
-        TokenResponseDto tokenResponseDto = new TokenResponseDto(accessToken, refreshToken, message);
+        TokenResMsgDto tokenResponseDto = new TokenResMsgDto(message, accessToken, refreshToken);
 
         return ResponseEntity.ok(tokenResponseDto);
     }
 
+
+
+
+
+
+
+
+
+
     @PutMapping("/signup2")
-    public ResponseEntity<MessageResponseDto> updateUser(@RequestBody UpdateUserRequestDto requestDto, HttpServletRequest request) {
+    public ResponseEntity<MessageResponseDto> signup2(@RequestBody Signup2RequestDto requestDto, HttpServletRequest request) {
         try {
-            userService.updateUser(request, requestDto);
+            userService.signup2(request, requestDto);
             return ResponseEntity.ok(new MessageResponseDto("사용자 정보가 수정되었습니다."));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new MessageResponseDto(e.getMessage()));
         }
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<MessageResponseDto> updateUserInfo(@RequestBody UserUpdateRequestDto requestDto,
+                                                             HttpServletRequest request) {
+        String email = jwtUtil.getEmailFromAuthHeader(request);
+        userService.updateUserInfo(email, requestDto);
+        return ResponseEntity.ok(new MessageResponseDto("회원 정보가 수정되었습니다."));
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<MessageResponseDto> deleteUser(HttpServletRequest request) {
+        String email = jwtUtil.getEmailFromAuthHeader(request);
+        userService.deleteUser(email);
+        return ResponseEntity.ok(new MessageResponseDto("회원 탈퇴가 완료되었습니다."));
     }
 
 
