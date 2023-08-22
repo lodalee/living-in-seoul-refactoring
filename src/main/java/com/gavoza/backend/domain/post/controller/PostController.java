@@ -57,14 +57,25 @@ public class PostController {
 
     //게시글 상세 조회
     @GetMapping("/get/{postId}")
-    public PostResponse getOnePost(@PathVariable("postId") Long postId){
-        return postService.getOnePost(postId);
+    public PostResponse getOnePost(@PathVariable("postId") Long postId,
+                                   @RequestParam("userId") Long userId){
+        return postService.getOnePost(postId, userId);
     }
 
     //게시글 전체 조회(커뮤티니)
     @GetMapping("/get")
     public PostListResponse getPost(@RequestParam int page,
-                                    @RequestParam int size){
-        return postService.getPost(page-1,size);
+                                    @RequestParam int size,
+                                    @RequestParam("userId") Long userId){
+        return postService.getPost(page-1,size, userId);
+    }
+
+    //게시글 검색
+    @GetMapping("/get/search")
+    public PostListResponse searchPosts(@RequestParam int page,
+                                        @RequestParam int size,
+                                        @RequestParam String keyword,
+                                        @RequestParam Long userId){
+        return postService.searchPosts(page, size, keyword, userId);
     }
 }

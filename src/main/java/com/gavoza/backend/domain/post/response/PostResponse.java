@@ -1,19 +1,17 @@
 package com.gavoza.backend.domain.post.response;
 
 import com.gavoza.backend.domain.post.dto.PostResultDto;
-import com.gavoza.backend.domain.post.entity.Post;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class PostResponse{
     private String msg;
     private PostResultDto result;
-    private boolean hasLiked;
     //경도, 위도 추가
 
-    public PostResponse(Post post, String msg, PostResultDto postResultDto, boolean hasLikedPost){
+    public PostResponse(String msg, PostResultDto postResultDto){
         this.msg = msg;
         this.result = postResultDto;
-        this.hasLiked = hasLikedPost;
     }
 }
