@@ -81,7 +81,7 @@ public class PostController {
     //게시글 전체 조회(커뮤티니)
     @GetMapping("/get")
     public PostListResponse getPost(@RequestParam int page,
-                                        @RequestParam int size){
+                                    @RequestParam int size){
         return postService.getPost(page-1,size);
     }
 
