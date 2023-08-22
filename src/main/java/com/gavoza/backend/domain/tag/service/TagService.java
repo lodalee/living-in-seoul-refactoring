@@ -31,29 +31,29 @@ public class TagService {
     private final PostLikeRepository postLikeRepository;
 
     //전체 - 태그 순위
-    public List<String> allRankNumber(String gu, String dong) {
-        List<Post> postList = postRepository.findAllByGuAndDong(gu, dong);
+    public List<String> allRankNumber() {
+        List<Post> postList = postRepository.findAll();
         List<String> rankedIds = getHashTagsFromPosts(postList);
 
         return getTopRankedTags(rankedIds, 6);
     }
 
     //카테고리 - 태그 순위
-    public List<String> categoryRankNumer (String category, String gu, String dong) {
-        List<Post> postList = postRepository.findAllBycategoryAndGuAndDong(category, gu, dong);
+    public List<String> categoryRankNumer (String category) {
+        List<Post> postList = postRepository.findAllBycategory(category);
         List<String> rankedIds = getHashTagsFromPosts(postList);
 
         return getTopRankedTags(rankedIds, 6);
     }
 
     //전체 - 태그별 post
-    public PostListResponse hashtagPostResponseDtos (int size, int page, String hashtagName, String type, String gu, String dong) {
+    public PostListResponse hashtagPostResponseDtos (int size, int page, String hashtagName, String type) {
         Pageable pageable = PageRequest.of(page, size);
 
         //인기순/최신순
         Page<Post> postPage = type.equals("popular")
-                ? postRepository.findAllByHashtagContainingAndGuAndDongOrderByPostViewCountDesc(hashtagName, pageable, gu, dong)
-                : postRepository.findAllByHashtagContainingAndGuAndDongOrderByCreatedAtDesc(hashtagName, pageable, gu, dong);
+                ? postRepository.findAllByHashtagContainingOrderByPostViewCountDesc(hashtagName, pageable)
+                : postRepository.findAllByHashtagContainingOrderByCreatedAtDesc(hashtagName, pageable);
 
         if (!postPage.hasContent()) {
             throw new IllegalArgumentException("존재하지 않는 태그입니다.");
@@ -64,11 +64,11 @@ public class TagService {
     }
 
     //카테고리 - 태그별 포스트
-    public PostListResponse categoryHashtagPostResponseDtos (int size, int page, String hashtagName, String category, String type, String gu, String dong) {
+    public PostListResponse categoryHashtagPostResponseDtos (int size, int page, String hashtagName, String category, String type) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Post> postPage = type.equals("popular")
-                ? postRepository.findAllByCategoryAndHashtagContainingAndGuAndDongOrderByPostViewCountDesc(category, hashtagName, pageable, gu, dong)
-                : postRepository.findAllByCategoryAndHashtagContainingAndGuAndDongOrderByCreatedAtDesc(category, hashtagName, pageable, gu, dong);
+                ? postRepository.findAllByCategoryAndHashtagContainingOrderByPostViewCountDesc(category, hashtagName, pageable)
+                : postRepository.findAllByCategoryAndHashtagContainingOrderByCreatedAtDesc(category, hashtagName, pageable);
 
         if (!postPage.hasContent()) {
             throw new IllegalArgumentException("존재하지 않는 태그 혹은 존재하지 않는 카테고리 입니다.");
