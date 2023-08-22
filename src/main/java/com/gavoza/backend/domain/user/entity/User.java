@@ -16,7 +16,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user")
-    private Long Id;
+    private Long id;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -47,5 +47,9 @@ public class User {
         this.movedDate = movedDate;
         this.gender = gender;
         this.birthDate = birthDate;
+    }
+
+    public User(Long id){
+        this.id = id;
     }
 }

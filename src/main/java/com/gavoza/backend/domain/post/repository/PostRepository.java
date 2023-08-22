@@ -19,4 +19,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAllByHashtagContainingAndGuAndDongOrderByCreatedAtDesc(String hashtagName, Pageable pageable, String gu, String dong);
 
     List<Post> findAllByGuAndDong(String gu, String dong);
+
+    Page<Post> findAllByContentContaining(String keyword, Pageable pageable);
+
+    Page<Post> findAllByHashtagContaining(String keyword, Pageable pageable);
 }
