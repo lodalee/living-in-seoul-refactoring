@@ -1,5 +1,6 @@
 package com.gavoza.backend.domain.post.dto;
 
+import com.gavoza.backend.domain.comment.entity.Comment;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.entity.PostImg;
 import lombok.Getter;
@@ -16,8 +17,10 @@ public class PostInfoResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private String category;
-    private long likeSize;
-    private long postViewCount;
+    private int likeSize;
+    private Long postViewCount;
+    private List<Comment> comments;
+    private int commentSize;
 
     public PostInfoResponseDto(Post post) {
         this.postId = post.getId();
@@ -29,6 +32,8 @@ public class PostInfoResponseDto {
         this.category = post.getCategory();
         this.likeSize = post.getLike().size();
         this.postViewCount = post.getPostViewCount();
+        this.comments = post.getCommentList();
+        this.commentSize = getComments().size();
     }
 }
 
