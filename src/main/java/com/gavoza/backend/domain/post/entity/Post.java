@@ -2,7 +2,6 @@ package com.gavoza.backend.domain.post.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gavoza.backend.domain.Like.entity.Postlike;
-import com.gavoza.backend.domain.comment.entity.Comment;
 import com.gavoza.backend.domain.post.dto.PostRequestDto;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.config.Auditing;
@@ -42,10 +41,6 @@ public class Post extends Auditing {
 
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE})
     private List<Postlike> like = new ArrayList<>();
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE})
-    private List<Comment> commentList = new ArrayList<>();
 
     private String category;
     private Long lat;
