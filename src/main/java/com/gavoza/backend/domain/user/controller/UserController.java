@@ -104,4 +104,27 @@ public class UserController {
         userService.logout(email);
         return ResponseEntity.ok(new MessageResponseDto("로그아웃에 성공하셨습니다."));
     }
+
+    @PostMapping("/callback")
+    public ResponseEntity<?> signInWithKakao(@RequestBody KakaoAuthCodeRequestDto kakaoAuthCodeRequestDto) {
+        String authCode = kakaoAuthCodeRequestDto.getAuthCode();
+
+        // 인가 코드로 액세스 토큰 발급
+        String accessToken = userService.getAccessTokenFromAuthCode(authCode);
+
+        String email = userService.signInWithKakao(accessToken);
+
+        // 액세스 토큰 생성
+        String customAccessToken = jwtUtil.createAccessToken(email);
+
+        // 리프레시 토큰 저장 및 생성
+        RefreshToken refreshTokenEntity = userService.createAndSaveRefreshToken(email);
+
+        KakaoLoginResponseDto loginResponseDto = new KakaoLoginResponseDto();
+        loginResponseDto.setEmail(email);
+        loginResponseDto.setAccessToken(customAccessToken);
+        loginResponseDto.setRefreshToken(refreshTokenEntity.getToken());
+
+        return ResponseEntity.ok(loginResponseDto);
+    }
 }

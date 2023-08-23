@@ -44,6 +44,12 @@ public class User {
         this.gender = gender;
         this.birthDate = birthDate;
     }
+
+    public User(String email, String nickname,String password){
+        this.email=email;
+        this.nickname=nickname;
+        this.password=password;
+    }
     public User(Long id){
         this.id = id;
     }
