@@ -1,6 +1,7 @@
 package com.gavoza.backend.domain.comment.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gavoza.backend.domain.comment.dto.CommentRequestDto;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.global.config.Auditing;
@@ -8,6 +9,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -17,7 +21,8 @@ import lombok.Setter;
 public class Comment extends Auditing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long commentId;
+    @Column(name = "comment_id")
+    private Long id;
 
     @Column
     private String nickname;
@@ -29,6 +34,12 @@ public class Comment extends Auditing {
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "comment", cascade = {CascadeType.REMOVE})
+    private List<ReComment> reCommentList = new ArrayList<>();
+
+    private String userImg;
 
 
     public Comment(CommentRequestDto requestDto, String nickname, Post post) {
