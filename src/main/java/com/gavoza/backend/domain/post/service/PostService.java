@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,139 +40,199 @@ import java.util.UUID;
 public class PostService {
 
     private final AmazonS3Client amazonS3Client;
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
-
     private final PostRepository postRepository;
     private final PostImgRepository postImgRepository;
     private final PostLikeRepository postLikeRepository;
 
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
 
-    //upload
-    public MessageResponseDto upload(PostRequestDto requestDto, User user,List<MultipartFile> photos) throws IOException {
-
-        //존재하지 않는 카테고리 에러처리
+    //게시물 생성 : 게시물을 업로드하고 이미지를 저장
+    public MessageResponseDto upload(PostRequestDto requestDto, User user, List<MultipartFile> photos) throws IOException {
         requestDto.validateCategory();
 
+        List<PostImg> postImgList = uploadPhotosToS3AndCreatePostImages(photos);
+
+        Post post = new Post(requestDto, user);
+        postRepository.save(post);
+
+        associatePostImagesWithPost(post, postImgList);
+
+        return new MessageResponseDto("파일 저장 성공");
+    }
+
+    //이미지를 S3에 업로드하고, PostImg 객체를 생성하여 리스트에 추가
+    private List<PostImg> uploadPhotosToS3AndCreatePostImages(List<MultipartFile> photos) throws IOException {
         List<PostImg> postImgList = new ArrayList<>();
 
-        List<String> uuidFilePaths = new ArrayList<>();
-
-        //S3에 이미지 저장
-        //photos 목록이 null이 아니고 비어있지 않을 때만 업로드 작업 수행
-        if (photos != null && !photos.isEmpty()) {
+        if (photos != null) {
             for (MultipartFile photo : photos) {
-                long size = photo.getSize();
-
-                //ObjectMetadata 객체를 생성하여 파일의 메타데이터를 설정합니다.
-                //이 메타데이터에는 파일 크기, 콘텐츠 유형 및 인라인 콘텐츠 디스포지션을 설정합니다.
-                ObjectMetadata objectMetadata = new ObjectMetadata();
-                objectMetadata.setContentType(photo.getContentType());
-                objectMetadata.setContentLength(size);
-                objectMetadata.setContentDisposition("inline");
-
-                String prefix = UUID.randomUUID().toString();
-                String fileName = prefix + "_" + photo.getOriginalFilename();
-                String bucketFilePath = "photos/" + fileName;
-
-                //S3에 업로드
-                //Amazon S3 클라이언트를 사용하여 파일을 지정된 버킷(bucketName) 경로(bucketFilePath)에 업로드합니다.
-                //withCannedAcl은 업로드된 파일을 공개 읽기 권한으로 설정하는 데 사용됩니다.
-                amazonS3Client.putObject(
-                        new PutObjectRequest(bucketName, bucketFilePath, photo.getInputStream(), objectMetadata)
-                                .withCannedAcl(CannedAccessControlList.PublicRead)
-                );
-
-                uuidFilePaths.add(fileName);
-
-                //PostImg 저장
-                PostImg postImg = new PostImg(fileNameToURL(fileName), null);
-                postImgList.add(postImg);
+                if (photo != null && !photo.isEmpty()) { // 이미지가 null이 아니고 비어있지 않은 경우에만 처리
+                    String fileName = uploadPhotoToS3AndGetFileName(photo);
+                    PostImg postImg = new PostImg(fileNameToURL(fileName), null);
+                    postImgList.add(postImg);
+                }
             }
         }
-
-            Post post = new Post(requestDto, user);
-            postRepository.save(post);
-
-            // PostImg 인스턴스를 저장된 게시물에 연결하여 저장
-            for (PostImg postImg : postImgList) {
-                postImg.setPost(post);
-                postImgRepository.save(postImg);
-            }
-            return new MessageResponseDto("파일 저장 성공");
-        }
-
-    private String fileNameToURL(String fileName){
-        return "https://living-in-seoul.s3.ap-northeast-2.amazonaws.com/photos/" + fileName;
+        return postImgList;
     }
 
+    //S3에 이미지를 업로드하고, 업로드된 파일의 이름을 반환
+    private String uploadPhotoToS3AndGetFileName(MultipartFile photo) throws IOException {
+        long size = photo.getSize();
 
-    //post 수정
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentType(photo.getContentType());
+        objectMetadata.setContentLength(size);
+        objectMetadata.setContentDisposition("inline");
+
+        String prefix = UUID.randomUUID().toString();
+        String fileName = prefix + "_" + photo.getOriginalFilename();
+        String bucketFilePath = "photos/" + fileName;
+
+        amazonS3Client.putObject(
+                new PutObjectRequest(bucketName, bucketFilePath, photo.getInputStream(), objectMetadata)
+                        .withCannedAcl(CannedAccessControlList.PublicRead)
+        );
+
+        return fileName;
+    }
+
+    //PostImg 객체와 Post를 연결하고 DB에 저장
+    private void associatePostImagesWithPost(Post post, List<PostImg> postImgList) {
+        for (PostImg postImg : postImgList) {
+            postImg.setPost(post);
+            postImgRepository.save(postImg);
+        }
+    }
+
+    //게시물 수정
     public void updatePost(Long postId, PostRequestDto requestDto, User user) {
         Post post = findPost(postId);
-        if (!(post.getUser().getNickname().equals(user.getNickname()))){
-            throw new IllegalArgumentException("해당 게시글의 작성자가 아닙니다.");
-        }
-        long lat = requestDto.getLat();
-        long lng = requestDto.getLng();
-        String content = requestDto.getContent();
-
-        post.update(content,lat,lng);
+        validateUserOwnership(user, post);
+        post.update(requestDto.getContent(), requestDto.getLat(), requestDto.getLng());
     }
 
-    //post 삭제
+    //게시물 삭제
     public void deletePost(Long postId, User user) {
         Post post = findPost(postId);
-
-        if (!(post.getUser().getNickname().equals(user.getNickname()))) {
-            throw new IllegalArgumentException("해당 게시글의 작성자가 아닙니다.");
-        }
+        validateUserOwnership(user, post);
         postRepository.delete(post);
     }
 
-    //게시물 상세 조회
-    public PostResponse getOnePost(Long postId) {
-        Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시물은 존재하지 않습니다."));
+    //유저 정보 상세 게시물 조회
+    public PostResponse getLikeOnePost(Long postId, User user) {
+        Post post = findPost(postId);
+        post.increaseViewCount();
 
-        findPost.increaseViewCount();
+        boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
+
+        UserResponseDto userResponseDto = new UserResponseDto(post.getUser().getNickname(), post.getUser().getEmail());
+        PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
+        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
+        return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost));
+    }
+
+    //상세 게시물 조회
+    public PostResponse getOnePost(Long postId) {
+        Post post = findPost(postId);
+        post.increaseViewCount();
+
         boolean hasLikedPost = false;
 
-        if (postLikeRepository.existsLikeByPostAndUser(findPost, findPost.getUser())){
-            hasLikedPost = true;
-        }
-
-        UserResponseDto userResponseDto = new UserResponseDto(findPost.getUser().getNickname(),findPost.getUser()
-                .getEmail());
-        PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(findPost);
-        LocationResponseDto locationResponseDto = new LocationResponseDto(findPost.getGu(),findPost.getDong(),findPost.getLat(),findPost.getLng());
-        return new PostResponse(findPost,"게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto),hasLikedPost);
+        UserResponseDto userResponseDto = new UserResponseDto(post.getUser().getNickname(), post.getUser().getEmail());
+        PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
+        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
+        return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost));
     }
 
-    //커뮤니티 전체조회
-    public PostListResponse getPost(int page, int size) {
-        // 페이지 및 사이즈 계산
-        Pageable pageable = PageRequest.of(page,size, Sort.by(Sort.Direction.DESC, "createdAt"));
-
+    //유저 게시물 전체 조회
+    public PostListResponse getLikePost(int page, int size, User user) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Post> postPages = postRepository.findAll(pageable);
-        List<PostResultDto> postResultDtos = new ArrayList<>();
 
-        for (Post post : postPages) {
-            UserResponseDto userResponseDto = new UserResponseDto(post.getUser());
-            PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
-            LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(),post.getDong(),post.getLat(),post.getLng());
-            postResultDtos.add(new PostResultDto(userResponseDto, postInfoResponseDto,locationResponseDto));
-        }
-        return new PostListResponse("검색 조회 성공",postPages.getTotalPages(),postPages.getTotalElements(), size, postResultDtos);
+        List<PostResultDto> postResultDtos = postPages.stream()
+                .map(post -> mapToPostResultDto(post,user))
+                .collect(Collectors.toList());
+
+        return new PostListResponse("게시글 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
     }
 
+    //게시물 전체 조회
+    public PostListResponse getPost(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Post> postPages = postRepository.findAll(pageable);
 
+        List<PostResultDto> postResultDtos = postPages.stream()
+                .map(post -> mapToPostResultDto(post))
+                .collect(Collectors.toList());
 
+        return new PostListResponse("게시글 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
+    }
+
+    //유저 PostResultDto 타입으로 반환
+    private PostResultDto mapToPostResultDto(Post post, User user) {
+        UserResponseDto userResponseDto = new UserResponseDto(post.getUser());
+        PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
+        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
+        boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
+        return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost);
+    }
+
+    //PostResultDto 타입으로 반환
+    private PostResultDto mapToPostResultDto(Post post) {
+        UserResponseDto userResponseDto = new UserResponseDto(post.getUser());
+        PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
+        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
+        boolean hasLikedPost = false;
+        return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost);
+    }
+
+    //주어진 게시물 ID에 해당하는 게시물 조회
     private Post findPost(Long postId) {
-        return postRepository.findById(postId).orElseThrow(() ->
-                new IllegalArgumentException("선택한 게시글은 존재하지 않습니다.")
-        );
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글은 존재하지 않습니다."));
+    }
+
+    //사용자가 게시물의 작성자인지 확인
+    private void validateUserOwnership(User user, Post post) {
+        if (!post.getUser().getNickname().equals(user.getNickname())) {
+            throw new IllegalArgumentException("해당 게시글의 작성자가 아닙니다.");
+        }
+    }
+
+    private String fileNameToURL(String fileName) {
+        return "https://living-in-seoul.s3.ap-northeast-2.amazonaws.com/photos/" + fileName;
+    }
+
+    //유저 게시글 검색
+    public PostListResponse searchLikePosts(int page, int size, String keyword, User user) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<Post> postPages = keyword.contains("#")
+                ? postRepository.findAllByHashtagContaining(keyword, pageable)
+                : postRepository.findAllByContentContaining(keyword, pageable);
+
+        List<PostResultDto> postResultDtos = postPages.stream()
+                .map(post -> mapToPostResultDto(post, user))
+                .collect(Collectors.toList());
+
+        return new PostListResponse("검색 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
+    }
+
+    //게시글 검색
+    public PostListResponse searchPosts(int page, int size, String keyword) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<Post> postPages = keyword.contains("#")
+                ? postRepository.findAllByHashtagContaining(keyword, pageable)
+                : postRepository.findAllByContentContaining(keyword, pageable);
+
+        List<PostResultDto> postResultDtos = postPages.stream()
+                .map(post -> mapToPostResultDto(post, post.getUser()))
+                .collect(Collectors.toList());
+
+        return new PostListResponse("검색 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
     }
 }
 
