@@ -8,6 +8,7 @@ import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.post.response.PostListResponse;
 import com.gavoza.backend.domain.user.ToPost.UserResponseDto;
+import com.gavoza.backend.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,7 +48,8 @@ public class TagService {
     }
 
     //전체 - 태그별 post
-    public PostListResponse hashtagPostResponseDtos (int size, int page, String hashtagName, String type) {
+    public PostListResponse hashtagPostResponseDtos (int size, int page, String hashtagName, String type, User user
+    ) {
         Pageable pageable = PageRequest.of(page, size);
 
         //인기순/최신순
@@ -59,13 +61,16 @@ public class TagService {
             throw new IllegalArgumentException("존재하지 않는 태그입니다.");
         }
 
-        List<PostResultDto> postResultDtos = buildPostResultDtos(postPage);
+        List<PostResultDto> postResultDtos =
+                postPage.getContent().stream()
+                        .map(post -> mapToPostResultDto(post,user))
+                        .collect(Collectors.toList());
         return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size, postResultDtos);
     }
 
     //카테고리 - 태그별 포스트
-    public PostListResponse categoryHashtagPostResponseDtos (int size, int page, String hashtagName, String category, String type) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+    public PostListResponse categoryHashtagPostResponseDtos (int size, int page, String hashtagName, String category, String type, User user) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<Post> postPage = type.equals("popular")
                 ? postRepository.findAllByCategoryAndHashtagContainingOrderByPostViewCountDesc(category, hashtagName, pageable)
                 : postRepository.findAllByCategoryAndHashtagContainingOrderByCreatedAtDesc(category, hashtagName, pageable);
@@ -74,7 +79,9 @@ public class TagService {
             throw new IllegalArgumentException("존재하지 않는 태그 혹은 존재하지 않는 카테고리 입니다.");
         }
 
-        List<PostResultDto> postResultDtos = buildPostResultDtos(postPage);
+        List<PostResultDto> postResultDtos = postPage.stream()
+                .map(post -> mapToPostResultDto(post,user))
+                .collect(Collectors.toList());
         return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size, postResultDtos);
     }
 
@@ -83,18 +90,15 @@ public class TagService {
         return rankedIds.stream().limit(limit).collect(Collectors.toList());
     }
 
-    //PostResultDto 객체를 생성하는 메서드
-    private List<PostResultDto> buildPostResultDtos(Page<Post> postPage) {
-        return postPage.getContent().stream().map(this::mapToPostResultDto).collect(Collectors.toList());
-    }
-
-    //Post 객체를 PostResultDto 객체로 변환하는 메서드
-    private PostResultDto mapToPostResultDto(Post post) {
+    //PostResultDto 객체로 변환하는 메서드
+    private PostResultDto mapToPostResultDto(Post post, User user) {
         UserResponseDto userResponseDto = new UserResponseDto(post.getUser());
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
         LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
-
-        boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, post.getUser());
+        if (Objects.isNull(user)){
+            return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false);
+        }
+        boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
         return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto,hasLikedPost);
     }
 

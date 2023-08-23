@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -54,52 +55,41 @@ public class PostController {
         return new MessageResponseDto("게시글 삭제 성공");
     }
 
-    //유저 게시글 상세 조회
-    @GetMapping("/like/get/{postId}")
-    public PostResponse getLikeOnePost(@PathVariable("postId") Long postId,
-                                   @AuthenticationPrincipal UserDetailsImpl userDetails){
-        User user = userDetails.getUser();
-        return postService.getLikeOnePost(postId, user);
-    }
-
     //게시글 상세 조회
     @GetMapping("/get/{postId}")
-    public PostResponse getOnePost(@PathVariable("postId") Long postId){
-        return postService.getOnePost(postId);
-    }
-
-
-    //유저 게시글 전체 조회(커뮤티니)
-    @GetMapping("/like/get")
-    public PostListResponse getLikePost(@RequestParam int page,
-                                    @RequestParam int size,
-                                    @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public PostResponse getOnePost(@PathVariable("postId") Long postId,
+                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
+        if(Objects.isNull(userDetails)){
+            return postService.getOnePost(postId, null);
+        }
         User user = userDetails.getUser();
-        return postService.getLikePost(page-1,size, user);
+        return postService.getOnePost(postId, user);
     }
+
 
     //게시글 전체 조회(커뮤티니)
     @GetMapping("/get")
     public PostListResponse getPost(@RequestParam int page,
-                                    @RequestParam int size){
-        return postService.getPost(page-1,size);
+                                    @RequestParam int size,
+                                    @AuthenticationPrincipal UserDetailsImpl userDetails){
+        if(Objects.isNull(userDetails)){
+            return postService.getPost(page-1 , size, null);
+        }
+        User user = userDetails.getUser();
+        return postService.getPost(page-1,size, user);
     }
 
-    //유저 게시글 검색
-    @GetMapping("/like/get/search")
-    public PostListResponse searchLikePosts(@RequestParam int page,
-                                        @RequestParam int size,
-                                        @RequestParam String keyword,
-                                        @AuthenticationPrincipal UserDetailsImpl userDetails){
-        User user = userDetails.getUser();
-        return postService.searchLikePosts(page, size, keyword, user);
-    }
 
     //게시글 검색
     @GetMapping("/get/search")
     public PostListResponse searchPosts(@RequestParam int page,
-                                            @RequestParam int size,
-                                            @RequestParam String keyword){
-        return postService.searchPosts(page, size, keyword);
+                                        @RequestParam int size,
+                                        @RequestParam String keyword,
+                                        @AuthenticationPrincipal UserDetailsImpl userDetails){
+        if(Objects.isNull(userDetails)){
+            return postService.searchPosts(page-1 , size, keyword ,null);
+        }
+        User user = userDetails.getUser();
+        return postService.searchPosts(page-1, size, keyword, user);
     }
 }
