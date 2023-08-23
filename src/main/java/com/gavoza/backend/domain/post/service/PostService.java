@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -120,34 +121,26 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    //유저 정보 상세 게시물 조회
-    public PostResponse getLikeOnePost(Long postId, User user) {
+    //상세 게시물 조회
+    public PostResponse getOnePost(Long postId, User user) {
         Post post = findPost(postId);
         post.increaseViewCount();
+
+        UserResponseDto userResponseDto = new UserResponseDto(post.getUser().getNickname(), post.getUser().getEmail());
+        PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
+        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
+
+        if(Objects.isNull(user)){
+            return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false));
+        }
 
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
 
-        UserResponseDto userResponseDto = new UserResponseDto(post.getUser().getNickname(), post.getUser().getEmail());
-        PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
-        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
         return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost));
     }
 
-    //상세 게시물 조회
-    public PostResponse getOnePost(Long postId) {
-        Post post = findPost(postId);
-        post.increaseViewCount();
-
-        boolean hasLikedPost = false;
-
-        UserResponseDto userResponseDto = new UserResponseDto(post.getUser().getNickname(), post.getUser().getEmail());
-        PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
-        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
-        return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost));
-    }
-
-    //유저 게시물 전체 조회
-    public PostListResponse getLikePost(int page, int size, User user) {
+    //게시물 전체 조회
+    public PostListResponse getPost(int page, int size, User user) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Post> postPages = postRepository.findAll(pageable);
 
@@ -158,33 +151,31 @@ public class PostService {
         return new PostListResponse("게시글 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
     }
 
-    //게시물 전체 조회
-    public PostListResponse getPost(int page, int size) {
+    //게시글 검색
+    public PostListResponse searchPosts(int page, int size, String keyword, User user) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Post> postPages = postRepository.findAll(pageable);
+
+        Page<Post> postPages = keyword.contains("#")
+                ? postRepository.findAllByHashtagContaining(keyword, pageable)
+                : postRepository.findAllByContentContaining(keyword, pageable);
 
         List<PostResultDto> postResultDtos = postPages.stream()
-                .map(post -> mapToPostResultDto(post))
+                .map(post -> mapToPostResultDto(post, user))
                 .collect(Collectors.toList());
 
-        return new PostListResponse("게시글 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
+        return new PostListResponse("검색 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
     }
 
-    //유저 PostResultDto 타입으로 반환
+
+    //PostResultDto 타입으로 반환
     private PostResultDto mapToPostResultDto(Post post, User user) {
         UserResponseDto userResponseDto = new UserResponseDto(post.getUser());
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
         LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
+        if (Objects.isNull(user)){
+            return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false);
+        }
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
-        return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost);
-    }
-
-    //PostResultDto 타입으로 반환
-    private PostResultDto mapToPostResultDto(Post post) {
-        UserResponseDto userResponseDto = new UserResponseDto(post.getUser());
-        PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
-        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
-        boolean hasLikedPost = false;
         return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost);
     }
 
@@ -203,36 +194,6 @@ public class PostService {
 
     private String fileNameToURL(String fileName) {
         return "https://living-in-seoul.s3.ap-northeast-2.amazonaws.com/photos/" + fileName;
-    }
-
-    //유저 게시글 검색
-    public PostListResponse searchLikePosts(int page, int size, String keyword, User user) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-        Page<Post> postPages = keyword.contains("#")
-                ? postRepository.findAllByHashtagContaining(keyword, pageable)
-                : postRepository.findAllByContentContaining(keyword, pageable);
-
-        List<PostResultDto> postResultDtos = postPages.stream()
-                .map(post -> mapToPostResultDto(post, user))
-                .collect(Collectors.toList());
-
-        return new PostListResponse("검색 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
-    }
-
-    //게시글 검색
-    public PostListResponse searchPosts(int page, int size, String keyword) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-        Page<Post> postPages = keyword.contains("#")
-                ? postRepository.findAllByHashtagContaining(keyword, pageable)
-                : postRepository.findAllByContentContaining(keyword, pageable);
-
-        List<PostResultDto> postResultDtos = postPages.stream()
-                .map(post -> mapToPostResultDto(post, post.getUser()))
-                .collect(Collectors.toList());
-
-        return new PostListResponse("검색 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
     }
 }
 
