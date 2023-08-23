@@ -19,8 +19,6 @@ public class PostLikeController {
     public MessageResponseDto postLike(@PathVariable Long postId,
                                        @AuthenticationPrincipal UserDetailsImpl userDetails){
         User user = userDetails.getUser();
-        postLikeService.postLike(postId,user);
-
-        return new MessageResponseDto("좋아요");
+        return postLikeService.postLike(postId,user);
     }
 }
