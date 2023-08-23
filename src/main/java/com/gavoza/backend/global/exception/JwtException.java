@@ -1,7 +1,7 @@
 package com.gavoza.backend.global.exception;
 
 public class JwtException extends RuntimeException {
-    private String errorMessage;
+    private final String errorMessage;
 
     public JwtException(String errorMessage) {
         this.errorMessage = errorMessage;

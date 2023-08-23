@@ -12,7 +12,6 @@ import java.util.Collections;
 public class UserDetailsImpl implements UserDetails {
 
     private final User user;
-    private Long id;
 
 
     public UserDetailsImpl(User user) {
@@ -58,11 +57,4 @@ public class UserDetailsImpl implements UserDetails {
         return true;
     }
 
-//    public Long getId() {
-//        return id;
-//    }
-//
-//    public void setId(Long id) {
-//        this.id = id;
-//    }
 }

@@ -44,6 +44,7 @@ public class CityScraper {
 
         return cities;
     }
+
     public static void main(String[] args) {
         CityScraper cityScraper = new CityScraper();
         List<String> cities = cityScraper.getCities();

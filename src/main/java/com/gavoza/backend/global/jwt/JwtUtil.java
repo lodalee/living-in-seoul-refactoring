@@ -4,9 +4,6 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -71,11 +68,11 @@ public class JwtUtil {
     }
 
 
-
     // 토큰에서 사용자 정보 가져오기
     public Claims getUserInfoFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
+
     //헤더에서 토큰 가져오기
     public String getTokenFromRequest(HttpServletRequest req) {
         String tokenValue = req.getHeader(AUTHORIZATION_HEADER);
@@ -84,6 +81,7 @@ public class JwtUtil {
         }
         return null;
     }
+
     //토큰생성
     public String createAccessToken(String email) {
         return createToken(email);

@@ -4,12 +4,11 @@ import com.gavoza.backend.domain.user.dto.*;
 import com.gavoza.backend.domain.user.entity.RefreshToken;
 import com.gavoza.backend.domain.user.service.UserService;
 import com.gavoza.backend.global.exception.MessageResponseDto;
+import com.gavoza.backend.global.exception.RefreshResMsgDto;
 import com.gavoza.backend.global.exception.TokenResMsgDto;
 import com.gavoza.backend.global.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +34,7 @@ public class UserController {
 
 
     @GetMapping("/refresh")
-    public ResponseEntity<MessageResponseDto> refreshToken(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
+    public ResponseEntity<RefreshResMsgDto> refreshToken(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
         String refreshTokenValue = refreshTokenRequestDto.getRefreshToken();
 
         try {
@@ -46,15 +45,14 @@ public class UserController {
             String newAccessToken = jwtUtil.createAccessToken(email);
 
             // 토큰 응답
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.BEARER_PREFIX + newAccessToken);
-            MessageResponseDto messageResponseDto = new MessageResponseDto("Access 토큰 발급 성공");
-            return ResponseEntity.ok().headers(responseHeaders).body(messageResponseDto);
+            RefreshResMsgDto refreshResMsgDto = new RefreshResMsgDto("Access 토큰 발급 성공", newAccessToken);
+            return ResponseEntity.ok().body(refreshResMsgDto);
 
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(new MessageResponseDto("refreshToken이 만료되었습니다."));
+            return ResponseEntity.badRequest().body(new RefreshResMsgDto(e.getMessage(), null));
         }
     }
+
 
 
     @PostMapping("/login")
@@ -74,15 +72,6 @@ public class UserController {
 
         return ResponseEntity.ok(tokenResponseDto);
     }
-
-
-
-
-
-
-
-
-
 
     @PutMapping("/signup2")
     public ResponseEntity<MessageResponseDto> signup2(@RequestBody Signup2RequestDto requestDto, HttpServletRequest request) {
@@ -109,11 +98,35 @@ public class UserController {
         return ResponseEntity.ok(new MessageResponseDto("회원 탈퇴가 완료되었습니다."));
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<MessageResponseDto> logout(HttpServletRequest request) {
+        String email = jwtUtil.getEmailFromAuthHeader(request);
+        userService.logout(email);
+        return ResponseEntity.ok(new MessageResponseDto("로그아웃에 성공하셨습니다."));
+    }
 
+    @PostMapping("/callback")
+    public ResponseEntity<?> signInWithKakao(@RequestBody KakaoAuthCodeRequestDto kakaoAuthCodeRequestDto) {
+        String authCode = kakaoAuthCodeRequestDto.getAuthCode();
 
+        // 인가 코드로 액세스 토큰 발급
+        String accessToken = userService.getAccessTokenFromAuthCode(authCode);
 
+        String email = userService.signInWithKakao(accessToken);
 
+        // 액세스 토큰 생성
+        String customAccessToken = jwtUtil.createAccessToken(email);
 
+        // 리프레시 토큰 저장 및 생성
+        RefreshToken refreshTokenEntity = userService.createAndSaveRefreshToken(email);
+
+        KakaoLoginResponseDto loginResponseDto = new KakaoLoginResponseDto();
+        loginResponseDto.setEmail(email);
+        loginResponseDto.setAccessToken(customAccessToken);
+        loginResponseDto.setRefreshToken(refreshTokenEntity.getToken());
+
+        return ResponseEntity.ok(loginResponseDto);
+    }
 
 
 }

@@ -27,16 +27,12 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = true)
     private String hometown;
 
-    @Column(nullable = true)
     private String movedDate;
 
-    @Column(nullable = true)
     private String gender;
 
-    @Column(nullable = true)
     private String birthDate;
 
     public User(String email, String nickname, String password, String hometown, String movedDate, String gender, String birthDate) {
@@ -48,4 +44,11 @@ public class User {
         this.gender = gender;
         this.birthDate = birthDate;
     }
+
+    public User(String email, String nickname,String password){
+        this.email=email;
+        this.nickname=nickname;
+        this.password=password;
+    }
+
 }

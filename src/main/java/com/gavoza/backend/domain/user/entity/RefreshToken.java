@@ -28,13 +28,18 @@ public class RefreshToken {
     }
 
     public RefreshToken(String token, String userEmail, LocalDateTime expiryDate) {
+        if (userEmail == null || userEmail.isEmpty()) {
+            throw new IllegalArgumentException("User email cannot be null or empty.");
+        }
         this.token = token;
         this.userEmail = userEmail;
         this.expiryDate = expiryDate;
     }
+
     public void updateToken(String newToken) {
         this.token = newToken;
     }
+
     public void updateExpiryDate(LocalDateTime newExpiryDate) {
         this.expiryDate = newExpiryDate;
     }
