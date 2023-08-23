@@ -44,17 +44,7 @@ public class User {
         this.gender = gender;
         this.birthDate = birthDate;
     }
-
-<<<<<<< HEAD
-    public User(String email, String nickname,String password){
-        this.email=email;
-        this.nickname=nickname;
-        this.password=password;
-    }
-
-=======
     public User(Long id){
         this.id = id;
     }
->>>>>>> b2cf682e091b1dbb4e851466e608bd2422b3b3bf
 }

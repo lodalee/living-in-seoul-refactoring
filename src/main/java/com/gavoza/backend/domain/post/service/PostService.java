@@ -66,13 +66,11 @@ public class PostService {
     private List<PostImg> uploadPhotosToS3AndCreatePostImages(List<MultipartFile> photos) throws IOException {
         List<PostImg> postImgList = new ArrayList<>();
 
-        if (photos != null) {
+        if (photos != null && !photos.isEmpty()) {
             for (MultipartFile photo : photos) {
-                if (photo != null && !photo.isEmpty()) { // 이미지가 null이 아니고 비어있지 않은 경우에만 처리
-                    String fileName = uploadPhotoToS3AndGetFileName(photo);
-                    PostImg postImg = new PostImg(fileNameToURL(fileName), null);
-                    postImgList.add(postImg);
-                }
+                String fileName = uploadPhotoToS3AndGetFileName(photo);
+                PostImg postImg = new PostImg(fileNameToURL(fileName), null);
+                postImgList.add(postImg);
             }
         }
         return postImgList;
@@ -148,7 +146,7 @@ public class PostService {
                 .map(post -> mapToPostResultDto(post,user))
                 .collect(Collectors.toList());
 
-        return new PostListResponse("게시글 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
+        return new PostListResponse("검색 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
     }
 
     //게시글 검색
