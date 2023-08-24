@@ -40,6 +40,7 @@ public class Post extends Auditing {
 
     private long postViewCount = 0;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE})
     private List<Postlike> like = new ArrayList<>();
 
@@ -73,5 +74,9 @@ public class Post extends Auditing {
 
     public void increaseViewCount() {
         this.postViewCount += 1;
+    }
+
+    public List<Comment> getComments() {
+        return commentList;
     }
 }

@@ -41,6 +41,9 @@ public class Comment extends Auditing {
 
     private String userImg;
 
+    @Transient
+    private boolean commentHasLiked;
+
 
     public Comment(CommentRequestDto requestDto, String nickname, Post post) {
         this.nickname = nickname;
