@@ -15,10 +15,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostLikeController {
     private final PostLikeService postLikeService;
 
+    //포스트 좋아요
     @PostMapping("/posts/{postId}/like")
     public MessageResponseDto postLike(@PathVariable Long postId,
                                        @AuthenticationPrincipal UserDetailsImpl userDetails){
         User user = userDetails.getUser();
         return postLikeService.postLike(postId,user);
+    }
+
+    //댓글 좋아요
+    @PostMapping("/comment/{id}/like") //comment id
+    public MessageResponseDto commentLike(@PathVariable Long id,
+                                          @AuthenticationPrincipal UserDetailsImpl userDetails){
+        User user = userDetails.getUser();
+        return postLikeService.commentLike(id, user);
     }
 }

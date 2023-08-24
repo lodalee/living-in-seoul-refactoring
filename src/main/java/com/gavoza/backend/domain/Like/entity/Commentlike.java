@@ -1,5 +1,6 @@
 package com.gavoza.backend.domain.Like.entity;
 
+import com.gavoza.backend.domain.comment.entity.Comment;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -9,11 +10,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "post_like")
-public class Postlike {
+@Table(name = "comment_like")
+public class Commentlike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_like_id")
+    @Column(name = "comment_like_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -21,11 +22,11 @@ public class Postlike {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
 
-    public Postlike(Post post, User user) {
-        this.post = post;
+    public Commentlike(Comment comment, User user) {
+        this.comment = comment;
         this.user = user;
     }
 }
