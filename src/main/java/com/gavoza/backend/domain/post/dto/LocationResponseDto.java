@@ -4,12 +4,12 @@ import lombok.Getter;
 
 @Getter
 public class LocationResponseDto {
-    private long lat;
-    private long lng;
+    private double lat;
+    private double lng;
     private String gu;
     private String dong;
 
-    public LocationResponseDto(String gu, String dong, Long lat, Long lng) {
+    public LocationResponseDto(String gu, String dong, double lat, double lng) {
         this.lat = lat;
         this.lng = lng;
         this.gu = gu;

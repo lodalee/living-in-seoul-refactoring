@@ -48,8 +48,8 @@ public class Post extends Auditing {
     private List<Comment> commentList = new ArrayList<>();
 
     private String category;
-    private Long lat;
-    private Long lng;
+    private double lat;
+    private double lng;
     private String gu;
     private String dong;
 
