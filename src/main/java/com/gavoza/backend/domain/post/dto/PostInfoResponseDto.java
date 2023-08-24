@@ -19,7 +19,6 @@ public class PostInfoResponseDto {
     private String category;
     private int likeSize;
     private Long postViewCount;
-    private List<Comment> comments;
     private int commentSize;
 
     public PostInfoResponseDto(Post post) {
@@ -32,8 +31,7 @@ public class PostInfoResponseDto {
         this.category = post.getCategory();
         this.likeSize = post.getLike().size();
         this.postViewCount = post.getPostViewCount();
-        this.comments = post.getCommentList();
-        this.commentSize = getComments().size();
+        this.commentSize = post.getComments().size();
     }
 }
 
