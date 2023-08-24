@@ -125,26 +125,6 @@ public class PostService {
         postRepository.delete(post);
     }
 
-
-//    //상세 게시물 조회
-//    @Transactional(readOnly = true)
-//    public PostResponse getOnePost(Long postId, User user) {
-//        Post post = findPost(postId);
-//        post.increaseViewCount();
-//
-//        UserResponseDto userResponseDto = new UserResponseDto(post.getUser());
-//        PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
-//        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
-//
-//        List<CommentResponseDto> commentResponseDtos = post.getComments().stream()
-//                .map(comment -> getOneComment(comment.getId(), user))
-//                .collect(Collectors.toList());
-//
-//        boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
-//
-//        return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost, commentResponseDtos));
-//    }
-
     //상세 게시물 조회
     public PostResponse getOnePost(Long postId, User user) {
         Post post = findPost(postId);
@@ -154,17 +134,17 @@ public class PostService {
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
         LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
 
-        List<CommentResponseDto> commentResponseDtos = post.getComments().stream()
+        List<CommentResponseDto> comments = post.getComments().stream()
                 .map(comment -> getOneComment(comment.getId(), user))
                 .collect(Collectors.toList());
 
         if(Objects.isNull(user)){
-            return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false,commentResponseDtos));
+            return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false,comments));
 
         }
 
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
-        return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost, commentResponseDtos));
+        return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost, comments));
     }
 
     //게시물 전체 조회
