@@ -12,7 +12,7 @@ public class PostResultDto {
     PostInfoResponseDto post;
     LocationResponseDto location;
     private boolean hasLiked;
-    List<CommentResponseDto> commentResponseDtos;
+    List<CommentResponseDto> comments;
 
 
     public PostResultDto(UserResponseDto userResponseDto, PostInfoResponseDto postInfoResponseDto, LocationResponseDto locationResponseDto, boolean hasLiked) {
@@ -27,6 +27,6 @@ public class PostResultDto {
         this.post = postInfoResponseDto;
         this.location = locationResponseDto;
         this.hasLiked = hasLikedPost;
-        this.commentResponseDtos = commentResponseDtos;
+        this.comments = commentResponseDtos;
     }
 }
