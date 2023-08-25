@@ -14,13 +14,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -41,13 +44,23 @@ public class UserService {
     private final UserValidator userValidator;
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
-    private String clientId;
-
-//    @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
-//    private String clientSecret;
+    private String kakaoClientId;
 
     @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
-    private String redirectUri;
+    private String kakaoRedirectUri;
+
+//    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+//    private String googleClientId;
+//
+//    private final OAuth2AuthorizedClientService authorizedClientService;
+//    private final ClientRegistrationRepository clientRegistrationRepository;
+
+    @Value("${spring.security.oauth2.client.registration.naver.client-id}")
+    private String naverClientId;
+
+    @Value("${spring.security.oauth2.client.registration.naver.redirect-uri}")
+    private String naverRedirectUri;
+
 
 
     @Transactional
@@ -263,9 +276,9 @@ public class UserService {
 
         URI uri = UriComponentsBuilder.fromHttpUrl("https://kauth.kakao.com/oauth/token")
                 .queryParam("grant_type", grantType)
-                .queryParam("client_id", clientId)
+                .queryParam("client_id", kakaoClientId)
 //                .queryParam("client_secret", clientSecret)
-                .queryParam("redirect_uri", redirectUri)
+                .queryParam("redirect_uri", kakaoRedirectUri)
                 .queryParam("code", authCode)
                 .build()
                 .encode()
@@ -283,6 +296,103 @@ public class UserService {
             return responseEntity.getBody().get("access_token").toString();
         } else {
             throw new IllegalStateException("액세스 토큰을 가져올 수 없습니다.");
+        }
+    }
+
+    public String signInWithGoogle(OAuth2AuthenticationToken authentication) {
+        OAuth2User userInfo = authentication.getPrincipal();
+
+        // 구글 사용자 정보에서 이메일을 가져온다.
+        String email = userInfo.getAttribute("email");
+
+        // DB에서 해당 이메일에 대한 사용자 찾기
+        Optional<User> existingUserOptional = userRepository.findByEmail(email);
+
+        // 만약 DB에 해당 이메일의 사용자가 없다면 회원 가입 진행
+        if (!existingUserOptional.isPresent()) {
+            // 구글 사용자 이름을 닉네임으로 설정
+            String nickname = userInfo.getAttribute("name");
+
+            // 임시 비밀번호 생성 (랜덤 UUID)
+            String password = UUID.randomUUID().toString();
+
+            // 비밀번호 암호화
+            String encodedPassword = passwordEncoder.encode(password);
+
+            // 새로운 사용자 객체 생성
+            User newUser = new User(email, nickname, encodedPassword);
+
+            // DB에 저장
+            userRepository.save(newUser);
+        }
+
+        return email;
+    }
+    public String getAccessTokenFromNaverAuthCode(String authCode) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        queryParams.add("grant_type", "authorization_code");
+        queryParams.add("client_id", naverClientId);
+        queryParams.add("redirect_uri", naverRedirectUri);
+        queryParams.add("code", authCode);
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(queryParams, headers);
+
+        ResponseEntity<Map<String, Object>> responseEntity = restTemplate.exchange(
+                "https://nid.naver.com/oauth2.0/token",
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<>() {});
+
+        if (responseEntity.getBody() != null && responseEntity.getBody().containsKey("access_token")) {
+            return responseEntity.getBody().get("access_token").toString();
+        } else {
+            throw new IllegalStateException("액세스 토큰을 가져올 수 없습니다.");
+        }
+    }
+
+    public String signInWithNaver(String accessToken) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<Map<String, Object>> responseEntity = restTemplate.exchange(
+                "https://openapi.naver.com/v1/nid/me",
+                HttpMethod.GET,
+                requestEntity,
+                new ParameterizedTypeReference<>() {
+                });
+
+        if (responseEntity.getBody() != null && responseEntity.getBody().containsKey("response")) {
+            Map<String, Object> response = (Map<String, Object>) responseEntity.getBody().get("response");
+
+            String email = (String) response.get("email");
+
+            if (email == null || email.isEmpty()) {
+                throw new IllegalArgumentException("유효하지 않은 네이버 유저입니다. 이메일 정보가 없습니다.");
+            }
+
+            Optional<User> existingUserOptional = userRepository.findByEmail(email);
+
+            if (!existingUserOptional.isPresent()) {
+                String nickname = (String) response.get("name");
+                String password = UUID.randomUUID().toString();
+                String encodedPassword = passwordEncoder.encode(password);
+
+                User newUser = new User(email, nickname, encodedPassword);
+                userRepository.save(newUser);
+            }
+
+            return email;
+        } else {
+            throw new IllegalArgumentException("네이버 유저 정보를 가져올 수 없습니다.");
         }
     }
 }

@@ -10,6 +10,8 @@ import com.gavoza.backend.global.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -105,7 +107,7 @@ public class UserController {
         return ResponseEntity.ok(new MessageResponseDto("로그아웃에 성공하셨습니다."));
     }
 
-    @PostMapping("/callback")
+    @PostMapping("/login/kakao")
     public ResponseEntity<?> signInWithKakao(@RequestBody KakaoAuthCodeRequestDto kakaoAuthCodeRequestDto) {
         String authCode = kakaoAuthCodeRequestDto.getAuthCode();
 
@@ -126,5 +128,45 @@ public class UserController {
         loginResponseDto.setRefreshToken(refreshTokenEntity.getToken());
 
         return ResponseEntity.ok(loginResponseDto);
+    }
+
+    @PostMapping("/login/google")
+    public ResponseEntity<?> signInWithGoogle(@AuthenticationPrincipal OAuth2AuthenticationToken authentication) {
+        String email = userService.signInWithGoogle(authentication);
+
+        // 액세스 토큰 생성
+        String customAccessToken = jwtUtil.createAccessToken(email);
+
+        // 리프레시 토큰 저장 및 생성
+        RefreshToken refreshTokenEntity = userService.createAndSaveRefreshToken(email);
+
+        // 토큰 응답
+        String message = "구글 로그인에 성공하셨습니다.";
+        TokenResMsgDto tokenResponseDto = new TokenResMsgDto(message, customAccessToken, refreshTokenEntity.getToken());
+
+        return ResponseEntity.ok(tokenResponseDto);
+    }
+
+    @PostMapping("/login/naver")
+    public ResponseEntity<?> signInWithNaver(@RequestBody NaverAuthCodeRequestDto naverAuthCodeRequestDto) {
+        String authCode = naverAuthCodeRequestDto.getAuthCode();
+
+        // 인가 코드로 액세스 토큰 발급
+        String accessToken = userService.getAccessTokenFromNaverAuthCode(authCode);
+
+        // 네이버 로그인
+        String email = userService.signInWithNaver(accessToken);
+
+        // 액세스 토큰 생성
+        String customAccessToken = jwtUtil.createAccessToken(email);
+
+        // 리프레시 토큰 저장 및 생성
+        RefreshToken refreshTokenEntity = userService.createAndSaveRefreshToken(email);
+
+        // 토큰 응답
+        String message = "네이버 로그인에 성공하셨습니다.";
+        TokenResMsgDto tokenResponseDto = new TokenResMsgDto(message, customAccessToken, refreshTokenEntity.getToken());
+
+        return ResponseEntity.ok(tokenResponseDto);
     }
 }
