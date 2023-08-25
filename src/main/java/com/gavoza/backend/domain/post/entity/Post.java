@@ -66,7 +66,7 @@ public class Post extends Auditing {
         this.dong = requestDto.getDong();
     }
 
-    public void update(String content, long lat, long lng) {
+    public void update(String content, double lat, double lng) {
         this.content = content;
         this.lat = lat;
         this.lng = lng;
