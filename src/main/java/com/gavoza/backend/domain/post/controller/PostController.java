@@ -78,18 +78,4 @@ public class PostController {
         User user = userDetails.getUser();
         return postService.getPost(page-1,size, user);
     }
-
-
-    //게시글 검색
-    @GetMapping("/get/search")
-    public PostListResponse searchPosts(@RequestParam int page,
-                                        @RequestParam int size,
-                                        @RequestParam String keyword,
-                                        @AuthenticationPrincipal UserDetailsImpl userDetails){
-        if(Objects.isNull(userDetails)){
-            return postService.searchPosts(page-1 , size, keyword ,null);
-        }
-        User user = userDetails.getUser();
-        return postService.searchPosts(page-1, size, keyword, user);
-    }
 }
