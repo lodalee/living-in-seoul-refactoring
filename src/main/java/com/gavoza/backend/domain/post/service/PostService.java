@@ -159,22 +159,6 @@ public class PostService {
         return new PostListResponse("검색 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
     }
 
-    //게시글 검색
-    public PostListResponse searchPosts(int page, int size, String keyword, User user) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-        Page<Post> postPages = keyword.contains("#")
-                ? postRepository.findAllByHashtagContaining(keyword, pageable)
-                : postRepository.findAllByContentContaining(keyword, pageable);
-
-        List<PostResultDto> postResultDtos = postPages.stream()
-                .map(post -> mapToPostResultDto(post, user))
-                .collect(Collectors.toList());
-
-        return new PostListResponse("검색 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
-    }
-
-
     //PostResultDto 타입으로 반환
     private PostResultDto mapToPostResultDto(Post post, User user) {
         UserResponseDto userResponseDto = new UserResponseDto(post.getUser());
