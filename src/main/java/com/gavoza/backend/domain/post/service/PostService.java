@@ -4,11 +4,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.gavoza.backend.domain.Like.repository.CommentLikeRepository;
 import com.gavoza.backend.domain.Like.repository.PostLikeRepository;
-import com.gavoza.backend.domain.comment.dto.CommentResponseDto;
-import com.gavoza.backend.domain.comment.entity.Comment;
-import com.gavoza.backend.domain.comment.repository.CommentRepository;
 import com.gavoza.backend.domain.post.dto.LocationResponseDto;
 import com.gavoza.backend.domain.post.dto.PostInfoResponseDto;
 import com.gavoza.backend.domain.post.dto.PostRequestDto;
@@ -48,8 +44,6 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostImgRepository postImgRepository;
     private final PostLikeRepository postLikeRepository;
-    private final CommentLikeRepository commentLikeRepository;
-    private final CommentRepository commentRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -134,17 +128,12 @@ public class PostService {
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
         LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
 
-        List<CommentResponseDto> comments = post.getComments().stream()
-                .map(comment -> getOneComment(comment.getId(), user))
-                .collect(Collectors.toList());
-
         if(Objects.isNull(user)){
-            return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false,comments));
-
+            return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false));
         }
 
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
-        return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost, comments));
+        return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost));
     }
 
     //게시물 전체 조회
@@ -182,16 +171,6 @@ public class PostService {
         if (!post.getUser().getNickname().equals(user.getNickname())) {
             throw new IllegalArgumentException("해당 게시글의 작성자가 아닙니다.");
         }
-    }
-
-    @Transactional(readOnly = true)
-    public CommentResponseDto getOneComment(Long commentId, User user) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
-
-        boolean commentHasLiked = commentLikeRepository.existsLikeByCommentAndUser(comment, user);
-
-        return new CommentResponseDto(comment, commentHasLiked);
     }
 
     private String fileNameToURL(String fileName) {

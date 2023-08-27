@@ -2,6 +2,7 @@ package com.gavoza.backend.domain.comment.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.gavoza.backend.domain.Like.entity.Commentlike;
 import com.gavoza.backend.domain.comment.dto.CommentRequestDto;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.global.config.Auditing;
@@ -38,6 +39,10 @@ public class Comment extends Auditing {
     @JsonManagedReference
     @OneToMany(mappedBy = "comment", cascade = {CascadeType.REMOVE})
     private List<ReComment> reCommentList = new ArrayList<>();
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "comment", cascade = {CascadeType.REMOVE})
+    private List<Commentlike> commentLike = new ArrayList<>();
 
     private String userImg;
 
