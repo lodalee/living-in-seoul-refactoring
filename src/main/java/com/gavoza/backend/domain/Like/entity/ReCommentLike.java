@@ -1,32 +1,35 @@
 package com.gavoza.backend.domain.Like.entity;
 
-import com.gavoza.backend.domain.post.entity.Post;
+import com.gavoza.backend.domain.comment.entity.ReComment;
 import com.gavoza.backend.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
-@Table(name = "post_like")
-public class Postlike {
-
+@Table(name = "re_comment_like")
+public class ReCommentLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_like_id")
+    @Column(name = "re_comment_like_id")
     private Long id;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
+    @JoinColumn(name = "re_comment_id")
+    private ReComment reComment;
 
-    public Postlike(Post post, User user) {
-        this.post = post;
+    public ReCommentLike(ReComment reComment, User user) {
+        this.reComment = reComment;
         this.user = user;
     }
+    
 }
