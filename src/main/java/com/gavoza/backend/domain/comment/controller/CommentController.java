@@ -1,7 +1,7 @@
 package com.gavoza.backend.domain.comment.controller;
 
+import com.gavoza.backend.domain.comment.dto.CommentListResponse;
 import com.gavoza.backend.domain.comment.dto.CommentRequestDto;
-import com.gavoza.backend.domain.comment.dto.CommentResponseDto;
 import com.gavoza.backend.domain.comment.dto.ReCommentRequestDto;
 import com.gavoza.backend.domain.comment.service.CommentService;
 import com.gavoza.backend.domain.user.entity.User;
@@ -11,22 +11,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/comment")
 public class CommentController {
     private final CommentService commentService;
     //comment 상세 조회
-    @GetMapping("/get/{id}")//commentId
-    public CommentResponseDto getOneComment(@PathVariable Long id,
-                                            @AuthenticationPrincipal UserDetailsImpl userDetails){
-        if(Objects.isNull(userDetails)){
-            return commentService.getOneComment(id, null);
-        }
-        User user = userDetails.getUser();
-        return commentService.getOneComment(id, user);
+    @GetMapping("/get/{postId}")
+    public CommentListResponse getOneComment(@PathVariable Long postId,
+                                             @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                             int size,
+                                             int page) {
+        User user = userDetails != null ? userDetails.getUser() : null;
+        return commentService.getCommentByPostId(page-1, size, postId, user);
     }
 
     //댓글 작성
