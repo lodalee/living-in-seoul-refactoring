@@ -15,6 +15,8 @@ import com.gavoza.backend.domain.post.repository.PostImgRepository;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.post.response.PostListResponse;
 import com.gavoza.backend.domain.post.response.PostResponse;
+import com.gavoza.backend.domain.scrap.entity.PostScrap;
+import com.gavoza.backend.domain.scrap.repository.PostScrapRepository;
 import com.gavoza.backend.domain.user.ToPost.UserResponseDto;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.exception.MessageResponseDto;
@@ -44,6 +46,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostImgRepository postImgRepository;
     private final PostLikeRepository postLikeRepository;
+    private final PostScrapRepository postScrapRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -126,14 +129,14 @@ public class PostService {
 
         UserResponseDto userResponseDto = new UserResponseDto(post.getUser().getNickname(), post.getUser().getEmail());
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
-        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
+        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getLname(), post.getAddress(), post.getLat(), post.getLng(), post.getGu());
 
-        if(Objects.isNull(user)){
-            return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false));
+        if (Objects.isNull(user)) {
+            return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false));
         }
 
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
-        return new PostResponse( "게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost));
+        return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost));
     }
 
     //게시물 전체 조회
@@ -142,18 +145,46 @@ public class PostService {
         Page<Post> postPages = postRepository.findAll(pageable);
 
         List<PostResultDto> postResultDtos = postPages.stream()
-                .map(post -> mapToPostResultDto(post,user))
+                .map(post -> mapToPostResultDto(post, user))
                 .collect(Collectors.toList());
 
         return new PostListResponse("검색 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
+    }
+
+    //내가 쓴 글
+    public PostListResponse getMyPost(int page, int size, User user) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Post> postPages = postRepository.findAllByUserId(user.getId(), pageable);
+
+        List<PostResultDto> postResultDtos = postPages.stream()
+                .map(post -> mapToPostResultDto(post, user))
+                .collect(Collectors.toList());
+
+        return new PostListResponse("검색 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
+    }
+
+    // 사용자가 스크랩한 글 조회
+    public PostListResponse getMyScrap(int page, int size, User user) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<PostScrap> scrapPages = postScrapRepository.findAllByUser(user, pageable);
+
+        List<Post> myScrapPosts = scrapPages.getContent().stream()
+                .map(PostScrap::getPost)
+                .collect(Collectors.toList());
+
+        List<PostResultDto> postResultDtos = myScrapPosts.stream()
+                .map(post -> mapToPostResultDto(post, user))
+                .collect(Collectors.toList());
+
+        return new PostListResponse("스크랩한 글 조회 성공", scrapPages.getTotalPages(), scrapPages.getTotalElements(), size, postResultDtos);
     }
 
     //PostResultDto 타입으로 반환
     private PostResultDto mapToPostResultDto(Post post, User user) {
         UserResponseDto userResponseDto = new UserResponseDto(post.getUser());
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
-        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getGu(), post.getDong(), post.getLat(), post.getLng());
-        if (Objects.isNull(user)){
+        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getLname(), post.getAddress(), post.getLat(), post.getLng(), post.getGu());
+        if (Objects.isNull(user)) {
             return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false);
         }
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
