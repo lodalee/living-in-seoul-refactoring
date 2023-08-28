@@ -30,4 +30,12 @@ public class PostLikeController {
         User user = userDetails.getUser();
         return postLikeService.commentLike(id, user);
     }
+
+    //대댓글 좋아요
+    @PostMapping("/recomment/{id}/like") //recomment id
+    public MessageResponseDto recommentLike(@PathVariable Long id,
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails){
+        User user = userDetails.getUser();
+        return postLikeService.recommentLike(id,user);
+    }
 }

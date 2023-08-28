@@ -2,10 +2,14 @@ package com.gavoza.backend.domain.Like.service;
 
 import com.gavoza.backend.domain.Like.entity.Commentlike;
 import com.gavoza.backend.domain.Like.entity.Postlike;
+import com.gavoza.backend.domain.Like.entity.ReCommentLike;
 import com.gavoza.backend.domain.Like.repository.CommentLikeRepository;
 import com.gavoza.backend.domain.Like.repository.PostLikeRepository;
+import com.gavoza.backend.domain.Like.repository.ReCommentLikeRepository;
 import com.gavoza.backend.domain.comment.entity.Comment;
+import com.gavoza.backend.domain.comment.entity.ReComment;
 import com.gavoza.backend.domain.comment.repository.CommentRepository;
+import com.gavoza.backend.domain.comment.repository.ReCommentRepository;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.user.entity.User;
@@ -20,6 +24,9 @@ public class PostLikeService {
     private final PostRepository postRepository;
     private final CommentLikeRepository commentLikeRepository;
     private final CommentRepository commentRepository;
+    private final ReCommentLikeRepository reCommentLikeRepository;
+    private final ReCommentRepository reCommentRepository;
+
     //post 좋아요
     public MessageResponseDto postLike(Long postId, User user){
         Post post = postRepository.findById(postId).orElseThrow(
@@ -53,6 +60,23 @@ public class PostLikeService {
                 .orElseThrow(
                         ()-> new IllegalArgumentException("좋아요에 대한 정보가 존재하지 않습니다."));
         commentLikeRepository.delete(like);
+        return new MessageResponseDto("댓글 좋아요 취소");
+    }
+
+    //대댓글 좋아요
+    public MessageResponseDto recommentLike(Long id, User user) {
+        ReComment reComment = reCommentRepository.findById(id)
+                .orElseThrow(()-> new IllegalArgumentException("해당 댓글은 존재하지 않습니다."));
+
+        if (!reCommentLikeRepository.existsLikeByReCommentAndUser(reComment,user)){
+            ReCommentLike like = new ReCommentLike(reComment,user);
+            reCommentLikeRepository.save(like);
+            return new MessageResponseDto("댓글 좋아요");
+        }
+
+        ReCommentLike like = reCommentLikeRepository.findByReCommentAndUser(reComment,user)
+                .orElseThrow(()-> new IllegalArgumentException("좋아요에 대한 정보가 존재하지 않습니다."));
+        reCommentLikeRepository.delete(like);
         return new MessageResponseDto("댓글 좋아요 취소");
     }
 }

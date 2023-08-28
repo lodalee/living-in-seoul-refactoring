@@ -1,12 +1,16 @@
 package com.gavoza.backend.domain.comment.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.gavoza.backend.domain.Like.entity.ReCommentLike;
 import com.gavoza.backend.domain.comment.dto.ReCommentRequestDto;
 import com.gavoza.backend.global.config.Auditing;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -31,6 +35,12 @@ public class ReComment extends Auditing {
     private Comment comment;
 
     private String userImg;
+
+    @Transient
+    private boolean reCommentHasLiked;
+
+    @OneToMany(mappedBy = "reComment", cascade = {CascadeType.REMOVE})
+    private List<ReCommentLike> reCommentLikes = new ArrayList<>();
 
     public ReComment(ReCommentRequestDto requestDto, String nickname, Comment comment) {
         this.nickname = nickname;
