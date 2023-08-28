@@ -2,6 +2,7 @@ package com.gavoza.backend.domain.user.controller;
 
 import com.gavoza.backend.domain.user.dto.*;
 import com.gavoza.backend.domain.user.entity.RefreshToken;
+import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.domain.user.service.UserService;
 import com.gavoza.backend.global.exception.MessageResponseDto;
 import com.gavoza.backend.global.exception.RefreshResMsgDto;
@@ -13,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -130,23 +134,6 @@ public class UserController {
         return ResponseEntity.ok(loginResponseDto);
     }
 
-    @PostMapping("/login/google")
-    public ResponseEntity<?> signInWithGoogle(@AuthenticationPrincipal OAuth2AuthenticationToken authentication) {
-        String email = userService.signInWithGoogle(authentication);
-
-        // 액세스 토큰 생성
-        String customAccessToken = jwtUtil.createAccessToken(email);
-
-        // 리프레시 토큰 저장 및 생성
-        RefreshToken refreshTokenEntity = userService.createAndSaveRefreshToken(email);
-
-        // 토큰 응답
-        String message = "구글 로그인에 성공하셨습니다.";
-        TokenResMsgDto tokenResponseDto = new TokenResMsgDto(message, customAccessToken, refreshTokenEntity.getToken());
-
-        return ResponseEntity.ok(tokenResponseDto);
-    }
-
     @PostMapping("/login/naver")
     public ResponseEntity<?> signInWithNaver(@RequestBody NaverAuthCodeRequestDto naverAuthCodeRequestDto) {
         String authCode = naverAuthCodeRequestDto.getAuthCode();
@@ -169,4 +156,55 @@ public class UserController {
 
         return ResponseEntity.ok(tokenResponseDto);
     }
+
+    @PostMapping("/login/google")
+    public ResponseEntity<?> signInWithGoogle(@RequestBody GoogleAuthCodeRequestDto googleAuthCodeRequestDto) {
+        String authCode = googleAuthCodeRequestDto.getAuthCode();
+
+        // 인가 코드로 액세스 토큰 발급
+        String accessToken = userService.getAccessTokenFromGoogleAuthCode(authCode);
+
+        // 구글 로그인
+        String email = userService.signInWithGoogle(accessToken);
+
+        // 액세스 토큰 생성
+        String customAccessToken = jwtUtil.createAccessToken(email);
+
+        // 리프레시 토큰 저장 및 생성
+        RefreshToken refreshTokenEntity = userService.createAndSaveRefreshToken(email);
+
+        // 토큰 응답
+        String message = "구글 로그인에 성공하셨습니다.";
+        TokenResMsgDto tokenResponseDto = new TokenResMsgDto(message, customAccessToken, refreshTokenEntity.getToken());
+
+        return ResponseEntity.ok(tokenResponseDto);
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserProfileResponseDto> getMyProfile(HttpServletRequest request) {
+        String email = jwtUtil.getEmailFromAuthHeader(request);
+        User user = userService.findUserProfileByEmail(email);
+
+        UserProfileResponseDto userProfile = new UserProfileResponseDto(user.getEmail(), user.getNickname(), user.getProfileImageUrl());
+
+        return ResponseEntity.ok(userProfile);
+    }
+
+
+
+    @PutMapping("/profile/update")
+    public ResponseEntity<MessageResponseDto> updateProfileImage(@RequestParam("image") MultipartFile imageFile,
+                                                                 HttpServletRequest request) throws IOException {
+        String email = jwtUtil.getEmailFromAuthHeader(request);
+        userService.updateProfileImage(email, imageFile);
+        return ResponseEntity.ok(new MessageResponseDto("프로필 이미지가 수정되었습니다."));
+    }
+
+    @DeleteMapping("/profile/delete")
+    public ResponseEntity<MessageResponseDto> deleteProfileImage(HttpServletRequest request) {
+        String email = jwtUtil.getEmailFromAuthHeader(request);
+        userService.deleteProfileImage(email);
+        return ResponseEntity.ok(new MessageResponseDto("프로필 이미지가 삭제되었습니다."));
+    }
+
 }

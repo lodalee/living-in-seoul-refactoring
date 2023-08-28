@@ -36,6 +36,8 @@ dependencies {
 
 //// Google OAuth2 API
 //    implementation 'com.google.apis:google-api-services-oauth2:v2-rev164-1.26.0'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 
 
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'

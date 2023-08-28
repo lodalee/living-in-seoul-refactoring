@@ -8,5 +8,10 @@ import lombok.Setter;
 public class GoogleAuthCodeRequestDto {
     private String authCode;
 
+    public String getAuthCode() {
+
+        return authCode;
+    }
+
 }
 

@@ -35,6 +35,8 @@ public class User {
 
     private String birthDate;
 
+    private String profileImageUrl;
+
     public User(String email, String nickname, String password, String hometown, String movedDate, String gender, String birthDate) {
         this.email = email;
         this.nickname = nickname;
