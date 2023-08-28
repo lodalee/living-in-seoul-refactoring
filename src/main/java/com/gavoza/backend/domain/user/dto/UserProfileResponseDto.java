@@ -1,19 +1,21 @@
 package com.gavoza.backend.domain.user.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserProfileResponseDto {
-    private String email;
     private String nickname;
+    private String birthDate;
+    private String movedDate;
+    private String gender;
+    private String hometown;
     private String profileImageUrl;
-
-    public UserProfileResponseDto(String email, String nickname, String profileImageUrl) {
-        this.email = email;
-        this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
     }
-}
+
 

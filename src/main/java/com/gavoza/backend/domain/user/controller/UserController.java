@@ -183,12 +183,21 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseEntity<UserProfileResponseDto> getMyProfile(HttpServletRequest request) {
         String email = jwtUtil.getEmailFromAuthHeader(request);
+
         User user = userService.findUserProfileByEmail(email);
 
-        UserProfileResponseDto userProfile = new UserProfileResponseDto(user.getEmail(), user.getNickname(), user.getProfileImageUrl());
+        UserProfileResponseDto userProfile = new UserProfileResponseDto(
+                user.getNickname(),
+                user.getBirthDate(),
+                user.getMovedDate(),
+                user.getGender(),
+                user.getHometown(),
+                user.getProfileImageUrl()
+        );
 
         return ResponseEntity.ok(userProfile);
     }
+
 
 
 
