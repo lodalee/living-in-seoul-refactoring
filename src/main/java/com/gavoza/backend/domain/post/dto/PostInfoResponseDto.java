@@ -13,6 +13,7 @@ public class PostInfoResponseDto {
     private String content;
     private String category;
     private String hashtag;
+    private int commentSize;
     private int likeSize;
     private int scrapSize;
     private Long postViewCount;
@@ -32,6 +33,7 @@ public class PostInfoResponseDto {
         this.likeSize = post.getLike().size();
         this.postViewCount = post.getPostViewCount();
         this.scrapSize = post.getScraps().size();
+        this.commentSize = post.getComments().size();
     }
 }
 

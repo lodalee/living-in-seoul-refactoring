@@ -15,6 +15,7 @@ public class ReCommentResponseDto {
     private String userImg;
     private LocalDateTime createdAt;
     private boolean reCommentHasLiked;
+    private int reCommentLikeSize;
 
 
     public ReCommentResponseDto(ReComment newReComment) {
@@ -23,6 +24,7 @@ public class ReCommentResponseDto {
         this.createdAt = newReComment.getCreatedAt();
         this.userImg = newReComment.getUserImg();
         this.reCommentId = newReComment.getId();
+        this.reCommentLikeSize = newReComment.getReCommentLikes().size();
     }
 
     public ReCommentResponseDto(ReComment reComment, boolean reCommentHasLiked) {
@@ -32,5 +34,6 @@ public class ReCommentResponseDto {
         this.userImg = reComment.getUserImg();
         this.reCommentHasLiked = reCommentHasLiked;
         this.reCommentId = reComment.getId();
+        this.reCommentLikeSize = reComment.getReCommentLikes().size();
     }
 }
