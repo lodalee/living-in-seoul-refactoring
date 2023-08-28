@@ -168,10 +168,12 @@ public class PostService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<PostScrap> scrapPages = postScrapRepository.findAllByUser(user, pageable);
 
+        // 스크랩한 글을 가져와서 리스트로 변환
         List<Post> myScrapPosts = scrapPages.getContent().stream()
                 .map(PostScrap::getPost)
                 .collect(Collectors.toList());
 
+        // 가져온 글을 PostResultDto로 매핑하여 리스트로 변환
         List<PostResultDto> postResultDtos = myScrapPosts.stream()
                 .map(post -> mapToPostResultDto(post, user))
                 .collect(Collectors.toList());
