@@ -14,6 +14,7 @@ public class PostInfoResponseDto {
     private String category;
     private String hashtag;
     private int likeSize;
+    private int scrapSize;
     private Long postViewCount;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
@@ -30,6 +31,7 @@ public class PostInfoResponseDto {
         this.category = post.getCategory();
         this.likeSize = post.getLike().size();
         this.postViewCount = post.getPostViewCount();
+        this.scrapSize = post.getScraps().size();
     }
 }
 

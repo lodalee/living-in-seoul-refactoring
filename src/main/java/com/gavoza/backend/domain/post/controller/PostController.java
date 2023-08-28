@@ -78,4 +78,22 @@ public class PostController {
         User user = userDetails.getUser();
         return postService.getPost(page-1,size, user);
     }
+
+    //내가 쓴 글 조회
+    @GetMapping("/mypost")
+    public PostListResponse getMyPost(@RequestParam int page,
+                                      @RequestParam int size,
+                                      @AuthenticationPrincipal UserDetailsImpl userDetails){
+        User user = userDetails.getUser();
+        return postService.getMyPost(page-1, size, user);
+    }
+
+    //내가 스크랩한 글 조회
+    @GetMapping("/myscrap")
+    public PostListResponse getMyScrap(@RequestParam int page,
+                                       @RequestParam int size,
+                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
+        User user = userDetails.getUser();
+        return postService.getMyScrap(page-1, size, user);
+    }
 }
