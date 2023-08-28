@@ -2,10 +2,7 @@ package com.gavoza.backend.domain.comment.service;
 
 import com.gavoza.backend.domain.Like.repository.CommentLikeRepository;
 import com.gavoza.backend.domain.Like.repository.ReCommentLikeRepository;
-import com.gavoza.backend.domain.comment.dto.CommentRequestDto;
-import com.gavoza.backend.domain.comment.dto.CommentResponseDto;
-import com.gavoza.backend.domain.comment.dto.ReCommentRequestDto;
-import com.gavoza.backend.domain.comment.dto.ReCommentResponseDto;
+import com.gavoza.backend.domain.comment.dto.*;
 import com.gavoza.backend.domain.comment.entity.Comment;
 import com.gavoza.backend.domain.comment.entity.ReComment;
 import com.gavoza.backend.domain.comment.repository.CommentRepository;
@@ -14,11 +11,15 @@ import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -33,19 +34,21 @@ public class CommentService {
     private final ReCommentLikeRepository reCommentLikeRepository;
 
     //comment 조회
-    public CommentResponseDto getOneComment(Long id, User user) {
-        Comment comment = findComment(id);
+    public CommentListResponse getCommentByPostId(int page, int size, Long postId, User user) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Comment> commentPages = commentRepository.findAllByPostId(postId, pageable);
+        List<CommentResponseDto> commentResponseDtos = new ArrayList<>();
 
-        List<ReCommentResponseDto> reComments = comment.getReCommentList().stream()
-                .map(reComment -> getOneReComment(reComment.getId(), user))
-                .collect(Collectors.toList());
+        for (Comment comment : commentPages) {
+            List<ReCommentResponseDto> reComments = comment.getReCommentList().stream()
+                    .map(reComment -> getOneReComment(reComment.getId(), user))
+                    .collect(Collectors.toList());
 
-        if(Objects.isNull(user)){
-            return new CommentResponseDto(comment, false, reComments);
+            boolean hasLikeComment = user != null && commentLikeRepository.existsLikeByCommentAndUser(comment, user);
+            commentResponseDtos.add(new CommentResponseDto(comment, hasLikeComment, reComments));
         }
 
-        boolean hasLikeComment = commentLikeRepository.existsLikeByCommentAndUser(comment, user);
-        return new CommentResponseDto(comment, hasLikeComment, reComments);
+        return new CommentListResponse(commentResponseDtos,commentPages.getTotalPages(), commentPages.getTotalElements(), size);
     }
 
     @Transactional(readOnly = true)

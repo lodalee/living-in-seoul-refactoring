@@ -32,7 +32,7 @@ public class Comment extends Auditing {
     private  String comment;
 
     @JsonBackReference
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
