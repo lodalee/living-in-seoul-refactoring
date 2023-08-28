@@ -15,9 +15,9 @@ public class CommentResponseDto {
     private String nickname; // 작성자 이름
     private String comment; // 댓글 내용
     private String userImg;
-    private int commentSize;
     private LocalDateTime createdAt; // 작성 시간
     private boolean commentHasLiked;
+    private int commentLikeSize;
     private List<ReCommentResponseDto> reComments;
 
     public CommentResponseDto(Comment newComment) {
@@ -30,7 +30,7 @@ public class CommentResponseDto {
                 .map(ReCommentResponseDto::new)
                 .collect(Collectors.toList());
         this.commentId = newComment.getId();
-        this.commentSize = newComment.getReCommentList().size();
+        this.commentLikeSize = newComment.getCommentLike().size();
     }
 
     public CommentResponseDto(Comment comment, boolean hasLikeComment, List<ReCommentResponseDto> reComments) {
@@ -41,6 +41,6 @@ public class CommentResponseDto {
         this.commentHasLiked = hasLikeComment;
         this.reComments = reComments;
         this.commentId = comment.getId();
-        this.commentSize = comment.getReCommentList().size();
+        this.commentLikeSize = comment.getCommentLike().size();
     }
 }
