@@ -39,7 +39,7 @@ public class UserController {
 
 
 
-    @GetMapping("/refresh")
+    @PostMapping("/refresh")
     public ResponseEntity<RefreshResMsgDto> refreshToken(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
         String refreshTokenValue = refreshTokenRequestDto.getRefreshToken();
 
