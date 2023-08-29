@@ -13,8 +13,8 @@ public class PostRequestDto {
     private String content;
     private String postImg;
     private String category;
-    private Long lat;
-    private Long lng;
+    private double lat;
+    private double lng;
     private String gu;
     private String lname;
     private String address;
