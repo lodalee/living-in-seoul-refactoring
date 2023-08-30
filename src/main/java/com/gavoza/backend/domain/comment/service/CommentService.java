@@ -12,6 +12,7 @@ import com.gavoza.backend.domain.comment.repository.CommentRepository;
 import com.gavoza.backend.domain.comment.repository.ReCommentRepository;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
+import com.gavoza.backend.domain.report.repository.ReportRepository;
 import com.gavoza.backend.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,7 @@ public class CommentService {
     private final CommentLikeRepository commentLikeRepository;
     private final ReCommentLikeRepository reCommentLikeRepository;
     private final AlarmRepository alarmRepository;
+    private final ReportRepository reportRepository;
 
     //comment 조회
     public CommentListResponse getCommentByPostId(int page, int size, Long postId, User user) {
@@ -55,7 +57,9 @@ public class CommentService {
                     .collect(Collectors.toList());
 
             boolean hasLikeComment = user != null && commentLikeRepository.existsLikeByCommentAndUser(comment, user);
-            commentResponseDtos.add(new CommentResponseDto(comment, hasLikeComment, reComments));
+            boolean hasReported = reportRepository.existsReportByCommentAndUser(comment,user);
+
+            commentResponseDtos.add(new CommentResponseDto(comment, hasLikeComment, reComments,hasReported));
         }
 
         return new CommentListResponse(commentResponseDtos,commentPages.getTotalPages(), commentPages.getTotalElements(), size);
@@ -67,8 +71,8 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
 
         boolean reCommentHasLiked = reCommentLikeRepository.existsLikeByReCommentAndUser(reComment, user);
-
-        return new ReCommentResponseDto(reComment, reCommentHasLiked);
+        boolean hasReported = reportRepository.existsReportByReCommentAndUser(reComment,user);
+        return new ReCommentResponseDto(reComment, reCommentHasLiked,hasReported);
     }
 
     // 댓글 생성

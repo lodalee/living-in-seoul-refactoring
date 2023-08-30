@@ -16,6 +16,7 @@ public class ReCommentResponseDto {
     private LocalDateTime createdAt;
     private boolean reCommentHasLiked;
     private int reCommentLikeSize;
+    private boolean hasReported;
 
 
     public ReCommentResponseDto(ReComment newReComment) {
@@ -27,7 +28,7 @@ public class ReCommentResponseDto {
         this.reCommentLikeSize = newReComment.getReCommentLikes().size();
     }
 
-    public ReCommentResponseDto(ReComment reComment, boolean reCommentHasLiked) {
+    public ReCommentResponseDto(ReComment reComment, boolean reCommentHasLiked, boolean hasReported) {
         this.nickname = reComment.getNickname();
         this.reComment = reComment.getReComment();
         this.createdAt = reComment.getCreatedAt();
@@ -35,5 +36,6 @@ public class ReCommentResponseDto {
         this.reCommentHasLiked = reCommentHasLiked;
         this.reCommentId = reComment.getId();
         this.reCommentLikeSize = reComment.getReCommentLikes().size();
+        this.hasReported = hasReported;
     }
 }
