@@ -6,6 +6,9 @@ import com.gavoza.backend.domain.Like.entity.ReCommentLike;
 import com.gavoza.backend.domain.Like.repository.CommentLikeRepository;
 import com.gavoza.backend.domain.Like.repository.PostLikeRepository;
 import com.gavoza.backend.domain.Like.repository.ReCommentLikeRepository;
+import com.gavoza.backend.domain.alarm.AlarmEventType;
+import com.gavoza.backend.domain.alarm.entity.Alarm;
+import com.gavoza.backend.domain.alarm.repository.AlarmRepository;
 import com.gavoza.backend.domain.comment.entity.Comment;
 import com.gavoza.backend.domain.comment.entity.ReComment;
 import com.gavoza.backend.domain.comment.repository.CommentRepository;
@@ -17,6 +20,8 @@ import com.gavoza.backend.global.exception.MessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class PostLikeService {
@@ -26,6 +31,7 @@ public class PostLikeService {
     private final CommentRepository commentRepository;
     private final ReCommentLikeRepository reCommentLikeRepository;
     private final ReCommentRepository reCommentRepository;
+    private final AlarmRepository alarmRepository;
 
     //post 좋아요
     public MessageResponseDto postLike(Long postId, User user){
@@ -36,12 +42,23 @@ public class PostLikeService {
         if (!postLikeRepository.existsLikeByPostAndUser(post, user)){
             Postlike like = new Postlike(post, user) ;
             postLikeRepository.save(like);
+
+            // 좋아요 알림 생성 및 저장
+            String notificationMessage = user.getNickname() + "님이 [" + post.getContent() + "] 글에 좋아요를 눌렀어요!"; // 알림 메시지 설정
+            AlarmEventType eventType = AlarmEventType.NEW_LIKE_ON_POST; // 알림 타입 설정
+            Boolean isRead = false; // 초기값으로 미읽음 상태 설정
+            LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+
+            Alarm likeNotification = new Alarm(post,post.getUser(), eventType, isRead, notificationMessage, registeredAt);
+            alarmRepository.save(likeNotification);
+
             return new MessageResponseDto("좋아요");
         }
 
         Postlike like = postLikeRepository.findByPostAndUser(post, user).orElseThrow(
                 ()-> new IllegalArgumentException("좋아요에 대한 정보가 존재하지 않습니다."));
         postLikeRepository.delete(like);
+
         return new MessageResponseDto("좋아요 취소");
     }
 
@@ -53,6 +70,17 @@ public class PostLikeService {
         if (!commentLikeRepository.existsLikeByCommentAndUser(comment, user)){
             Commentlike like = new Commentlike(comment, user);
             commentLikeRepository.save(like);
+
+            // 좋아요 알림 생성 및 저장
+            String notificationMessage = user.getNickname() + "님이 [" + comment.getComment() + "] 댓글에 좋아요를 눌렀어요!"; // 알림 메시지 설정
+            AlarmEventType eventType = AlarmEventType.NEW_LIKE_ON_COMMENT; // 알림 타입 설정
+            Boolean isRead = false; // 초기값으로 미읽음 상태 설정
+            LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+
+            Alarm likeNotification = new Alarm(comment.getPost(),comment.getUser(), eventType, isRead, notificationMessage, registeredAt);
+            alarmRepository.save(likeNotification);
+
+
             return new MessageResponseDto("댓글 좋아요");
         }
 
@@ -71,6 +99,16 @@ public class PostLikeService {
         if (!reCommentLikeRepository.existsLikeByReCommentAndUser(reComment,user)){
             ReCommentLike like = new ReCommentLike(reComment,user);
             reCommentLikeRepository.save(like);
+
+            // 좋아요 알림 생성 및 저장
+            String notificationMessage = user.getNickname() + "님이 [" + reComment.getReComment() + "] 답글에 좋아요를 눌렀어요!"; // 알림 메시지 설정
+            AlarmEventType eventType = AlarmEventType.NEW_LIKE_ON_RECOMMENT; // 알림 타입 설정
+            Boolean isRead = false; // 초기값으로 미읽음 상태 설정
+            LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+
+            Alarm likeNotification = new Alarm(reComment.getComment().getPost() ,reComment.getUser(), eventType, isRead, notificationMessage, registeredAt);
+            alarmRepository.save(likeNotification);
+
             return new MessageResponseDto("댓글 좋아요");
         }
 

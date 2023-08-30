@@ -50,9 +50,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-//    //jsonb 타입을 쓸 수 있도록 오픈소스 가져옴
-//    implementation 'com.vladmihalcea:hibernate-types-52:2.21.1'
-
     //JPA
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'com.mysql:mysql-connector-j'
