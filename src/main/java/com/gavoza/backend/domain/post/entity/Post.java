@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gavoza.backend.domain.Like.entity.Postlike;
 import com.gavoza.backend.domain.comment.entity.Comment;
 import com.gavoza.backend.domain.post.dto.PostRequestDto;
+import com.gavoza.backend.domain.report.entity.Report;
 import com.gavoza.backend.domain.scrap.entity.PostScrap;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.config.Auditing;
@@ -51,6 +52,10 @@ public class Post extends Auditing {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE})
+    private List<Report> reports = new ArrayList<>();
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE})
     private List<Comment> commentList = new ArrayList<>();
 
     private String category;
@@ -87,3 +92,4 @@ public class Post extends Auditing {
         return commentList;
     }
 }
+

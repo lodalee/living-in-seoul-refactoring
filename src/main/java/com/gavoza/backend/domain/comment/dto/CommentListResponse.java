@@ -9,6 +9,7 @@ public class CommentListResponse {
     private PostPageable pageable;
     private List<CommentResponseDto> comments;
 
+
     public CommentListResponse(
             List<CommentResponseDto> comments,
 
