@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,6 +70,18 @@ public class TagService {
         return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size, postResultDtos);
     }
 
+    //전체 - 태그별 post - +위치
+    public PostListResponse postLocationResponseDtos(int size, int page, String gu, User user) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Post> postPage = postRepository.findAllByGu(gu, pageable);
+
+        List<PostResultDto> postResultDtos =
+                postPage.getContent().stream()
+                        .map(post -> mapToPostResultDto(post,user))
+                        .collect(Collectors.toList());
+        return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size, postResultDtos);
+    }
+
     //카테고리 - 태그별 포스트
     public PostListResponse categoryHashtagPostResponseDtos (int size, int page, String hashtagName, String category, String type, User user) {
         Pageable pageable = PageRequest.of(page, size);
@@ -83,6 +96,18 @@ public class TagService {
         List<PostResultDto> postResultDtos = postPage.stream()
                 .map(post -> mapToPostResultDto(post,user))
                 .collect(Collectors.toList());
+        return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size, postResultDtos);
+    }
+
+    //카테고리 - 태그별 포스트 - +위치
+    public PostListResponse categoryLocationPostResponseDtos(int size, int page, String gu, String category, User user) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Post> postPage = postRepository.findAllByGuAndCategory(gu,category, pageable);
+
+        List<PostResultDto> postResultDtos =
+                postPage.getContent().stream()
+                        .map(post -> mapToPostResultDto(post,user))
+                        .collect(Collectors.toList());
         return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size, postResultDtos);
     }
 
