@@ -18,6 +18,7 @@ import com.gavoza.backend.domain.post.repository.PostImgRepository;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.post.response.PostListResponse;
 import com.gavoza.backend.domain.post.response.PostResponse;
+import com.gavoza.backend.domain.report.repository.ReportRepository;
 import com.gavoza.backend.domain.scrap.entity.PostScrap;
 import com.gavoza.backend.domain.scrap.repository.PostScrapRepository;
 import com.gavoza.backend.domain.user.ToPost.UserResponseDto;
@@ -54,6 +55,7 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final PostScrapRepository postScrapRepository;
     private final AlarmRepository alarmRepository;
+    private final ReportRepository reportRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -182,12 +184,13 @@ public class PostService {
         LocationResponseDto locationResponseDto = new LocationResponseDto(post.getLname(), post.getAddress(), post.getLat(), post.getLng(), post.getGu());
 
         if (Objects.isNull(user)) {
-            return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false,false));
+            return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false,false, false));
         }
 
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
         boolean hasScrapped = postScrapRepository.existsScrapByPostAndUser(post, user);
-        return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost,hasScrapped));
+        boolean hasReported = reportRepository.existsReportByPostAndUser(post,user);
+        return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost,hasScrapped, hasReported));
     }
 
     //게시물 전체 조회
@@ -238,11 +241,12 @@ public class PostService {
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
         LocationResponseDto locationResponseDto = new LocationResponseDto(post.getLname(), post.getAddress(), post.getLat(), post.getLng(), post.getGu());
         if (Objects.isNull(user)) {
-            return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false,false);
+            return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false,false,false);
         }
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
         boolean hasScrapped = postScrapRepository.existsScrapByPostAndUser(post, user);
-        return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost,hasScrapped);
+        boolean hasReported = reportRepository.existsReportByPostAndUser(post,user);
+        return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost,hasScrapped, hasReported);
     }
 
     //주어진 게시물 ID에 해당하는 게시물 조회

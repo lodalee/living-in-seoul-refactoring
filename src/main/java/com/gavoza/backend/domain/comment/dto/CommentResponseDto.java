@@ -18,6 +18,7 @@ public class CommentResponseDto {
     private LocalDateTime createdAt; // 작성 시간
     private boolean commentHasLiked;
     private int commentLikeSize;
+    private boolean hasReported;
     private List<ReCommentResponseDto> reComments;
 
     public CommentResponseDto(Comment newComment) {
@@ -33,7 +34,7 @@ public class CommentResponseDto {
         this.commentLikeSize = newComment.getCommentLike().size();
     }
 
-    public CommentResponseDto(Comment comment, boolean hasLikeComment, List<ReCommentResponseDto> reComments) {
+    public CommentResponseDto(Comment comment, boolean hasLikeComment, List<ReCommentResponseDto> reComments, boolean hasReported) {
         this.nickname = comment.getNickname();
         this.comment = comment.getComment();
         this.createdAt = comment.getCreatedAt();
@@ -42,5 +43,6 @@ public class CommentResponseDto {
         this.reComments = reComments;
         this.commentId = comment.getId();
         this.commentLikeSize = comment.getCommentLike().size();
+        this.hasReported = hasReported;
     }
 }
