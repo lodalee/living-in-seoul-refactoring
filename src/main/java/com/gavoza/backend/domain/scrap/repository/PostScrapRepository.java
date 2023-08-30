@@ -10,9 +10,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface PostScrapRepository extends JpaRepository<PostScrap, Long> {
-    boolean existsLikeByPostAndUser(Post post, User user);
 
     Optional<PostScrap> findByPostAndUser(Post post, User user);
 
     Page<PostScrap> findAllByUser(User user, Pageable pageable);
+
+    boolean existsScrapByPostAndUser(Post post, User user);
 }

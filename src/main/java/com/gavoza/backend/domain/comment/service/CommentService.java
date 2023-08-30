@@ -2,6 +2,9 @@ package com.gavoza.backend.domain.comment.service;
 
 import com.gavoza.backend.domain.Like.repository.CommentLikeRepository;
 import com.gavoza.backend.domain.Like.repository.ReCommentLikeRepository;
+import com.gavoza.backend.domain.alarm.AlarmEventType;
+import com.gavoza.backend.domain.alarm.entity.Alarm;
+import com.gavoza.backend.domain.alarm.repository.AlarmRepository;
 import com.gavoza.backend.domain.comment.dto.*;
 import com.gavoza.backend.domain.comment.entity.Comment;
 import com.gavoza.backend.domain.comment.entity.ReComment;
@@ -18,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,9 +36,15 @@ public class CommentService {
     private final ReCommentRepository reCommentRepository;
     private final CommentLikeRepository commentLikeRepository;
     private final ReCommentLikeRepository reCommentLikeRepository;
+    private final AlarmRepository alarmRepository;
 
     //comment 조회
     public CommentListResponse getCommentByPostId(int page, int size, Long postId, User user) {
+        // postId 유효성 확인
+        if (!postRepository.existsById(postId)) {
+            throw new IllegalArgumentException("해당 게시물이 존재하지 않습니다.");
+        }
+
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Comment> commentPages = commentRepository.findAllByPostId(postId, pageable);
         List<CommentResponseDto> commentResponseDtos = new ArrayList<>();
@@ -64,8 +74,17 @@ public class CommentService {
     // 댓글 생성
     public CommentResponseDto createComment(Long postId, CommentRequestDto requestDto, User user) {
         Post post = getPostById(postId);
-        Comment comment = new Comment(requestDto, user.getNickname(), post);
+        Comment comment = new Comment(requestDto, user.getNickname(), post, user);
         Comment newComment = commentRepository.save(comment);
+
+        AlarmEventType eventType = AlarmEventType.NEW_COMMENT_ON_POST; // 댓글에 대한 알림 타입 설정
+        Boolean isRead = false; // 초기값으로 미읽음 상태 설정
+        String notificationMessage = user.getNickname() + "님이 [" + post.getContent() + "] 글에 [" + comment.getComment() + "] 댓글을 달았어요!"; // 알림 메시지 설정
+        LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+
+        Alarm alarm = new Alarm(post ,post.getUser(), eventType, isRead, notificationMessage, registeredAt);
+        alarmRepository.save(alarm);
+
 
         return new CommentResponseDto(newComment); // ReCommentResponseDto로 변경
     }
@@ -73,8 +92,16 @@ public class CommentService {
     // 대댓글 생성
     public ReCommentResponseDto createReComment(Long commentId, ReCommentRequestDto requestDto, User user) {
         Comment comment = getCommentById(commentId);
-        ReComment reComment = new ReComment(requestDto, user.getNickname(), comment);
+        ReComment reComment = new ReComment(requestDto, user.getNickname(), comment, user);
         ReComment newReComment = reCommentRepository.save(reComment);
+
+        AlarmEventType eventType = AlarmEventType.NEW_RECOMMENT_ON_POST; // 댓글에 대한 알림 타입 설정
+        Boolean isRead = false; // 초기값으로 미읽음 상태 설정
+        String notificationMessage = user.getNickname() + "님이 [" + comment.getComment() + "] 댓글에 [" + reComment.getReComment() + "] 답글을 달았어요!"; // 알림 메시지 설정
+        LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+
+        Alarm alarm = new Alarm(comment.getPost(),comment.getUser(), eventType, isRead, notificationMessage, registeredAt);
+        alarmRepository.save(alarm);
 
         return new ReCommentResponseDto(newReComment);
     }

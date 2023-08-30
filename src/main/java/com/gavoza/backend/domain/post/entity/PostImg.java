@@ -16,7 +16,7 @@ public class PostImg {
     @Column(name = "post_img_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column
     private String postImg;
 
     @JsonBackReference

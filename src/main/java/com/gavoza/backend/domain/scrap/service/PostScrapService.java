@@ -9,6 +9,8 @@ import com.gavoza.backend.global.exception.MessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class PostScrapService {
@@ -21,14 +23,15 @@ public class PostScrapService {
                 ()-> new IllegalArgumentException("해당 게시글은 존재하지 않습니다.")
         );
 
-        if (!postScrapRepository.existsLikeByPostAndUser(post, user)){
-            PostScrap scrap = new PostScrap(post, user) ;
+        if (!postScrapRepository.existsScrapByPostAndUser(post, user)){
+            LocalDateTime scrapedAt = LocalDateTime.now(); // 현재 시간을 스크랩 시간으로 설정
+            PostScrap scrap = new PostScrap(post, user, scrapedAt) ;
             postScrapRepository.save(scrap);
             return new MessageResponseDto("스크랩");
         }
 
         PostScrap scrap = postScrapRepository.findByPostAndUser(post, user).orElseThrow(
-                ()-> new IllegalArgumentException("좋아요에 대한 정보가 존재하지 않습니다."));
+                ()-> new IllegalArgumentException("스크랩에 대한 정보가 존재하지 않습니다."));
         postScrapRepository.delete(scrap);
         return new MessageResponseDto("스크랩 취소");
     }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gavoza.backend.domain.Like.entity.Commentlike;
 import com.gavoza.backend.domain.comment.dto.CommentRequestDto;
 import com.gavoza.backend.domain.post.entity.Post;
+import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.config.Auditing;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -49,8 +50,13 @@ public class Comment extends Auditing {
     @Transient
     private boolean commentHasLiked;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    public Comment(CommentRequestDto requestDto, String nickname, Post post) {
+
+    public Comment(CommentRequestDto requestDto, String nickname, Post post, User user) {
+        this.user = user;
         this.nickname = nickname;
         this.comment = requestDto.getComment();
         this.post = post;
