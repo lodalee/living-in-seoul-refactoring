@@ -18,9 +18,9 @@ public class AlarmController {
     //활동 및 해시태그 알림 조회
     @GetMapping("/activity")
     public AlarmListResponse getNotification(@RequestParam int page,
-                                                  @RequestParam int size,
-                                                  @RequestParam String alarmCategory,
-                                                  @AuthenticationPrincipal UserDetailsImpl userDetails){
+                                             @RequestParam int size,
+                                             @RequestParam String alarmCategory,
+                                             @AuthenticationPrincipal UserDetailsImpl userDetails){
         User user = userDetails.getUser();
         return alarmService.getNotification(page-1, size, alarmCategory,  user);
     }
@@ -48,4 +48,13 @@ public class AlarmController {
         Long userId = userDetails.getUser().getId();
         return alarmService.unsubscribeHashtag(hashtag, userId);
     }
+
+    //알림 눌렀을 때 is read true로
+    @PostMapping("/read/{notificationId}")
+    public MessageResponseDto markNotificationAsRead(@PathVariable Integer notificationId,
+                                                     @AuthenticationPrincipal UserDetailsImpl userDetails){
+        User user = userDetails.getUser();
+        return alarmService.markNotificationAsRead(notificationId, user);
+    }
+
 }

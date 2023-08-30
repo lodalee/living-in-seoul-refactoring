@@ -9,12 +9,14 @@ public class PostResultDto {
     LocationResponseDto location;
     PostInfoResponseDto post;
     private boolean hasLiked;
+    private boolean hasScrapped;
 
 
-    public PostResultDto(UserResponseDto userResponseDto, PostInfoResponseDto postInfoResponseDto, LocationResponseDto locationResponseDto, boolean hasLiked) {
+    public PostResultDto(UserResponseDto userResponseDto, PostInfoResponseDto postInfoResponseDto, LocationResponseDto locationResponseDto, boolean hasLiked, boolean hasScrapped) {
         this.user = userResponseDto;
         this.post = postInfoResponseDto;
         this.location = locationResponseDto;
         this.hasLiked = hasLiked;
+        this.hasScrapped = hasScrapped;
     }
 }

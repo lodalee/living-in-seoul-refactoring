@@ -7,6 +7,7 @@ import com.gavoza.backend.domain.post.dto.PostResultDto;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.post.response.PostListResponse;
+import com.gavoza.backend.domain.scrap.repository.PostScrapRepository;
 import com.gavoza.backend.domain.search.entity.SearchLog;
 import com.gavoza.backend.domain.search.repository.SearchRepository;
 import com.gavoza.backend.domain.user.ToPost.UserResponseDto;
@@ -31,6 +32,7 @@ public class SearchService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
     private final SearchRepository searchRepository;
+    private final PostScrapRepository postScrapRepository;
 
     //게시글 검색
     public PostListResponse searchPosts(int page, int size, String keyword, User user) {
@@ -106,10 +108,11 @@ public class SearchService {
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
         LocationResponseDto locationResponseDto = new LocationResponseDto(post.getLname(), post.getAddress(), post.getLat(), post.getLng(), post.getGu());
         if (Objects.isNull(user)){
-            return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false);
+            return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false,false);
         }
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
-        return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost);
+        boolean hasScrapped = postScrapRepository.existsScrapByPostAndUser(post, user);
+        return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost,hasScrapped);
     }
 
 

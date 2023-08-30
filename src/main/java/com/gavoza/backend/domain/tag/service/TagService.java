@@ -7,6 +7,7 @@ import com.gavoza.backend.domain.post.dto.PostResultDto;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.post.response.PostListResponse;
+import com.gavoza.backend.domain.scrap.repository.PostScrapRepository;
 import com.gavoza.backend.domain.user.ToPost.UserResponseDto;
 import com.gavoza.backend.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class TagService {
 
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
+    private final PostScrapRepository postScrapRepository;
 
     //전체 - 태그 순위
     public List<String> allRankNumber() {
@@ -95,10 +97,11 @@ public class TagService {
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
         LocationResponseDto locationResponseDto = new LocationResponseDto(post.getLname(), post.getAddress(), post.getLat(), post.getLng(), post.getGu());
         if (Objects.isNull(user)){
-            return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false);
+            return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false,false);
         }
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
-        return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto,hasLikedPost);
+        boolean hasScrapped = postScrapRepository.existsScrapByPostAndUser(post, user);
+        return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto,hasLikedPost,hasScrapped);
     }
 
     //postList에서 해시태그를 추출하고 인기순으로 정렬된 태그 목록을 반환
