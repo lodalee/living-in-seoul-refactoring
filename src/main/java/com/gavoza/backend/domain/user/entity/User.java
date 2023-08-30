@@ -37,6 +37,10 @@ public class User {
 
     private String profileImageUrl;
 
+    private boolean likeAlarm;
+    private boolean commentAlarm;
+    private boolean hashtagAlarm;
+
     public User(String email, String nickname, String password, String hometown, String movedDate, String gender, String birthDate) {
         this.email = email;
         this.nickname = nickname;
@@ -54,5 +58,15 @@ public class User {
     }
     public User(Long id){
         this.id = id;
+    }
+
+    public void changeLikeAlarm() {
+        this.likeAlarm = !this.likeAlarm;
+    }
+    public void changeCommentAlarm() {
+        this.commentAlarm = !this.commentAlarm;
+    }
+    public void changeHashtagAlarm() {
+        this.hashtagAlarm = !this.hashtagAlarm;
     }
 }

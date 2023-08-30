@@ -2,16 +2,17 @@ package com.gavoza.backend.domain.scrap.entity;
 
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.user.entity.User;
-import com.gavoza.backend.global.config.Auditing;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @Table(name = "post_scrap")
-public class PostScrap extends Auditing {
+public class PostScrap {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,8 +27,13 @@ public class PostScrap extends Auditing {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public PostScrap(Post post, User user) {
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime scrapedAt; // 스크랩한 시간을 저장할 필드
+
+    public PostScrap(Post post, User user, LocalDateTime scrapedAt) {
         this.post = post;
         this.user = user;
+        this.scrapedAt = scrapedAt;
     }
 }

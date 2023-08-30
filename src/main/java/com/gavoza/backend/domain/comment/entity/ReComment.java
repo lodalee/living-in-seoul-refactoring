@@ -3,6 +3,7 @@ package com.gavoza.backend.domain.comment.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gavoza.backend.domain.Like.entity.ReCommentLike;
 import com.gavoza.backend.domain.comment.dto.ReCommentRequestDto;
+import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.config.Auditing;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -39,13 +40,18 @@ public class ReComment extends Auditing {
     @Transient
     private boolean reCommentHasLiked;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @OneToMany(mappedBy = "reComment", cascade = {CascadeType.REMOVE})
     private List<ReCommentLike> reCommentLikes = new ArrayList<>();
 
-    public ReComment(ReCommentRequestDto requestDto, String nickname, Comment comment) {
+    public ReComment(ReCommentRequestDto requestDto, String nickname, Comment comment, User user) {
         this.nickname = nickname;
         this.reComment = requestDto.getReComment();
         this.comment = comment;
+        this.user = user;
     }
 
     public void update(ReCommentRequestDto requestDto) {
