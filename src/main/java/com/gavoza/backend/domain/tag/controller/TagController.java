@@ -49,6 +49,22 @@ public class TagController {
         return tagService.hashtagPostResponseDtos(size, page-1, hashtagName, type, user);
     }
 
+
+    //전체 인기 순위 태그 post 조회 - 위치
+    @GetMapping("/post/location/All")
+    public PostListResponse postLocationResponseDtos(
+            @RequestParam int size,
+            @RequestParam int page,
+            @RequestParam String gu,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        if(Objects.isNull(userDetails)){
+            return tagService.postLocationResponseDtos(size, page-1, gu, null);
+        }
+        User user = userDetails.getUser();
+        return tagService.postLocationResponseDtos(size, page-1,gu, user);
+    }
+
     //유저 카테고리별 인기 순위 태그 post 조회
     @GetMapping("/post/category")
     public PostListResponse categoryHashtagPostResponseDtos(
@@ -58,11 +74,27 @@ public class TagController {
             @RequestParam String category,
             @RequestParam String type,
             @AuthenticationPrincipal UserDetailsImpl userDetails
-            ){
+    ){
         if(Objects.isNull(userDetails)){
             return tagService.categoryHashtagPostResponseDtos(size, page-1, hashtagName, category , type, null);
         }
         User user = userDetails.getUser();
         return tagService.categoryHashtagPostResponseDtos(size, page-1, hashtagName, category,type,user);
+    }
+
+    //유저 카테고리별 인기 순위 태그 post 조회
+    @GetMapping("/post/location/category")
+    public PostListResponse categoryLocationPostResponseDtos(
+            @RequestParam int size,
+            @RequestParam int page,
+            @RequestParam String gu,
+            @RequestParam String category,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        if(Objects.isNull(userDetails)){
+            return tagService.categoryLocationPostResponseDtos(size, page-1, gu, category , null);
+        }
+        User user = userDetails.getUser();
+        return tagService.categoryLocationPostResponseDtos(size, page-1, gu, category,user);
     }
 }
