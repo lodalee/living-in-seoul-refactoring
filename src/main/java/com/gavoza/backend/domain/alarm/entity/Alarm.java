@@ -41,6 +41,7 @@ public class Alarm {
 
     private LocalDateTime registeredAt;
 
+
     public Alarm(Post post, User user, AlarmEventType alarmEventType, Boolean isRead, String notificationMessage, LocalDateTime registeredAt) {
         this.post = post;
         this.user = user;

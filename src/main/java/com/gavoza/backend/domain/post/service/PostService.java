@@ -182,11 +182,12 @@ public class PostService {
         LocationResponseDto locationResponseDto = new LocationResponseDto(post.getLname(), post.getAddress(), post.getLat(), post.getLng(), post.getGu());
 
         if (Objects.isNull(user)) {
-            return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false));
+            return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false,false));
         }
 
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
-        return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost));
+        boolean hasScrapped = postScrapRepository.existsScrapByPostAndUser(post, user);
+        return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost,hasScrapped));
     }
 
     //게시물 전체 조회
@@ -237,10 +238,11 @@ public class PostService {
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
         LocationResponseDto locationResponseDto = new LocationResponseDto(post.getLname(), post.getAddress(), post.getLat(), post.getLng(), post.getGu());
         if (Objects.isNull(user)) {
-            return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false);
+            return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false,false);
         }
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
-        return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost);
+        boolean hasScrapped = postScrapRepository.existsScrapByPostAndUser(post, user);
+        return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost,hasScrapped);
     }
 
     //주어진 게시물 ID에 해당하는 게시물 조회

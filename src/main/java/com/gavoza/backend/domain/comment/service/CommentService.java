@@ -82,14 +82,14 @@ public class CommentService {
         String notificationMessage = user.getNickname() + "님이 [" + post.getContent() + "] 글에 [" + comment.getComment() + "] 댓글을 달았어요!"; // 알림 메시지 설정
         LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
 
-        Alarm alarm = new Alarm(post ,post.getUser(), eventType, isRead, notificationMessage, registeredAt);
-        alarmRepository.save(alarm);
-
-
+        if (!post.getUser().getId().equals(user.getId())) {
+            Alarm commentNotification = new Alarm(post ,post.getUser(), eventType, isRead, notificationMessage, registeredAt);
+            alarmRepository.save(commentNotification);
+        }
         return new CommentResponseDto(newComment); // ReCommentResponseDto로 변경
     }
 
-    // 대댓글 생성
+    // 대댓글 생성  //내가 쓴 댓글에 대댓글을 달면 알림이 안와요! 그러려면 댓글 userid 와 대댓글을 다는 현재의 userid가 똑같으면 안되겠주?
     public ReCommentResponseDto createReComment(Long commentId, ReCommentRequestDto requestDto, User user) {
         Comment comment = getCommentById(commentId);
         ReComment reComment = new ReComment(requestDto, user.getNickname(), comment, user);
@@ -100,9 +100,10 @@ public class CommentService {
         String notificationMessage = user.getNickname() + "님이 [" + comment.getComment() + "] 댓글에 [" + reComment.getReComment() + "] 답글을 달았어요!"; // 알림 메시지 설정
         LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
 
-        Alarm alarm = new Alarm(comment.getPost(),comment.getUser(), eventType, isRead, notificationMessage, registeredAt);
-        alarmRepository.save(alarm);
-
+        if (!comment.getUser().getId().equals(user.getId())) {
+            Alarm commentNotification = new Alarm(comment.getPost(),comment.getUser(), eventType, isRead, notificationMessage, registeredAt);
+            alarmRepository.save(commentNotification);
+        }
         return new ReCommentResponseDto(newReComment);
     }
 
