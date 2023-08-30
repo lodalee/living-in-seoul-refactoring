@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,55 +28,54 @@ public class AlarmService {
 
     //알림 조회
     public AlarmListResponse getNotification(int page, int size, String alarmCategory, User user) {
-            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registeredAt"));
-            Page<Alarm> alarmPages = alarmRepository.findAllByUser(user, pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registeredAt"));
+        Page<Alarm> alarmPages = alarmRepository.findAllByUser(user, pageable);
 
+        if (alarmCategory.equals("activity")) {
+            alarmPages = new PageImpl<>(alarmPages.stream()
+                    .filter(alarm -> alarm.getAlarmEventType().getAlarmType().equals(AlarmType.LIKE)
+                            || alarm.getAlarmEventType().getAlarmType().equals(AlarmType.COMMENT)).toList());
 
-            if (alarmCategory.equals("activity")){
-                alarmPages =  new PageImpl<>(alarmPages.stream()
-                        .filter(alarm -> alarm.getAlarmEventType().getAlarmType().equals(AlarmType.LIKE)
-                                || alarm.getAlarmEventType().getAlarmType().equals(AlarmType.COMMENT)).toList());
+        } else if (alarmCategory.equals("hashtag")) {
+            alarmPages = new PageImpl<>(alarmPages.stream()
+                    .filter(alarm -> alarm.getAlarmEventType().getAlarmType().equals(AlarmType.HASHTAG)).toList());
+        } else {
+            throw new IllegalArgumentException("알림 타입이 존재하지 않습니다.");
+        }
 
-            } else if(alarmCategory.equals("hashtag")) {
-                alarmPages = new PageImpl<>(alarmPages.stream()
-                        .filter(alarm -> alarm.getAlarmEventType().getAlarmType().equals(AlarmType.HASHTAG)).toList());
-            } else {
-                throw new IllegalArgumentException("알림 타입이 존재하지 않습니다.");
-            }
-
-            // 조회 결과를 AlarmResponse 리스트로 변환
-            List<AlarmResponse> alarmResponses = alarmPages.stream()
-                    .map(alarm -> new AlarmResponse(
-                            alarm.getId(),
-                            alarm.getAlarmEventType(),
-                            alarm.getNotificationMessage(), // 알림 내용을 원하는 방식으로 생성
-                            alarm.getIsRead(),
-                            alarm.getRegisteredAt()
-                    ))
-                    .collect(Collectors.toList());
-            return new AlarmListResponse("조회 성공", alarmPages.getTotalPages(), alarmPages.getTotalElements(), size, alarmResponses);
+        // 조회 결과를 AlarmResponse 리스트로 변환
+        List<AlarmResponse> alarmResponses = alarmPages.stream()
+                .map(alarm -> new AlarmResponse(
+                        alarm.getId(),
+                        alarm.getAlarmEventType(),
+                        alarm.getNotificationMessage(), // 알림 내용을 원하는 방식으로 생성
+                        alarm.getIsRead(),
+                        alarm.getRegisteredAt()
+                ))
+                .collect(Collectors.toList());
+        return new AlarmListResponse("조회 성공", alarmPages.getTotalPages(), alarmPages.getTotalElements(), size, alarmResponses);
     }
 
     //알림 구독
     @Transactional
     public MessageResponseDto subscribeAlarm(AlarmType alarmType, Long userId) {
-        User user= userRepository.findById(userId)
-                .orElseThrow(()-> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
 
-        if (alarmType.equals(AlarmType.LIKE)){
+        if (alarmType.equals(AlarmType.LIKE)) {
             user.changeLikeAlarm();
-        } else if (alarmType.equals(AlarmType.COMMENT)){
+        } else if (alarmType.equals(AlarmType.COMMENT)) {
             user.changeCommentAlarm();
-        } else if (alarmType.equals(AlarmType.HASHTAG)){
+        } else if (alarmType.equals(AlarmType.HASHTAG)) {
             user.changeHashtagAlarm();
         }
-        return new MessageResponseDto( alarmType + " 구독이 변경 완료되었습니다." );
+        return new MessageResponseDto(alarmType + " 구독이 변경 완료되었습니다.");
     }
 
     //해시 태그 구독
     public MessageResponseDto subscribeHashtag(String hashtag, Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
 
         SubscribeHashtag subscribeHashtag = new SubscribeHashtag(user, hashtag);
         subscribeHashtagRepository.save(subscribeHashtag);
@@ -97,4 +97,27 @@ public class AlarmService {
             return new MessageResponseDto("사용자가 해당 해시태그를 구독하지 않았습니다.");
         }
     }
+
+    // 알림 클릭 후 알림 읽음 처리
+    public MessageResponseDto markNotificationAsRead(@PathVariable Integer notificationId, User user) {
+        // 알림 조회
+        Alarm alarm = alarmRepository.findById(notificationId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 알림은 존재하지 않습니다."));
+
+        // 사용자 인증 및 권한 검사
+        if (!alarm.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("알림에 대한 액세스 권한이 없습니다.");
+        }
+
+        // 알림을 읽음 처리
+        alarm.setIsRead(true);
+        alarmRepository.save(alarm);
+
+        return new MessageResponseDto("알림을 읽음 처리했습니다.");
+    }
 }
+
+
+
+
+
