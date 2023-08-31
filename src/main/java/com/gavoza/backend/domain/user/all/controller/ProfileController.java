@@ -54,4 +54,6 @@ public class ProfileController {
         return ResponseEntity.ok(new MessageResponseDto("프로필 이미지가 삭제되었습니다."));
     }
 
+
+
 }

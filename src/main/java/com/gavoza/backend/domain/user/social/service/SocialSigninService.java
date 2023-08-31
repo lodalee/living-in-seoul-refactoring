@@ -2,7 +2,6 @@ package com.gavoza.backend.domain.user.social.service;
 
 import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.domain.user.all.repository.UserRepository;
-import com.gavoza.backend.domain.user.social.dto.KakaoUserResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -32,43 +31,43 @@ public class SocialSigninService {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
 
-        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
-        ResponseEntity<KakaoUserResponseDto> responseEntity = restTemplate.exchange(
+        ResponseEntity<Map<String, Object>> responseEntity = restTemplate.exchange(
                 "https://kapi.kakao.com/v2/user/me",
                 HttpMethod.GET,
                 requestEntity,
-                KakaoUserResponseDto.class
-        );
+                new ParameterizedTypeReference<>() {
+                });
 
-        KakaoUserResponseDto kakaoUser = responseEntity.getBody();
+        if (responseEntity.getBody() != null && responseEntity.getBody().containsKey("kakao_account")) {
+            Map<String, Object> kakaoAccountMap = (Map<String, Object>) responseEntity.getBody().get("kakao_account");
 
-        if (kakaoUser == null) {
+            String email = (String) kakaoAccountMap.get("email");
+
+            if (email == null || email.isEmpty()) {
+                throw new IllegalArgumentException("유효하지 않은 카카오 유저입니다. 이메일 정보가 없습니다.");
+            }
+
+            Optional<User> existingUserOptional = userRepository.findByEmail(email);
+
+            if (!existingUserOptional.isPresent()) {
+                String nickname = String.valueOf(responseEntity.getBody().get("id"));
+
+                String password = UUID.randomUUID().toString();
+                String encodedPassword = passwordEncoder.encode(password);
+
+                User newUser = new User(email, nickname, encodedPassword);
+
+                userRepository.save(newUser);
+            }
+
+            return email;
+        } else {
             throw new IllegalArgumentException("카카오 유저 정보를 가져올 수 없습니다.");
         }
-
-        // 추가: 이메일 확인
-        String email = kakaoUser.getKakao_account().getEmail();
-
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("유효하지 않은 카카오 유저입니다. 이메일 정보가 없습니다.");
-        }
-
-        // DB에서 사용자 찾기
-        Optional<User> existingUserOptional = userRepository.findByEmail(email);
-
-        if (!existingUserOptional.isPresent()) {  // 만약 DB에 해당 이메일의 사용자가 없다면 회원 가입 진행
-            String nickname = String.valueOf(kakaoUser.getId());  // 카카오 ID를 닉네임으로 설정
-
-            String password = UUID.randomUUID().toString();  // 임시 비밀번호 생성 (랜덤 UUID)
-            String encodedPassword = passwordEncoder.encode(password);  // 비밀번호 암호화
-
-            User newUser = new User(email, nickname, encodedPassword);
-            userRepository.save(newUser);  // DB에 저장
-        }
-
-        return email;
     }
+
 
 
 
