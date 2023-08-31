@@ -82,13 +82,17 @@ public class PostService {
             List<User> subscribers = findSubscribersForHashtag(hashtag);
 
             for (User subscriber : subscribers) {
-                AlarmEventType eventType = AlarmEventType.NEW_POST_WITH_HASHTAG; // 댓글에 대한 알림 타입 설정
-                Boolean isRead = false; // 초기값으로 미읽음 상태 설정
-                String notificationMessage = post.getContent(); // 알림 메시지 설정
-                LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+                // 로그인한 사용자와 게시물을 올린 사용자가 다를 때만 알림 생성
+                if (!subscriber.getId().equals(user.getId())) {
+                    AlarmEventType eventType = AlarmEventType.NEW_POST_WITH_HASHTAG; // 댓글에 대한 알림 타입 설정
+                    Boolean isRead = false; // 초기값으로 미읽음 상태 설정
+                    String notificationMessage = post.getContent(); // 알림 메시지 설정
+                    LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+                    String hashtagName = hashtag;
 
-                Alarm alarm = new Alarm(post, subscriber, eventType, isRead, notificationMessage, registeredAt);
-                alarmRepository.save(alarm);
+                    Alarm alarm = new Alarm(post, subscriber, eventType, isRead, notificationMessage, registeredAt, hashtagName);
+                    alarmRepository.save(alarm);
+                }
             }
         }
         return new MessageResponseDto("파일 저장 성공");

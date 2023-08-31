@@ -44,13 +44,14 @@ public class PostLikeService {
             postLikeRepository.save(like);
 
             // 좋아요 알림 생성 및 저장
-            String notificationMessage = user.getNickname() + "님이 [" + post.getContent() + "] 글에 좋아요를 눌렀어요!"; // 알림 메시지 설정
+            String notificationMessage = "<b>" + user.getNickname() + "</b>" + "님이 [" + post.getContent() + "] 글에 좋아요를 눌렀어요!"; // 알림 메시지 설정
             AlarmEventType eventType = AlarmEventType.NEW_LIKE_ON_POST; // 알림 타입 설정
             Boolean isRead = false; // 초기값으로 미읽음 상태 설정
             LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+            String userImg = user.getProfileImageUrl();
 
             if (!post.getUser().getId().equals(user.getId())) {
-                Alarm likeNotification = new Alarm(post, post.getUser(), eventType, isRead, notificationMessage, registeredAt);
+                Alarm likeNotification = new Alarm(post, post.getUser(), eventType, isRead, notificationMessage, registeredAt, userImg);
                 alarmRepository.save(likeNotification);
             }
             return new MessageResponseDto("좋아요");
@@ -73,13 +74,14 @@ public class PostLikeService {
             commentLikeRepository.save(like);
 
             // 좋아요 알림 생성 및 저장
-            String notificationMessage = user.getNickname() + "님이 [" + comment.getComment() + "] 댓글에 좋아요를 눌렀어요!"; // 알림 메시지 설정
+            String notificationMessage ="<b>" + user.getNickname() +"</b>"+ "님이 [" + comment.getComment() + "] 댓글에 좋아요를 눌렀어요!"; // 알림 메시지 설정
             AlarmEventType eventType = AlarmEventType.NEW_LIKE_ON_COMMENT; // 알림 타입 설정
             Boolean isRead = false; // 초기값으로 미읽음 상태 설정
             LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+            String userImg = user.getProfileImageUrl();
 
             if (!comment.getUser().getId().equals(user.getId())) {
-                Alarm likeNotification = new Alarm(comment.getPost(), comment.getUser(), eventType, isRead, notificationMessage, registeredAt);
+                Alarm likeNotification = new Alarm(comment.getPost(), comment.getUser(), eventType, isRead, notificationMessage, registeredAt,userImg);
                 alarmRepository.save(likeNotification);
             }
             return new MessageResponseDto("댓글 좋아요");
@@ -102,13 +104,14 @@ public class PostLikeService {
             reCommentLikeRepository.save(like);
 
             // 좋아요 알림 생성 및 저장
-            String notificationMessage = user.getNickname() + "님이 [" + reComment.getReComment() + "] 답글에 좋아요를 눌렀어요!"; // 알림 메시지 설정
+            String notificationMessage = "<b>" + user.getNickname() +"</b>"+ "님이 [" + reComment.getReComment() + "] 답글에 좋아요를 눌렀어요!"; // 알림 메시지 설정
             AlarmEventType eventType = AlarmEventType.NEW_LIKE_ON_RECOMMENT; // 알림 타입 설정
             Boolean isRead = false; // 초기값으로 미읽음 상태 설정
             LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+            String userImg = user.getProfileImageUrl();
 
             if (!reComment.getUser().getId().equals(user.getId())) {
-                Alarm likeNotification = new Alarm(reComment.getComment().getPost() ,reComment.getUser(), eventType, isRead, notificationMessage, registeredAt);
+                Alarm likeNotification = new Alarm(reComment.getComment().getPost() ,reComment.getUser(), eventType, isRead, notificationMessage, registeredAt, userImg);
                 alarmRepository.save(likeNotification);
             }
             return new MessageResponseDto("댓글 좋아요");
