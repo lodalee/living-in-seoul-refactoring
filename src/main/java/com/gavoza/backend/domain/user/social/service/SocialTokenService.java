@@ -1,5 +1,6 @@
 package com.gavoza.backend.domain.user.social.service;
 
+import com.gavoza.backend.global.exception.CustomRuntimeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -7,7 +8,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -24,22 +24,19 @@ public class SocialTokenService {
     @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String kakaoRedirectUri;
 
-    @Value("${spring.security.oauth2.client.registration.google.client-id}")
-    private String googleClientId;
-
-    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
-    private String googleClientSecret;
-
-    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
-    private String googleRedirectUri;
-
     @Value("${spring.security.oauth2.client.registration.naver.client-id}")
     private String naverClientId;
 
     @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
     private String naverClientSecret;
 
-    public String getAccessTokenFromAuthCode(String authCode) {
+    public String getAccessTokenFromKakaoAuthCode(String authCode) {
+
+        // 인가 코드 유효성 검사
+        if (authCode == null || authCode.isEmpty()) {
+            throw new CustomRuntimeException("유효하지 않은 인증 코드입니다.", HttpStatus.BAD_REQUEST);
+        }
+
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -97,52 +94,6 @@ public class SocialTokenService {
             return responseEntity.getBody().get("access_token").toString();
         } else {
             throw new IllegalStateException("액세스 토큰을 가져올 수 없습니다.");
-        }
-    }
-    public String getAccessTokenFromGoogleAuthCode(String authCode) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-        queryParams.add("grant_type", "authorization_code");
-        queryParams.add("client_id", googleClientId);
-        queryParams.add("client_secret", googleClientSecret);
-
-        if (authCode == null || authCode.trim().isEmpty()) {
-            throw new IllegalArgumentException("유효하지 않은 인증 코드입니다.");
-        }
-
-        queryParams.add("code", authCode);
-
-        if (googleRedirectUri == null || googleRedirectUri.trim().isEmpty()) {
-            throw new IllegalArgumentException("유효하지 않은 리디렉션 URI입니다.");
-        }
-
-        queryParams.add("redirect_uri", googleRedirectUri);
-
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(queryParams, headers);
-
-        ResponseEntity<Map<String, Object>> responseEntity;
-
-        try {
-            responseEntity = restTemplate.exchange(
-                    "https://oauth2.googleapis.com/token",
-                    HttpMethod.POST,
-                    requestEntity,
-                    new ParameterizedTypeReference<>() {
-                    });
-
-            if (responseEntity.getBody() != null && responseEntity.getBody().containsKey("access_token")) {
-                return responseEntity.getBody().get("access_token").toString();
-            } else {
-                throw new IllegalStateException("액세스 토큰을 가져올 수 없습니다.");
-            }
-
-        } catch (HttpClientErrorException e) {
-            System.out.println(e.getResponseBodyAsString()); // Google OAuth 서버에서 오류 메시지 출력.
-            throw e;
         }
     }
 

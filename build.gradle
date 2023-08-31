@@ -25,20 +25,9 @@ dependencies {
 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.5'
 
-//    implementation 'com.google.apis:google-api-services-oauth2:v2-rev20210626-1.32.1'
-
-
     implementation 'com.google.http-client:google-http-client-gson:1.40.1'
 
-
-    // Google API Client Library
-    implementation 'com.google.api-client:google-api-client:1.31.5'
-
-//// Google OAuth2 API
-//    implementation 'com.google.apis:google-api-services-oauth2:v2-rev164-1.26.0'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
-
 
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 

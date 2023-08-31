@@ -1,6 +1,5 @@
 package com.gavoza.backend.global.exception;
 
-
 import org.springframework.http.HttpStatus;
 
 public class CustomRuntimeException extends RuntimeException {
@@ -8,6 +7,11 @@ public class CustomRuntimeException extends RuntimeException {
 
     public CustomRuntimeException(String message, HttpStatus status) {
         super(message);
+        this.status = status;
+    }
+
+    public CustomRuntimeException(String message, HttpStatus status, Throwable cause) {
+        super(message, cause);
         this.status = status;
     }
 

@@ -6,8 +6,10 @@ import com.gavoza.backend.domain.user.social.dto.SocialAuthCodeRequestDto;
 import com.gavoza.backend.domain.user.social.dto.SocialLoginResponseDto;
 import com.gavoza.backend.domain.user.social.service.SocialTokenService;
 import com.gavoza.backend.domain.user.social.service.SocialSigninService;
+import com.gavoza.backend.global.exception.CustomRuntimeException;
 import com.gavoza.backend.global.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,35 +29,47 @@ public class SocialController {
     @PostMapping("/login/kakao")
     public ResponseEntity<SocialLoginResponseDto> signInWithKakao(@RequestBody SocialAuthCodeRequestDto kakaoAuthCodeRequestDto) {
         String authCode = kakaoAuthCodeRequestDto.getAuthCode();
-        // 인가 코드로 액세스 토큰 발급
-        String accessToken = socialTokenService.getAccessTokenFromAuthCode(authCode);
-        String email = socialSigninService.signInWithKakao(accessToken);
 
-        return processSocialLogin(email,"카카오 로그인에 성공하셨습니다.");
+        // 인가 코드 유효성 검사
+        if (authCode == null || authCode.isEmpty()) {
+            throw new CustomRuntimeException("유효하지 않은 인증 코드입니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        String accessToken;
+        try {
+            // 인가 코드로 액세스 토큰 발급
+            accessToken = socialTokenService.getAccessTokenFromKakaoAuthCode(authCode);
+        } catch (Exception e) {
+            throw new CustomRuntimeException("카카오에서 액세스 토큰을 가져오는데 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
+
+        String email;
+        try {
+            email = socialSigninService.signInWithKakao(accessToken);
+        } catch (Exception e) {
+            throw new CustomRuntimeException("카카오 로그인에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
+
+        return processSocialLogin(email, "카카오 로그인에 성공하셨습니다.");
     }
+
 
     @PostMapping("/login/naver")
     public ResponseEntity<SocialLoginResponseDto> signInWithNaver(@RequestBody SocialAuthCodeRequestDto naverAuthCodeRequestDto) {
         String authCode = naverAuthCodeRequestDto.getAuthCode();
+
+        // 인가 코드 유효성 검사
+        if (authCode == null || authCode.isEmpty()) {
+            throw new CustomRuntimeException("유효하지 않은 인증 코드입니다.", HttpStatus.BAD_REQUEST);
+        }
+
         // 인가 코드로 액세스 토큰 발급
         String accessToken = socialTokenService.getAccessTokenFromNaverAuthCode(authCode);
         // 네이버 로그인
         String email = socialSigninService.signInWithNaver(accessToken);
 
-        return processSocialLogin(email,"네이버 로그인에 성공하셨습니다.");
+        return processSocialLogin(email, "네이버 로그인에 성공하셨습니다.");
     }
-
-    @PostMapping("/login/google")
-    public ResponseEntity<SocialLoginResponseDto> signInWithGoogle(@RequestBody SocialAuthCodeRequestDto googleAuthCodeRequestDto) {
-        String authCode = googleAuthCodeRequestDto.getAuthCode();
-        // 인가 코드로 액세스 토큰 발급
-        String accessToken = socialTokenService.getAccessTokenFromGoogleAuthCode(authCode);
-        // 구글 로그인
-        String email = socialSigninService.signInWithGoogle(accessToken);
-
-        return processSocialLogin(email,"구글 로그인에 성공하셨습니다.");
-    }
-
 
 
     private ResponseEntity<SocialLoginResponseDto> processSocialLogin(String email, String successMessage) {
