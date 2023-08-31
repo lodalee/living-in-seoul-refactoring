@@ -16,7 +16,7 @@ import java.util.Date;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("/social")
 public class SocialController {
 
     private final SocialSigninService socialSigninService;
