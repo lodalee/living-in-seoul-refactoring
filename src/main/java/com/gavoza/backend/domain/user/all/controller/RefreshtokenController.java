@@ -6,7 +6,10 @@ import com.gavoza.backend.domain.user.all.validator.TokenValidator;
 import com.gavoza.backend.global.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 
@@ -31,7 +34,7 @@ public class RefreshtokenController {
             String newAccessToken = jwtUtil.createAccessToken(email);
 
             // 액세스 토큰의 만료 날짜와 시간 가져오기
-            Date expirationDate= jwtUtil.getExpirationDateFromToken(newAccessToken);
+            Date expirationDate = jwtUtil.getExpirationDateFromToken(newAccessToken);
 
             // 토큰 응답
             RefreshResMsgDto refreshResMsgDto =
@@ -39,7 +42,7 @@ public class RefreshtokenController {
             return ResponseEntity.ok().body(refreshResMsgDto);
 
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(new RefreshResMsgDto(e.getMessage(), null,null));
+            return ResponseEntity.badRequest().body(new RefreshResMsgDto(e.getMessage(), null, null));
         }
     }
 

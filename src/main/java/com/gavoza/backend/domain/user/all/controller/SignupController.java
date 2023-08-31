@@ -60,6 +60,7 @@ public class SignupController {
             return ResponseEntity.badRequest().body(new MessageResponseDto(e.getMessage()));
         }
     }
+
     @PutMapping("/update")
     public ResponseEntity<MessageResponseDto> updateUserInfo(@RequestBody UserUpdateRequestDto requestDto,
                                                              HttpServletRequest request) {
@@ -67,6 +68,7 @@ public class SignupController {
         profileService.updateUserInfo(email, requestDto);
         return ResponseEntity.ok(new MessageResponseDto("회원 정보가 수정되었습니다."));
     }
+
     @DeleteMapping("/delete")
     public ResponseEntity<MessageResponseDto> deleteUser(HttpServletRequest request) {
         String email = jwtUtil.getEmailFromAuthHeader(request);

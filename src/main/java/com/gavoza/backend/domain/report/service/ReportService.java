@@ -9,8 +9,8 @@ import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.report.ReportType;
 import com.gavoza.backend.domain.report.entity.Report;
 import com.gavoza.backend.domain.report.repository.ReportRepository;
-import com.gavoza.backend.domain.user.entity.User;
-import com.gavoza.backend.global.exception.MessageResponseDto;
+import com.gavoza.backend.domain.user.all.entity.User;
+import com.gavoza.backend.domain.user.ToPost.MessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

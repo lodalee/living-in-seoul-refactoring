@@ -1,10 +1,9 @@
 package com.gavoza.backend.domain.user.all.controller;
 
+import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
 import com.gavoza.backend.domain.user.all.dto.response.UserProfileResponseDto;
 import com.gavoza.backend.domain.user.all.entity.User;
-import com.gavoza.backend.domain.user.all.service.LoginService;
 import com.gavoza.backend.domain.user.all.service.ProfileService;
-import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
 import com.gavoza.backend.global.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
