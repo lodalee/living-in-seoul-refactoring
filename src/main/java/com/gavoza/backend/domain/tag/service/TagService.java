@@ -7,6 +7,7 @@ import com.gavoza.backend.domain.post.dto.PostResultDto;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.post.response.PostListResponse;
+import com.gavoza.backend.domain.report.repository.ReportRepository;
 import com.gavoza.backend.domain.scrap.repository.PostScrapRepository;
 import com.gavoza.backend.domain.user.ToPost.UserResponseDto;
 import com.gavoza.backend.domain.user.all.entity.User;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ public class TagService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
     private final PostScrapRepository postScrapRepository;
+    private final ReportRepository reportRepository;
 
     //전체 - 태그 순위
     public List<String> allRankNumber() {
@@ -69,6 +72,18 @@ public class TagService {
         return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size, postResultDtos);
     }
 
+    //전체 - 태그별 post - +위치
+    public PostListResponse postLocationResponseDtos(int size, int page, String gu, User user) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Post> postPage = postRepository.findAllByGu(gu, pageable);
+
+        List<PostResultDto> postResultDtos =
+                postPage.getContent().stream()
+                        .map(post -> mapToPostResultDto(post,user))
+                        .collect(Collectors.toList());
+        return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size, postResultDtos);
+    }
+
     //카테고리 - 태그별 포스트
     public PostListResponse categoryHashtagPostResponseDtos (int size, int page, String hashtagName, String category, String type, User user) {
         Pageable pageable = PageRequest.of(page, size);
@@ -86,6 +101,18 @@ public class TagService {
         return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size, postResultDtos);
     }
 
+    //카테고리 - 태그별 포스트 - +위치
+    public PostListResponse categoryLocationPostResponseDtos(int size, int page, String gu, String category, User user) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Post> postPage = postRepository.findAllByGuAndCategory(gu,category, pageable);
+
+        List<PostResultDto> postResultDtos =
+                postPage.getContent().stream()
+                        .map(post -> mapToPostResultDto(post,user))
+                        .collect(Collectors.toList());
+        return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size, postResultDtos);
+    }
+
     //주어진 리스트에서 상위 N개의 요소를 선택하는 메서드
     private List<String> getTopRankedTags(List<String> rankedIds, int limit) {
         return rankedIds.stream().limit(limit).collect(Collectors.toList());
@@ -97,11 +124,12 @@ public class TagService {
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
         LocationResponseDto locationResponseDto = new LocationResponseDto(post.getLname(), post.getAddress(), post.getLat(), post.getLng(), post.getGu());
         if (Objects.isNull(user)){
-            return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false,false);
+            return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false,false,false);
         }
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
         boolean hasScrapped = postScrapRepository.existsScrapByPostAndUser(post, user);
-        return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto,hasLikedPost,hasScrapped);
+        boolean hasReported = reportRepository.existsReportByPostAndUser(post,user);
+        return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto,hasLikedPost,hasScrapped,hasReported);
     }
 
     //postList에서 해시태그를 추출하고 인기순으로 정렬된 태그 목록을 반환

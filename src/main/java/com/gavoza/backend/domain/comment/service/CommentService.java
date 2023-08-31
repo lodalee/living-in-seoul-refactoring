@@ -12,7 +12,12 @@ import com.gavoza.backend.domain.comment.repository.CommentRepository;
 import com.gavoza.backend.domain.comment.repository.ReCommentRepository;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
+<<<<<<< HEAD
 import com.gavoza.backend.domain.user.all.entity.User;
+=======
+import com.gavoza.backend.domain.report.repository.ReportRepository;
+import com.gavoza.backend.domain.user.entity.User;
+>>>>>>> 06d60945699e29e8b348988c7cbe44af0dfa91ad
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +42,7 @@ public class CommentService {
     private final CommentLikeRepository commentLikeRepository;
     private final ReCommentLikeRepository reCommentLikeRepository;
     private final AlarmRepository alarmRepository;
+    private final ReportRepository reportRepository;
 
     //comment 조회
     public CommentListResponse getCommentByPostId(int page, int size, Long postId, User user) {
@@ -55,7 +61,9 @@ public class CommentService {
                     .collect(Collectors.toList());
 
             boolean hasLikeComment = user != null && commentLikeRepository.existsLikeByCommentAndUser(comment, user);
-            commentResponseDtos.add(new CommentResponseDto(comment, hasLikeComment, reComments));
+            boolean hasReported = reportRepository.existsReportByCommentAndUser(comment,user);
+
+            commentResponseDtos.add(new CommentResponseDto(comment, hasLikeComment, reComments,hasReported));
         }
 
         return new CommentListResponse(commentResponseDtos,commentPages.getTotalPages(), commentPages.getTotalElements(), size);
@@ -67,8 +75,8 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
 
         boolean reCommentHasLiked = reCommentLikeRepository.existsLikeByReCommentAndUser(reComment, user);
-
-        return new ReCommentResponseDto(reComment, reCommentHasLiked);
+        boolean hasReported = reportRepository.existsReportByReCommentAndUser(reComment,user);
+        return new ReCommentResponseDto(reComment, reCommentHasLiked,hasReported);
     }
 
     // 댓글 생성
@@ -79,11 +87,12 @@ public class CommentService {
 
         AlarmEventType eventType = AlarmEventType.NEW_COMMENT_ON_POST; // 댓글에 대한 알림 타입 설정
         Boolean isRead = false; // 초기값으로 미읽음 상태 설정
-        String notificationMessage = user.getNickname() + "님이 [" + post.getContent() + "] 글에 [" + comment.getComment() + "] 댓글을 달았어요!"; // 알림 메시지 설정
+        String notificationMessage = "<b>" + user.getNickname() + "</b>" + "님이 [" + post.getContent() + "] 글에 [" + comment.getComment() + "] 댓글을 달았어요!"; // 알림 메시지 설정
         LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+        String userImg = user.getProfileImageUrl();
 
         if (!post.getUser().getId().equals(user.getId())) {
-            Alarm commentNotification = new Alarm(post ,post.getUser(), eventType, isRead, notificationMessage, registeredAt);
+            Alarm commentNotification = new Alarm(post ,post.getUser(), eventType, isRead, notificationMessage, registeredAt,userImg);
             alarmRepository.save(commentNotification);
         }
         return new CommentResponseDto(newComment); // ReCommentResponseDto로 변경
@@ -97,11 +106,12 @@ public class CommentService {
 
         AlarmEventType eventType = AlarmEventType.NEW_RECOMMENT_ON_POST; // 댓글에 대한 알림 타입 설정
         Boolean isRead = false; // 초기값으로 미읽음 상태 설정
-        String notificationMessage = user.getNickname() + "님이 [" + comment.getComment() + "] 댓글에 [" + reComment.getReComment() + "] 답글을 달았어요!"; // 알림 메시지 설정
+        String notificationMessage ="<b>"+ user.getNickname() +"</b>"+ "님이 [" + comment.getComment() + "] 댓글에 [" + reComment.getReComment() + "] 답글을 달았어요!"; // 알림 메시지 설정
         LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+        String userImg = user.getProfileImageUrl();
 
         if (!comment.getUser().getId().equals(user.getId())) {
-            Alarm commentNotification = new Alarm(comment.getPost(),comment.getUser(), eventType, isRead, notificationMessage, registeredAt);
+            Alarm commentNotification = new Alarm(comment.getPost(),comment.getUser(), eventType, isRead, notificationMessage, registeredAt,userImg);
             alarmRepository.save(commentNotification);
         }
         return new ReCommentResponseDto(newReComment);
@@ -171,7 +181,6 @@ public class CommentService {
         return commentRepository.findById(id)
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 댓글입니다."));
     }
-
 }
 
 

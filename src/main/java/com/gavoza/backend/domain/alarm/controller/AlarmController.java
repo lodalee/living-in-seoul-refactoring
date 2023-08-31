@@ -56,5 +56,4 @@ public class AlarmController {
         User user = userDetails.getUser();
         return alarmService.markNotificationAsRead(notificationId, user);
     }
-
 }

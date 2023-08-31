@@ -10,13 +10,16 @@ public class PostResultDto {
     PostInfoResponseDto post;
     private boolean hasLiked;
     private boolean hasScrapped;
+    private boolean hasReported;
 
 
-    public PostResultDto(UserResponseDto userResponseDto, PostInfoResponseDto postInfoResponseDto, LocationResponseDto locationResponseDto, boolean hasLiked, boolean hasScrapped) {
+
+    public PostResultDto(UserResponseDto userResponseDto, PostInfoResponseDto postInfoResponseDto, LocationResponseDto locationResponseDto, boolean hasLiked, boolean hasScrapped, boolean hasReported) {
         this.user = userResponseDto;
         this.post = postInfoResponseDto;
         this.location = locationResponseDto;
         this.hasLiked = hasLiked;
         this.hasScrapped = hasScrapped;
+        this.hasReported = hasReported;
     }
 }

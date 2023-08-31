@@ -41,13 +41,26 @@ public class Alarm {
 
     private LocalDateTime registeredAt;
 
+    private String hashtagName;
+    private String userImg;
 
-    public Alarm(Post post, User user, AlarmEventType alarmEventType, Boolean isRead, String notificationMessage, LocalDateTime registeredAt) {
+    public Alarm(Post post, User user, AlarmEventType alarmEventType, Boolean isRead, String notificationMessage, LocalDateTime registeredAt, String userImg) {
         this.post = post;
         this.user = user;
         this.alarmEventType = alarmEventType;
         this.notificationMessage = notificationMessage;
         this.isRead = isRead;
         this.registeredAt = registeredAt;
+        this.userImg = userImg;
+    }
+    public Alarm(Post post, User user, AlarmEventType alarmEventType, Boolean isRead, String notificationMessage, LocalDateTime registeredAt, String userImg,String hashtagName) {
+        this.post = post;
+        this.user = user;
+        this.alarmEventType = alarmEventType;
+        this.notificationMessage = notificationMessage;
+        this.isRead = isRead;
+        this.registeredAt = registeredAt;
+        this.hashtagName = hashtagName;
+        this.userImg = userImg;
     }
 }
