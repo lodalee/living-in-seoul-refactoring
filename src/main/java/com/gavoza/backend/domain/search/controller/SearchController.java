@@ -26,12 +26,13 @@ public class SearchController {
     public PostListResponse searchPosts(@RequestParam int page,
                                         @RequestParam int size,
                                         @RequestParam String keyword,
+                                        @RequestParam String category,
                                         @AuthenticationPrincipal UserDetailsImpl userDetails){
         if(Objects.isNull(userDetails)){
-            return searchService.searchPosts(page-1 , size, keyword ,null);
+            return searchService.searchPosts(page-1 , size, keyword,category ,null);
         }
         User user = userDetails.getUser();
-        return searchService.searchPosts(page-1, size, keyword, user);
+        return searchService.searchPosts(page-1, size, keyword,category, user);
     }
 
     @PostMapping("/save")
