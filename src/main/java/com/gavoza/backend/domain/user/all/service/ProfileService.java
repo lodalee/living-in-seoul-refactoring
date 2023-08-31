@@ -2,7 +2,6 @@ package com.gavoza.backend.domain.user.all.service;
 
 import com.gavoza.backend.domain.user.all.dto.request.UserUpdateRequestDto;
 import com.gavoza.backend.domain.user.all.entity.User;
-import com.gavoza.backend.domain.user.all.repository.RefreshTokenRepository;
 import com.gavoza.backend.domain.user.all.repository.UserRepository;
 import com.gavoza.backend.domain.user.all.validator.UserValidator;
 import com.gavoza.backend.global.exception.UserNotFoundException;
@@ -20,9 +19,7 @@ public class ProfileService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final ImageService s3Service;
-    private final UserValidator userValidator;
 
 
     public User findUserProfileByEmail(String email) {

@@ -27,7 +27,7 @@ public class ImageService {
 
     public String uploadFile(MultipartFile file, String folderName) throws IOException {
         // Use UUID for unique file names
-        String fileName = folderName + "/" + UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        String fileName = folderName + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
 
         s3Client.putObject(new PutObjectRequest(bucketName, fileName, file.getInputStream(), null)
                 .withCannedAcl(CannedAccessControlList.PublicRead));

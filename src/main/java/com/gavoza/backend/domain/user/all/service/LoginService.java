@@ -1,6 +1,5 @@
 package com.gavoza.backend.domain.user.all.service;
 
-import com.gavoza.backend.domain.user.all.validator.UserValidator;
 import com.gavoza.backend.domain.user.all.entity.RefreshToken;
 import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.domain.user.all.repository.RefreshTokenRepository;
@@ -21,7 +20,6 @@ public class LoginService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserValidator userValidator;
 
     public String login(String email, String password) throws EmailNotFoundException, PasswordNotMatchException {
         User user = userRepository.findByEmail(email)
@@ -38,9 +36,6 @@ public class LoginService {
         Optional<RefreshToken> existingRefreshToken = refreshTokenRepository.findByUserEmail(email);
         existingRefreshToken.ifPresent(refreshTokenRepository::delete);
     }
-
-
-
 
 
 }

@@ -3,7 +3,6 @@ package com.gavoza.backend.domain.user.all.validator;
 import com.gavoza.backend.domain.user.all.entity.CityScraper;
 import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.domain.user.all.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

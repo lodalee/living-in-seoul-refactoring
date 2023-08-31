@@ -12,8 +12,10 @@ import com.gavoza.backend.domain.comment.repository.CommentRepository;
 import com.gavoza.backend.domain.comment.repository.ReCommentRepository;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
-import com.gavoza.backend.domain.user.all.entity.User;
+
 import com.gavoza.backend.domain.report.repository.ReportRepository;
+
+import com.gavoza.backend.domain.user.all.entity.User;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -59,6 +61,10 @@ public class CommentService {
 
             boolean hasLikeComment = user != null && commentLikeRepository.existsLikeByCommentAndUser(comment, user);
             boolean hasReported = reportRepository.existsReportByCommentAndUser(comment,user);
+
+
+
+
 
             commentResponseDtos.add(new CommentResponseDto(comment, hasLikeComment, reComments,hasReported));
         }
@@ -179,6 +185,5 @@ public class CommentService {
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 댓글입니다."));
     }
 }
-
 
 

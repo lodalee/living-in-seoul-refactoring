@@ -1,19 +1,19 @@
 package com.gavoza.backend.domain.user.all.controller;
 
-import com.gavoza.backend.domain.user.all.dto.request.*;
-import com.gavoza.backend.domain.user.all.service.ProfileService;
-import com.gavoza.backend.domain.user.all.service.SignupService;
-import com.gavoza.backend.domain.user.all.validator.TokenValidator;
+import com.gavoza.backend.domain.user.all.dto.request.LoginRequestDto;
+import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
+import com.gavoza.backend.domain.user.all.dto.response.TokenResMsgDto;
 import com.gavoza.backend.domain.user.all.entity.RefreshToken;
 import com.gavoza.backend.domain.user.all.service.LoginService;
-import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
-import com.gavoza.backend.domain.user.all.dto.response.RefreshResMsgDto;
-import com.gavoza.backend.domain.user.all.dto.response.TokenResMsgDto;
+import com.gavoza.backend.domain.user.all.validator.TokenValidator;
 import com.gavoza.backend.global.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 
@@ -25,7 +25,6 @@ public class LoginController {
     private final TokenValidator tokenValidator;
     private final LoginService loginService;
     private final JwtUtil jwtUtil;
-
 
 
     @PostMapping("/login")
@@ -49,15 +48,12 @@ public class LoginController {
     }
 
 
-
-
     @PostMapping("/logout")
     public ResponseEntity<MessageResponseDto> logout(HttpServletRequest request) {
         String email = jwtUtil.getEmailFromAuthHeader(request);
         loginService.logout(email);
         return ResponseEntity.ok(new MessageResponseDto("로그아웃에 성공하셨습니다."));
     }
-
 
 
 }

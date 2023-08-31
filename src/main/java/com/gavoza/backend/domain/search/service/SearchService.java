@@ -124,6 +124,4 @@ public class SearchService {
         boolean hasReported = reportRepository.existsReportByPostAndUser(post,user);
         return new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost,hasScrapped,hasReported);
     }
-
-
 }
