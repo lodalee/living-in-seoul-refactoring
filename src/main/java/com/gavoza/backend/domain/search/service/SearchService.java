@@ -36,13 +36,20 @@ public class SearchService {
     private final PostScrapRepository postScrapRepository;
     private final ReportRepository reportRepository;
 
-    //게시글 검색
-    public PostListResponse searchPosts(int page, int size, String keyword, User user) {
+    // 게시글 검색
+    public PostListResponse searchPosts(int page, int size, String keyword, String category, User user) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Post> postPages;
 
-        Page<Post> postPages = keyword.contains("#")
-                ? postRepository.findAllByHashtagContaining(keyword, pageable)
-                : postRepository.findAllByContentContaining(keyword, pageable);
+        if (category.isEmpty() || category == null) {
+            postPages = keyword.contains("#")
+                    ? postRepository.findAllByHashtagContaining(keyword, pageable)
+                    : postRepository.findAllByContentContaining(keyword, pageable);
+        } else {
+            postPages = keyword.contains("#")
+                    ? postRepository.findAllByHashtagContainingAndCategory(keyword, category, pageable)
+                    : postRepository.findAllByContentContainingAndCategory(keyword, category, pageable);
+        }
 
         List<PostResultDto> postResultDtos = postPages.stream()
                 .map(post -> mapToPostResultDto(post, user))
