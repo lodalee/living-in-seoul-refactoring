@@ -35,20 +35,9 @@ public class SocialController {
             throw new CustomRuntimeException("유효하지 않은 인증 코드입니다.", HttpStatus.BAD_REQUEST);
         }
 
-        String accessToken;
-        try {
-            // 인가 코드로 액세스 토큰 발급
-            accessToken = socialTokenService.getAccessTokenFromKakaoAuthCode(authCode);
-        } catch (Exception e) {
-            throw new CustomRuntimeException("카카오에서 액세스 토큰을 가져오는데 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
-        }
+        String accessToken = socialTokenService.getAccessTokenFromKakaoAuthCode(authCode);
 
-        String email;
-        try {
-            email = socialSigninService.signInWithKakao(accessToken);
-        } catch (Exception e) {
-            throw new CustomRuntimeException("카카오 로그인에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
-        }
+        String email = socialSigninService.signInWithKakao(accessToken);
 
         return processSocialLogin(email, "카카오 로그인에 성공하셨습니다.");
     }
