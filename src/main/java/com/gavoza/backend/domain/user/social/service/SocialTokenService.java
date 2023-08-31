@@ -31,12 +31,6 @@ public class SocialTokenService {
     private String naverClientSecret;
 
     public String getAccessTokenFromKakaoAuthCode(String authCode) {
-
-        // 인가 코드 유효성 검사
-        if (authCode == null || authCode.isEmpty()) {
-            throw new CustomRuntimeException("유효하지 않은 인증 코드입니다.", HttpStatus.BAD_REQUEST);
-        }
-
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
