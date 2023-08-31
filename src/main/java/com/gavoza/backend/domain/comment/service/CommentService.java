@@ -12,12 +12,9 @@ import com.gavoza.backend.domain.comment.repository.CommentRepository;
 import com.gavoza.backend.domain.comment.repository.ReCommentRepository;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
-<<<<<<< HEAD
 import com.gavoza.backend.domain.user.all.entity.User;
-=======
 import com.gavoza.backend.domain.report.repository.ReportRepository;
-import com.gavoza.backend.domain.user.entity.User;
->>>>>>> 06d60945699e29e8b348988c7cbe44af0dfa91ad
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
