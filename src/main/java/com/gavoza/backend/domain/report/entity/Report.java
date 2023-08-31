@@ -4,7 +4,7 @@ import com.gavoza.backend.domain.comment.entity.Comment;
 import com.gavoza.backend.domain.comment.entity.ReComment;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.report.ReportType;
-import com.gavoza.backend.domain.user.entity.User;
+import com.gavoza.backend.domain.user.all.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
