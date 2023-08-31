@@ -31,30 +31,43 @@ public class AlarmService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registeredAt"));
         Page<Alarm> alarmPages = alarmRepository.findAllByUser(user, pageable);
 
-        if (alarmCategory.equals("activity")) {
-            alarmPages = new PageImpl<>(alarmPages.stream()
-                    .filter(alarm -> alarm.getAlarmEventType().getAlarmType().equals(AlarmType.LIKE)
-                            || alarm.getAlarmEventType().getAlarmType().equals(AlarmType.COMMENT)).toList());
+        List<AlarmResponse> alarmResponses;
 
+        if (alarmCategory.equals("activity")) {
+            // activity일 때 필터링
+            alarmResponses = alarmPages.stream()
+                    .filter(alarm -> alarm.getAlarmEventType().getAlarmType().equals(AlarmType.LIKE)
+                            || alarm.getAlarmEventType().getAlarmType().equals(AlarmType.COMMENT))
+                    .map(alarm -> new AlarmResponse(
+                            alarm.getId(),
+                            alarm.getAlarmEventType(),
+                            alarm.getNotificationMessage(),
+                            alarm.getIsRead(),
+                            alarm.getRegisteredAt(),
+                            alarm.getUserImg()
+                    ))
+                    .collect(Collectors.toList());
         } else if (alarmCategory.equals("hashtag")) {
-            alarmPages = new PageImpl<>(alarmPages.stream()
-                    .filter(alarm -> alarm.getAlarmEventType().getAlarmType().equals(AlarmType.HASHTAG)).toList());
+            // hashtag일 때 필터링
+            alarmResponses = alarmPages.stream()
+                    .filter(alarm -> alarm.getAlarmEventType().getAlarmType().equals(AlarmType.HASHTAG))
+                    .map(alarm -> new AlarmResponse(
+                            alarm.getId(),
+                            alarm.getAlarmEventType(),
+                            alarm.getNotificationMessage(),
+                            alarm.getIsRead(),
+                            alarm.getRegisteredAt(),
+                            alarm.getUserImg(),
+                            alarm.getHashtagName()
+                    ))
+                    .collect(Collectors.toList());
         } else {
             throw new IllegalArgumentException("알림 타입이 존재하지 않습니다.");
         }
 
-        // 조회 결과를 AlarmResponse 리스트로 변환
-        List<AlarmResponse> alarmResponses = alarmPages.stream()
-                .map(alarm -> new AlarmResponse(
-                        alarm.getId(),
-                        alarm.getAlarmEventType(),
-                        alarm.getNotificationMessage(), // 알림 내용을 원하는 방식으로 생성
-                        alarm.getIsRead(),
-                        alarm.getRegisteredAt()
-                ))
-                .collect(Collectors.toList());
         return new AlarmListResponse("조회 성공", alarmPages.getTotalPages(), alarmPages.getTotalElements(), size, alarmResponses);
     }
+
 
     //알림 구독
     @Transactional
