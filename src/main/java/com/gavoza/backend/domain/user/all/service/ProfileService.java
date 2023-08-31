@@ -32,7 +32,7 @@ public class ProfileService {
     @Transactional
     public void updateUserInfo(String email, UserUpdateRequestDto requestDto) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-        // UserValidator 인스턴스 생성
+       
         UserValidator userValidator = new UserValidator(userRepository);
 
         // 닉네임 유효성 검사
