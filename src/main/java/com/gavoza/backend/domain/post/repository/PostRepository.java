@@ -8,9 +8,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
+    Page<Post> findAllByHashtagContaining(String keyword, Pageable pageable);
+
     Page<Post> findAllByContentContaining(String keyword, Pageable pageable);
 
-    Page<Post> findAllByHashtagContaining(String keyword, Pageable pageable);
+    Page<Post> findAllByContentContainingAndCategory(String keyword, String category, Pageable pageable);
+
+    Page<Post> findAllByHashtagContainingAndCategory(String keyword, String category, Pageable pageable);
 
     Page<Post> findAllByHashtagContainingOrderByPostViewCountDesc(String hashtagName, Pageable pageable);
 
