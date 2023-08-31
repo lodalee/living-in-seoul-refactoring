@@ -82,7 +82,7 @@ public class TagController {
         return tagService.categoryHashtagPostResponseDtos(size, page-1, hashtagName, category,type,user);
     }
 
-    //유저 카테고리별 인기 순위 태그 post 조회
+    //유저 카테고리별 인기 순위 태그 post 조회 + 위치
     @GetMapping("/post/location/category")
     public PostListResponse categoryLocationPostResponseDtos(
             @RequestParam int size,
@@ -95,6 +95,6 @@ public class TagController {
             return tagService.categoryLocationPostResponseDtos(size, page-1, gu, category , null);
         }
         User user = userDetails.getUser();
-        return tagService.categoryLocationPostResponseDtos(size, page-1, gu, category,user);
+        return tagService.categoryLocationPostResponseDtos(size, page-1, gu, category, user);
     }
 }
