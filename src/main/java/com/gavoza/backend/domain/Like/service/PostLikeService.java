@@ -9,6 +9,7 @@ import com.gavoza.backend.domain.Like.repository.ReCommentLikeRepository;
 import com.gavoza.backend.domain.alarm.AlarmEventType;
 import com.gavoza.backend.domain.alarm.entity.Alarm;
 import com.gavoza.backend.domain.alarm.repository.AlarmRepository;
+import com.gavoza.backend.domain.alarm.sse.NotificationService;
 import com.gavoza.backend.domain.comment.entity.Comment;
 import com.gavoza.backend.domain.comment.entity.ReComment;
 import com.gavoza.backend.domain.comment.repository.CommentRepository;
@@ -32,6 +33,7 @@ public class PostLikeService {
     private final ReCommentLikeRepository reCommentLikeRepository;
     private final ReCommentRepository reCommentRepository;
     private final AlarmRepository alarmRepository;
+    private final NotificationService notificationService;
 
     //post 좋아요
     public MessageResponseDto postLike(Long postId, User user){
@@ -54,6 +56,7 @@ public class PostLikeService {
                 Alarm likeNotification = new Alarm(post, post.getUser(), eventType, isRead, notificationMessage, registeredAt, userImg);
                 alarmRepository.save(likeNotification);
             }
+            notificationService.notifyAddCommentEvent(post.getUser(), post.getUser().isLikeAlarm());
             return new MessageResponseDto("좋아요");
         }
 
@@ -84,6 +87,7 @@ public class PostLikeService {
                 Alarm likeNotification = new Alarm(comment.getPost(), comment.getUser(), eventType, isRead, notificationMessage, registeredAt,userImg);
                 alarmRepository.save(likeNotification);
             }
+            notificationService.notifyAddCommentEvent(comment.getUser(), comment.getUser().isLikeAlarm());
             return new MessageResponseDto("댓글 좋아요");
         }
 
@@ -114,6 +118,7 @@ public class PostLikeService {
                 Alarm likeNotification = new Alarm(reComment.getComment().getPost() ,reComment.getUser(), eventType, isRead, notificationMessage, registeredAt, userImg);
                 alarmRepository.save(likeNotification);
             }
+            notificationService.notifyAddCommentEvent(reComment.getUser(), reComment.getUser().isLikeAlarm());
             return new MessageResponseDto("댓글 좋아요");
         }
 

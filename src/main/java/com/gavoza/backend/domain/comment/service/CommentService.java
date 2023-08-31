@@ -5,6 +5,7 @@ import com.gavoza.backend.domain.Like.repository.ReCommentLikeRepository;
 import com.gavoza.backend.domain.alarm.AlarmEventType;
 import com.gavoza.backend.domain.alarm.entity.Alarm;
 import com.gavoza.backend.domain.alarm.repository.AlarmRepository;
+import com.gavoza.backend.domain.alarm.sse.NotificationService;
 import com.gavoza.backend.domain.comment.dto.*;
 import com.gavoza.backend.domain.comment.entity.Comment;
 import com.gavoza.backend.domain.comment.entity.ReComment;
@@ -42,6 +43,7 @@ public class CommentService {
     private final ReCommentLikeRepository reCommentLikeRepository;
     private final AlarmRepository alarmRepository;
     private final ReportRepository reportRepository;
+    private final NotificationService notificationService;
 
     //comment 조회
     public CommentListResponse getCommentByPostId(int page, int size, Long postId, User user) {
@@ -61,10 +63,6 @@ public class CommentService {
 
             boolean hasLikeComment = user != null && commentLikeRepository.existsLikeByCommentAndUser(comment, user);
             boolean hasReported = reportRepository.existsReportByCommentAndUser(comment,user);
-
-
-
-
 
             commentResponseDtos.add(new CommentResponseDto(comment, hasLikeComment, reComments,hasReported));
         }
@@ -98,6 +96,7 @@ public class CommentService {
             Alarm commentNotification = new Alarm(post ,post.getUser(), eventType, isRead, notificationMessage, registeredAt,userImg);
             alarmRepository.save(commentNotification);
         }
+        notificationService.notifyAddCommentEvent(post.getUser(), post.getUser().isCommentAlarm());
         return new CommentResponseDto(newComment); // ReCommentResponseDto로 변경
     }
 
@@ -117,6 +116,7 @@ public class CommentService {
             Alarm commentNotification = new Alarm(comment.getPost(),comment.getUser(), eventType, isRead, notificationMessage, registeredAt,userImg);
             alarmRepository.save(commentNotification);
         }
+        notificationService.notifyAddCommentEvent(comment.getUser(), comment.getUser().isCommentAlarm());
         return new ReCommentResponseDto(newReComment);
     }
 
