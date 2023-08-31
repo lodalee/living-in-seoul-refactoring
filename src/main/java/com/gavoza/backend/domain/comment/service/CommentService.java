@@ -83,11 +83,12 @@ public class CommentService {
 
         AlarmEventType eventType = AlarmEventType.NEW_COMMENT_ON_POST; // 댓글에 대한 알림 타입 설정
         Boolean isRead = false; // 초기값으로 미읽음 상태 설정
-        String notificationMessage = user.getNickname() + "님이 [" + post.getContent() + "] 글에 [" + comment.getComment() + "] 댓글을 달았어요!"; // 알림 메시지 설정
+        String notificationMessage = "<b>" + user.getNickname() + "</b>" + "님이 [" + post.getContent() + "] 글에 [" + comment.getComment() + "] 댓글을 달았어요!"; // 알림 메시지 설정
         LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+        String userImg = user.getProfileImageUrl();
 
         if (!post.getUser().getId().equals(user.getId())) {
-            Alarm commentNotification = new Alarm(post ,post.getUser(), eventType, isRead, notificationMessage, registeredAt);
+            Alarm commentNotification = new Alarm(post ,post.getUser(), eventType, isRead, notificationMessage, registeredAt,userImg);
             alarmRepository.save(commentNotification);
         }
         return new CommentResponseDto(newComment); // ReCommentResponseDto로 변경
@@ -101,11 +102,12 @@ public class CommentService {
 
         AlarmEventType eventType = AlarmEventType.NEW_RECOMMENT_ON_POST; // 댓글에 대한 알림 타입 설정
         Boolean isRead = false; // 초기값으로 미읽음 상태 설정
-        String notificationMessage = user.getNickname() + "님이 [" + comment.getComment() + "] 댓글에 [" + reComment.getReComment() + "] 답글을 달았어요!"; // 알림 메시지 설정
+        String notificationMessage ="<b>"+ user.getNickname() +"</b>"+ "님이 [" + comment.getComment() + "] 댓글에 [" + reComment.getReComment() + "] 답글을 달았어요!"; // 알림 메시지 설정
         LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+        String userImg = user.getProfileImageUrl();
 
         if (!comment.getUser().getId().equals(user.getId())) {
-            Alarm commentNotification = new Alarm(comment.getPost(),comment.getUser(), eventType, isRead, notificationMessage, registeredAt);
+            Alarm commentNotification = new Alarm(comment.getPost(),comment.getUser(), eventType, isRead, notificationMessage, registeredAt,userImg);
             alarmRepository.save(commentNotification);
         }
         return new ReCommentResponseDto(newReComment);
@@ -175,7 +177,6 @@ public class CommentService {
         return commentRepository.findById(id)
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 댓글입니다."));
     }
-
 }
 
 
