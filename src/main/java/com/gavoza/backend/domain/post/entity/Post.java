@@ -5,7 +5,7 @@ import com.gavoza.backend.domain.Like.entity.Postlike;
 import com.gavoza.backend.domain.comment.entity.Comment;
 import com.gavoza.backend.domain.post.dto.PostRequestDto;
 import com.gavoza.backend.domain.scrap.entity.PostScrap;
-import com.gavoza.backend.domain.user.entity.User;
+import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.global.config.Auditing;
 import jakarta.persistence.*;
 import lombok.Getter;

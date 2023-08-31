@@ -1,6 +1,6 @@
 package com.gavoza.backend.domain.user.ToPost;
 
-import com.gavoza.backend.domain.user.entity.User;
+import com.gavoza.backend.domain.user.all.entity.User;
 import lombok.Getter;
 
 @Getter

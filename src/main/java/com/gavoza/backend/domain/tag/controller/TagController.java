@@ -2,7 +2,7 @@ package com.gavoza.backend.domain.tag.controller;
 
 import com.gavoza.backend.domain.post.response.PostListResponse;
 import com.gavoza.backend.domain.tag.service.TagService;
-import com.gavoza.backend.domain.user.entity.User;
+import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

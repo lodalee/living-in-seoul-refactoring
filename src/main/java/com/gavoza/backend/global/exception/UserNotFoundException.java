@@ -1,8 +1,10 @@
 package com.gavoza.backend.global.exception;
 
-public class UserNotFoundException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class UserNotFoundException extends CustomRuntimeException {
     public UserNotFoundException(String message) {
-        super(message);
+        super(message, HttpStatus.BAD_REQUEST);
     }
 }
 

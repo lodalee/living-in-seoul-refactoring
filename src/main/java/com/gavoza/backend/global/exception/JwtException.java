@@ -1,13 +1,9 @@
 package com.gavoza.backend.global.exception;
 
-public class JwtException extends RuntimeException {
-    private final String errorMessage;
+import org.springframework.http.HttpStatus;
 
+public class JwtException extends CustomRuntimeException {
     public JwtException(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
+        super(errorMessage, HttpStatus.UNAUTHORIZED);
     }
 }

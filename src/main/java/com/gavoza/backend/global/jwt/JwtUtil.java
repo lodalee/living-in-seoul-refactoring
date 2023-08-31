@@ -104,4 +104,16 @@ public class JwtUtil {
         }
     }
 
+    public long getExpirationTime(String token) {  // 토큰에서 만료시간 가져오기
+        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+
+        return claims.getExpiration().getTime();
+    }
+
+    public Date getExpirationDateFromToken(String token) {
+        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        return claims.getExpiration();
+    }
+
+
 }

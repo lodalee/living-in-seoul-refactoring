@@ -2,8 +2,8 @@ package com.gavoza.backend.domain.search.controller;
 
 import com.gavoza.backend.domain.post.response.PostListResponse;
 import com.gavoza.backend.domain.search.service.SearchService;
-import com.gavoza.backend.domain.user.entity.User;
-import com.gavoza.backend.global.exception.MessageResponseDto;
+import com.gavoza.backend.domain.user.all.entity.User;
+import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
 import com.gavoza.backend.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

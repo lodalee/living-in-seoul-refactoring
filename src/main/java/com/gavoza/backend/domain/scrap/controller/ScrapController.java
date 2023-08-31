@@ -1,8 +1,8 @@
 package com.gavoza.backend.domain.scrap.controller;
 
 import com.gavoza.backend.domain.scrap.service.PostScrapService;
-import com.gavoza.backend.domain.user.entity.User;
-import com.gavoza.backend.global.exception.MessageResponseDto;
+import com.gavoza.backend.domain.user.all.entity.User;
+import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
 import com.gavoza.backend.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

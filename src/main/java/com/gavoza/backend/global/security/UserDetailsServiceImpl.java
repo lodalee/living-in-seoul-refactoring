@@ -1,7 +1,7 @@
 package com.gavoza.backend.global.security;
 
-import com.gavoza.backend.domain.user.entity.User;
-import com.gavoza.backend.domain.user.repository.UserRepository;
+import com.gavoza.backend.domain.user.all.entity.User;
+import com.gavoza.backend.domain.user.all.repository.UserRepository;
 import lombok.Setter;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

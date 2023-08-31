@@ -3,7 +3,7 @@ package com.gavoza.backend.domain.comment.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gavoza.backend.domain.Like.entity.ReCommentLike;
 import com.gavoza.backend.domain.comment.dto.ReCommentRequestDto;
-import com.gavoza.backend.domain.user.entity.User;
+import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.global.config.Auditing;
 import jakarta.persistence.*;
 import lombok.Getter;

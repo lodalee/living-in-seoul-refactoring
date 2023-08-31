@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gavoza.backend.domain.Like.entity.Commentlike;
 import com.gavoza.backend.domain.comment.dto.CommentRequestDto;
 import com.gavoza.backend.domain.post.entity.Post;
-import com.gavoza.backend.domain.user.entity.User;
+import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.global.config.Auditing;
 import jakarta.persistence.*;
 import lombok.Getter;

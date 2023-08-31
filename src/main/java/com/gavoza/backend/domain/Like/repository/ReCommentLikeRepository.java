@@ -2,7 +2,7 @@ package com.gavoza.backend.domain.Like.repository;
 
 import com.gavoza.backend.domain.Like.entity.ReCommentLike;
 import com.gavoza.backend.domain.comment.entity.ReComment;
-import com.gavoza.backend.domain.user.entity.User;
+import com.gavoza.backend.domain.user.all.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

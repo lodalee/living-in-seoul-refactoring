@@ -1,7 +1,9 @@
 package com.gavoza.backend.global.exception;
 
-public class EmailNotFoundException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class EmailNotFoundException extends CustomRuntimeException {
     public EmailNotFoundException(String message) {
-        super(message);
+        super(message, HttpStatus.BAD_REQUEST);
     }
 }

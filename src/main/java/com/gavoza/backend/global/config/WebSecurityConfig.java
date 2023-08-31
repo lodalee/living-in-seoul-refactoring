@@ -1,6 +1,6 @@
 package com.gavoza.backend.global.config;
 
-import com.gavoza.backend.domain.user.service.UserService;
+import com.gavoza.backend.domain.user.all.validator.TokenValidator;
 import com.gavoza.backend.global.filter.JwtAuthenticationFilter;
 import com.gavoza.backend.global.filter.JwtAuthorizationFilter;
 import com.gavoza.backend.global.jwt.JwtUtil;
@@ -24,13 +24,13 @@ public class WebSecurityConfig {
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
-    private final UserService userService;
+    private final TokenValidator tokenValidator;
 
-    public WebSecurityConfig(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, AuthenticationConfiguration authenticationConfiguration, UserService userService) {
+    public WebSecurityConfig(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, AuthenticationConfiguration authenticationConfiguration, TokenValidator tokenValidator) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
         this.authenticationConfiguration = authenticationConfiguration;
-        this.userService = userService;
+        this.tokenValidator = tokenValidator;
     }
 
     @Bean
@@ -40,7 +40,7 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, userService);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, tokenValidator);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
@@ -63,7 +63,7 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("/auth/**", "/hc", "/tags/**", "/posts/get/**","/search/**", "/comment/get/**" ).permitAll()
+                        .requestMatchers("/auth/**","/token/**","/profile/**", "/signup/**","/hc", "/tags/**", "/posts/get/**","/search/**", "/comment/get/**" ).permitAll()
                         .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
 

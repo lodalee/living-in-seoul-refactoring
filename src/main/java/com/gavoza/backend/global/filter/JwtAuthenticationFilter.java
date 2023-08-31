@@ -1,10 +1,11 @@
 package com.gavoza.backend.global.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gavoza.backend.domain.user.dto.LoginRequestDto;
-import com.gavoza.backend.domain.user.entity.RefreshToken;
-import com.gavoza.backend.domain.user.service.UserService;
-import com.gavoza.backend.global.exception.TokenResMsgDto;
+import com.gavoza.backend.domain.user.all.dto.request.LoginRequestDto;
+import com.gavoza.backend.domain.user.all.entity.RefreshToken;
+import com.gavoza.backend.domain.user.all.service.LoginService;
+import com.gavoza.backend.domain.user.all.dto.response.TokenResMsgDto;
+import com.gavoza.backend.domain.user.all.validator.TokenValidator;
 import com.gavoza.backend.global.jwt.JwtUtil;
 import com.gavoza.backend.global.security.UserDetailsImpl;
 import jakarta.servlet.FilterChain;
@@ -17,15 +18,16 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.Date;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final JwtUtil jwtUtil;
-    private final UserService userService;
+    private final TokenValidator tokenValidator;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserService userService) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, TokenValidator tokenValidator) {
         this.jwtUtil = jwtUtil;
-        this.userService = userService;
+        this.tokenValidator = tokenValidator;
         setFilterProcessesUrl("/auth/login");
     }
 
@@ -59,10 +61,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String accessToken = jwtUtil.createAccessToken(email);
 
         // 리프레시 토큰 생성 및 저장
-        RefreshToken refreshToken = userService.createAndSaveRefreshToken(email);
+        RefreshToken refreshTokenEntity = tokenValidator.createAndSaveRefreshToken(email);
 
-        // 응답 바디에 액세스 토큰 및 리프레시 토큰 추가
-        TokenResMsgDto responseBody = new TokenResMsgDto("로그인에 성공하셨습니다.", accessToken, refreshToken.getToken());
+        Date expirationDate= jwtUtil.getExpirationDateFromToken(accessToken);  // 액세스토큰의 만료시간 추출
+
+        TokenResMsgDto responseBody =
+                new TokenResMsgDto("로그인에 성공하셨습니다.", accessToken,
+                        refreshTokenEntity.getToken(), expirationDate);  // 응답 바디에 만료시간 추가
+
         response.setContentType("application/json; charset=UTF-8");
         try {
             response.getWriter().write(new ObjectMapper().writeValueAsString(responseBody));
@@ -71,6 +77,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             throw new RuntimeException("응답 작성 중 문제 발생", e);
         }
     }
+
 
     @Override
     protected void unsuccessfulAuthentication(
