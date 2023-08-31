@@ -2,7 +2,6 @@ package com.gavoza.backend.domain.user.social.service;
 
 import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.domain.user.all.repository.UserRepository;
-import com.gavoza.backend.domain.user.social.dto.KakaoUserResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
