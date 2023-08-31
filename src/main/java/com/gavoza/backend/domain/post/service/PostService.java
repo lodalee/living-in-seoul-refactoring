@@ -8,6 +8,7 @@ import com.gavoza.backend.domain.Like.repository.PostLikeRepository;
 import com.gavoza.backend.domain.alarm.AlarmEventType;
 import com.gavoza.backend.domain.alarm.entity.Alarm;
 import com.gavoza.backend.domain.alarm.repository.AlarmRepository;
+import com.gavoza.backend.domain.alarm.sse.NotificationService;
 import com.gavoza.backend.domain.post.dto.LocationResponseDto;
 import com.gavoza.backend.domain.post.dto.PostInfoResponseDto;
 import com.gavoza.backend.domain.post.dto.PostRequestDto;
@@ -56,6 +57,7 @@ public class PostService {
     private final PostScrapRepository postScrapRepository;
     private final AlarmRepository alarmRepository;
     private final ReportRepository reportRepository;
+    private final NotificationService notificationService;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -88,13 +90,16 @@ public class PostService {
                     Boolean isRead = false; // 초기값으로 미읽음 상태 설정
                     String notificationMessage = post.getContent(); // 알림 메시지 설정
                     LocalDateTime registeredAt = LocalDateTime.now(); // 알림 생성 시간 설정
+                    String userImg = user.getProfileImageUrl();
                     String hashtagName = hashtag;
 
-                    Alarm alarm = new Alarm(post, subscriber, eventType, isRead, notificationMessage, registeredAt, hashtagName);
+                    Alarm alarm = new Alarm(post, subscriber, eventType, isRead, notificationMessage, registeredAt, userImg, hashtagName);
                     alarmRepository.save(alarm);
+                    notificationService.notifyAddCommentEvent(subscriber, subscriber.isHashtagAlarm());
                 }
             }
         }
+
         return new MessageResponseDto("파일 저장 성공");
     }
 

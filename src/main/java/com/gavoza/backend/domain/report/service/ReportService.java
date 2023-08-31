@@ -90,20 +90,20 @@ public class ReportService {
         );
 
         if (recomment.getUser().getId().equals(user.getId())) {
-            return new MessageResponseDto("자신의 게시물은 신고할 수 없습니다.");
+            return new MessageResponseDto("자신의 댓글은 신고할 수 없습니다.");
         }
 
         if (!reportRepository.existsReportByReCommentAndUser(recomment, user)) {
             LocalDateTime reportedAt = LocalDateTime.now();
             Report report = new Report(recomment, user, reportedAt, ReportType.RECOMMENT_REPORT);
             reportRepository.save(report);
-            return new MessageResponseDto("리코멘트를 신고하였습니다.");
+            return new MessageResponseDto("댓글을 신고하였습니다.");
         }
 
         Report report = reportRepository.findByReCommentAndUser(recomment, user).orElseThrow(
                 () -> new IllegalArgumentException("리코멘트 신고 정보가 존재하지 않습니다.")
         );
         reportRepository.delete(report);
-        return new MessageResponseDto("리코멘트 신고를 취소하였습니다.");
+        return new MessageResponseDto("댓글 신고를 취소하였습니다.");
     }
 }
