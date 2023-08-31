@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class SocialGetTokenService {
+public class SocialTokenService {
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String kakaoClientId;

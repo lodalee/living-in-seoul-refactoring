@@ -4,7 +4,7 @@ import com.gavoza.backend.domain.user.all.entity.RefreshToken;
 import com.gavoza.backend.domain.user.all.validator.TokenValidator;
 import com.gavoza.backend.domain.user.social.dto.SocialAuthCodeRequestDto;
 import com.gavoza.backend.domain.user.social.dto.SocialLoginResponseDto;
-import com.gavoza.backend.domain.user.social.service.SocialGetTokenService;
+import com.gavoza.backend.domain.user.social.service.SocialTokenService;
 import com.gavoza.backend.domain.user.social.service.SocialSigninService;
 import com.gavoza.backend.global.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.Date;
 public class SocialController {
 
     private final SocialSigninService socialSigninService;
-    private final SocialGetTokenService socialGetTokenService;
+    private final SocialTokenService socialTokenService;
     private final JwtUtil jwtUtil;
     private final TokenValidator tokenValidator;
 
@@ -28,7 +28,7 @@ public class SocialController {
     public ResponseEntity<SocialLoginResponseDto> signInWithKakao(@RequestBody SocialAuthCodeRequestDto kakaoAuthCodeRequestDto) {
         String authCode = kakaoAuthCodeRequestDto.getAuthCode();
         // 인가 코드로 액세스 토큰 발급
-        String accessToken = socialGetTokenService.getAccessTokenFromAuthCode(authCode);
+        String accessToken = socialTokenService.getAccessTokenFromAuthCode(authCode);
         String email = socialSigninService.signInWithKakao(accessToken);
 
         return processSocialLogin(email,"카카오 로그인에 성공하셨습니다.");
@@ -38,7 +38,7 @@ public class SocialController {
     public ResponseEntity<SocialLoginResponseDto> signInWithNaver(@RequestBody SocialAuthCodeRequestDto naverAuthCodeRequestDto) {
         String authCode = naverAuthCodeRequestDto.getAuthCode();
         // 인가 코드로 액세스 토큰 발급
-        String accessToken = socialGetTokenService.getAccessTokenFromNaverAuthCode(authCode);
+        String accessToken = socialTokenService.getAccessTokenFromNaverAuthCode(authCode);
         // 네이버 로그인
         String email = socialSigninService.signInWithNaver(accessToken);
 
@@ -49,7 +49,7 @@ public class SocialController {
     public ResponseEntity<SocialLoginResponseDto> signInWithGoogle(@RequestBody SocialAuthCodeRequestDto googleAuthCodeRequestDto) {
         String authCode = googleAuthCodeRequestDto.getAuthCode();
         // 인가 코드로 액세스 토큰 발급
-        String accessToken = socialGetTokenService.getAccessTokenFromGoogleAuthCode(authCode);
+        String accessToken = socialTokenService.getAccessTokenFromGoogleAuthCode(authCode);
         // 구글 로그인
         String email = socialSigninService.signInWithGoogle(accessToken);
 
