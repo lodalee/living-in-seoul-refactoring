@@ -151,10 +151,6 @@ public class PostService {
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
         LocationResponseDto locationResponseDto = new LocationResponseDto(post.getLname(), post.getAddress(), post.getLat(), post.getLng(), post.getGu());
 
-        if (Objects.isNull(user)) {
-            return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, false,false, false));
-        }
-
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
         boolean hasScrapped = postScrapRepository.existsScrapByPostAndUser(post, user);
         boolean hasReported = reportRepository.existsReportByPostAndUser(post,user);
