@@ -30,6 +30,15 @@ public class SocialTokenService {
     @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
     private String naverClientSecret;
 
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String googleClientId;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    private String googleClientSecret;
+
+    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    private String googleRedirectUri;
+
     public String getAccessTokenFromKakaoAuthCode(String authCode) {
         RestTemplate restTemplate = new RestTemplate();
 
@@ -91,5 +100,33 @@ public class SocialTokenService {
         }
     }
 
+    public String getAccessTokenFromGoogleAuthCode(String authCode) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, Object> queryParams= new LinkedMultiValueMap<>();
+        queryParams.add("client_id",googleClientId );
+        queryParams.add("client_secret",googleClientSecret );
+        queryParams.add("code", authCode);
+        queryParams.add("redirect_uri", googleRedirectUri);
+        queryParams.add("grant_type", "authorization_code");
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(queryParams, headers);
+
+        ResponseEntity<Map<String, Object>> responseEntity = restTemplate.exchange(
+                "https://oauth2.googleapis.com/token",
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<>() {
+                });
+
+        if (responseEntity.getBody() != null && responseEntity.getBody().containsKey("access_token")) {
+            return responseEntity.getBody().get("access_token").toString();
+        } else {
+            throw new IllegalStateException("액세스 토큰을 가져올 수 없습니다.");
+        }
+    }
 
 }

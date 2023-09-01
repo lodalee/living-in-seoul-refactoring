@@ -23,6 +23,9 @@ repositories {
 
 dependencies {
 
+
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
+
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.5'
 
     implementation 'com.google.http-client:google-http-client-gson:1.40.1'

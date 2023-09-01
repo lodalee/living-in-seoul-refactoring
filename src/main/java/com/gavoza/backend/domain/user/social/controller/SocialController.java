@@ -62,6 +62,24 @@ public class SocialController {
         return processSocialLogin(email, "네이버 로그인에 성공하셨습니다.");
     }
 
+    @PostMapping("/login/google")
+    public ResponseEntity<SocialLoginResponseDto> signInWithGoogle(@RequestBody SocialAuthCodeRequestDto googleAuthCodeRequestDto) {
+        String authCode = googleAuthCodeRequestDto.getAuthCode();
+
+        // 인가 코드 유효성 검사
+        if (authCode == null || authCode.isEmpty()) {
+            throw new CustomRuntimeException("유효하지 않은 인증 코드입니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        // 인가 코드로 액세스 토큰 발급
+        String accessToken = socialTokenService.getAccessTokenFromGoogleAuthCode(authCode);
+
+        // 구글 로그인
+        String email = socialSigninService.signInWithGoogle(accessToken);
+
+        return processSocialLogin(email, "구글 로그인에 성공하셨습니다.");
+    }
+
 
     private ResponseEntity<SocialLoginResponseDto> processSocialLogin(String email, String successMessage) {
         // 액세스 토큰 생성

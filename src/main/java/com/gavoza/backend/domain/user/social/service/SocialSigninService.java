@@ -2,6 +2,7 @@ package com.gavoza.backend.domain.user.social.service;
 
 import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.domain.user.all.repository.UserRepository;
+import com.gavoza.backend.domain.user.social.dto.GoogleUserResponseDto;
 import com.gavoza.backend.domain.user.social.dto.KakaoUserResponseDto;
 import com.gavoza.backend.domain.user.social.dto.NaverUserResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -116,5 +117,46 @@ public class SocialSigninService {
         }
 
         return email;
+    }
+
+    public String signInWithGoogle(String accessToken) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+
+        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<GoogleUserResponseDto> responseEntity = restTemplate.exchange(
+                "https://www.googleapis.com/oauth2/v1/userinfo?alt=json",
+                HttpMethod.GET,
+                requestEntity,
+                GoogleUserResponseDto.class);
+
+        GoogleUserResponseDto googleUser = responseEntity.getBody();
+
+        if (googleUser == null || googleUser.getEmail() == null) {
+            throw new IllegalArgumentException("구글 유저 정보를 가져올 수 없습니다.");
+        }
+
+        // 이메일 확인
+        String email = googleUser.getEmail();
+
+        // 유저가 이미 존재하는지 체크하고, 없다면 새로 생성한다.
+        Optional<User> existingUserOptional = userRepository.findByEmail(email);
+        if (!existingUserOptional.isPresent()) {
+            User newUser = createUser(googleUser);
+            userRepository.save(newUser);
+        }
+
+        return email;
+    }
+
+    private User createUser(GoogleUserResponseDto googleUserInfo) {
+        // 임시 비밀번호 생성 (랜덤 UUID)
+        String password = UUID.randomUUID().toString();
+        // 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(password);
+        return new User(googleUserInfo.getEmail(), googleUserInfo.getName(), encodedPassword);
     }
 }
