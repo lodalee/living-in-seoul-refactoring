@@ -1,7 +1,9 @@
 package com.gavoza.backend.domain.user.all.controller;
 
+import com.gavoza.backend.domain.user.all.dto.request.AddFavoriteRequestDto;
 import com.gavoza.backend.domain.user.all.dto.request.FavoriteLocationRequestDto;
 import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
+import com.gavoza.backend.domain.user.all.entity.FavoriteLocation;
 import com.gavoza.backend.domain.user.all.service.FavoriteLocationService;
 import com.gavoza.backend.global.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,10 +18,17 @@ public class FavoriteLocationController {
     private final JwtUtil jwtUtil;
     private final FavoriteLocationService favoriteLocationService;
     @PostMapping("/add")
-    public ResponseEntity<MessageResponseDto> addFavoriteLocation(HttpServletRequest request, @RequestBody FavoriteLocationRequestDto dto) {
+    public ResponseEntity<MessageResponseDto> addFavorite(HttpServletRequest request,
+                                                          @RequestBody AddFavoriteRequestDto dto) {
+
         String email = jwtUtil.getEmailFromAuthHeader(request);
-        favoriteLocationService.addFavoriteLocation(email, dto.getGu(), dto.getDong());
-        return ResponseEntity.ok(new MessageResponseDto("찜한 위치가 추가되었습니다."));
+
+        // 찜한 위치 객체 받아오기
+        FavoriteLocation added = favoriteLocationService.addFavoriteLocation(email, dto.getGu(), dto.getDong());
+
+
+
+        return ResponseEntity.ok(new MessageResponseDto("찜한 위치가 추가되었습니다. ID: " + added.getId()));
     }
 
     @DeleteMapping("/delete/{locationId}")

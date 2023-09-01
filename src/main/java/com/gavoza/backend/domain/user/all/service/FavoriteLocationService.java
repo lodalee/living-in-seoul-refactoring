@@ -14,12 +14,14 @@ public class FavoriteLocationService {
     private final UserRepository userRepository;
     private final FavoriteLocationRepository favoriteLocationRepository;
 
-    public void addFavoriteLocation(String email, String district, String neighborhood) {
+    public FavoriteLocation addFavoriteLocation(String email, String district, String neighborhood) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
         FavoriteLocation favoriteLocation= new FavoriteLocation(district, neighborhood,user);
         user.getFavoriteLocations().add(favoriteLocation);
 
         userRepository.save(user);
+
+        return favoriteLocationRepository.save(favoriteLocation);
     }
 
     public void removeFavoriteLocation(String email, Long locationId) {
