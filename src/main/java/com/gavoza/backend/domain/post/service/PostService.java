@@ -1,9 +1,5 @@
 package com.gavoza.backend.domain.post.service;
 
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.gavoza.backend.domain.Like.repository.PostLikeRepository;
 import com.gavoza.backend.domain.alarm.AlarmEventType;
 import com.gavoza.backend.domain.alarm.entity.Alarm;
@@ -23,8 +19,8 @@ import com.gavoza.backend.domain.report.repository.ReportRepository;
 import com.gavoza.backend.domain.scrap.entity.PostScrap;
 import com.gavoza.backend.domain.scrap.repository.PostScrapRepository;
 import com.gavoza.backend.domain.user.ToPost.UserResponseDto;
-import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
+import com.gavoza.backend.domain.user.all.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +38,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +45,7 @@ import java.util.stream.Collectors;
 @Transactional //(readOnly = true)
 public class PostService {
 
-    private final AmazonS3Client amazonS3Client;
+    private final AmazonS3Service amazonS3Service;
     private final PostRepository postRepository;
     private final PostImgRepository postImgRepository;
     private final PostLikeRepository postLikeRepository;
@@ -70,9 +65,8 @@ public class PostService {
 
         //본문에서 해시태그 추출
         List<String> hashtags = extractHashtagsFromContent(requestDto);
-        // [#맛집, #좋아요]
 
-        List<PostImg> postImgList = uploadPhotosToS3AndCreatePostImages(photos);
+        List<PostImg> postImgList = amazonS3Service.uploadPhotosToS3AndCreatePostImages(photos);
 
         Post post = new Post(requestDto, user);
         postRepository.save(post);
@@ -124,41 +118,6 @@ public class PostService {
         return entityManager.createQuery(query, User.class)
                 .setParameter("hashtag", hashtag)
                 .getResultList();
-    }
-
-    //이미지를 S3에 업로드하고, PostImg 객체를 생성하여 리스트에 추가
-    private List<PostImg> uploadPhotosToS3AndCreatePostImages(List<MultipartFile> photos) throws IOException {
-        List<PostImg> postImgList = new ArrayList<>();
-
-        if (photos != null && !photos.isEmpty()) {
-            for (MultipartFile photo : photos) {
-                String fileName = uploadPhotoToS3AndGetFileName(photo);
-                PostImg postImg = new PostImg(fileNameToURL(fileName), null);
-                postImgList.add(postImg);
-            }
-        }
-        return postImgList;
-    }
-
-    //S3에 이미지를 업로드하고, 업로드된 파일의 이름을 반환
-    private String uploadPhotoToS3AndGetFileName(MultipartFile photo) throws IOException {
-        long size = photo.getSize();
-
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType(photo.getContentType());
-        objectMetadata.setContentLength(size);
-        objectMetadata.setContentDisposition("inline");
-
-        String prefix = UUID.randomUUID().toString();
-        String fileName = prefix + "_" + photo.getOriginalFilename();
-        String bucketFilePath = "photos/" + fileName;
-
-        amazonS3Client.putObject(
-                new PutObjectRequest(bucketName, bucketFilePath, photo.getInputStream(), objectMetadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead)
-        );
-
-        return fileName;
     }
 
     //PostImg 객체와 Post를 연결하고 DB에 저장
@@ -269,10 +228,6 @@ public class PostService {
         if (!post.getUser().getNickname().equals(user.getNickname())) {
             throw new IllegalArgumentException("해당 게시글의 작성자가 아닙니다.");
         }
-    }
-
-    private String fileNameToURL(String fileName) {
-        return "https://living-in-seoul.s3.ap-northeast-2.amazonaws.com/photos/" + fileName;
     }
 }
 
