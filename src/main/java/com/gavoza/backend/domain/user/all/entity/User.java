@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @ToString
 @Entity
 @Getter
@@ -40,6 +43,9 @@ public class User {
     private boolean likeAlarm;
     private boolean commentAlarm;
     private boolean hashtagAlarm;
+
+    @OneToMany(mappedBy="user", cascade=CascadeType.ALL)
+    private List<FavoriteLocation> favoriteLocations = new ArrayList<>();
 
     public User(String email, String nickname, String password, String hometown, String movedDate, String gender, String birthDate) {
         this.email = email;
