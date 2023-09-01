@@ -16,7 +16,6 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    //토큰 데이터
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
     private final long TOKEN_TIME = 2 * 60 * 60 * 1000L;
