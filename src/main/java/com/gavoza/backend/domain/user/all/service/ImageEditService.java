@@ -15,12 +15,12 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 @Service
-public class ImageService {
+public class ImageEditService {
 
     private final AmazonS3 s3Client;
     private final String bucketName;
 
-    public ImageService(AmazonS3 s3Client, @Value("${cloud.aws.s3.bucket}") String bucketName) {
+    public ImageEditService(AmazonS3 s3Client, @Value("${cloud.aws.s3.bucket}") String bucketName) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;
     }

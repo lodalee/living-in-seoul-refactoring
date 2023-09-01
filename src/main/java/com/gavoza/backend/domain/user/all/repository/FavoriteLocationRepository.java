@@ -1,0 +1,13 @@
+package com.gavoza.backend.domain.user.all.repository;
+
+import com.gavoza.backend.domain.user.all.entity.FavoriteLocation;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface FavoriteLocationRepository extends JpaRepository<FavoriteLocation, Long> {
+    List<FavoriteLocation> findByUserId(Long userId);
+    Optional<FavoriteLocation> findByIdAndUserId(Long id, Long userId);
+
+}

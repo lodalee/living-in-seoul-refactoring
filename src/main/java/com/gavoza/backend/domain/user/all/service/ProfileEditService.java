@@ -1,6 +1,6 @@
 package com.gavoza.backend.domain.user.all.service;
 
-import com.gavoza.backend.domain.user.all.dto.request.UserUpdateRequestDto;
+import com.gavoza.backend.domain.user.all.dto.request.UserEditRequestDto;
 import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.domain.user.all.repository.UserRepository;
 import com.gavoza.backend.domain.user.all.validator.UserValidator;
@@ -15,11 +15,11 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-public class ProfileService {
+public class ProfileEditService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ImageService s3Service;
+    private final ImageEditService s3Service;
 
 
     public User findUserProfileByEmail(String email) {
@@ -30,7 +30,7 @@ public class ProfileService {
     }
 
     @Transactional
-    public void updateUserInfo(String email, UserUpdateRequestDto requestDto) {
+    public void updateUserInfo(String email, UserEditRequestDto requestDto) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
        
         UserValidator userValidator = new UserValidator(userRepository);

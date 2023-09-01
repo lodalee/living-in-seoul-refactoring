@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserProfileResponseDto {
+public class ProfileEditResponseDto {
     private String nickname;
     private String birthDate;
     private String movedDate;
