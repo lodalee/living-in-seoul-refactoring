@@ -22,7 +22,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -71,24 +70,23 @@ public class SearchService {
     //하루 지나면 검색 내용 삭제
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
     public void deleteOldSearches() {
-        searchRepository.deleteAllBySearchTimeBefore(LocalDateTime.now().minusDays(1));
-//        // 현재 날짜를 얻습니다.
-//        Date currentDate = new Date();
-//        System.out.println("현재날짜 : " + currentDate);
-//
-//        // 오늘의 시작 시간을 구합니다.
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTime(currentDate);
-//        calendar.set(Calendar.HOUR_OF_DAY, 0);
-//        calendar.set(Calendar.MINUTE, 0);
-//        calendar.set(Calendar.SECOND, 0);
-//
-//        Date todayStartTime = calendar.getTime();
-//        System.out.println("오늘의 시작 시간 구하기 :" + todayStartTime);
-//
-//        // 오늘 이전의 검색 내용을 삭제합니다.
-//        searchRepository.deleteAllBySearchTimeBefore(todayStartTime);
-//        System.out.println("검색 내용을 삭제했습니다.");
+        // 현재 날짜를 얻습니다.
+        Date currentDate = new Date();
+        System.out.println("현재날짜 : " + currentDate);
+
+        // 오늘의 시작 시간을 구합니다.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        Date todayStartTime = calendar.getTime();
+        System.out.println("오늘의 시작 시간 구하기 :" + todayStartTime);
+
+        // 오늘 이전의 검색 내용을 삭제합니다.
+        searchRepository.deleteAllBySearchTimeBefore(todayStartTime);
+        System.out.println("검색 내용을 삭제했습니다.");
     }
 
     //오늘의 가장 많이 검색된 태그 조회

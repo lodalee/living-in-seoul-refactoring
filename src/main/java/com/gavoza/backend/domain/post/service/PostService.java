@@ -5,10 +5,7 @@ import com.gavoza.backend.domain.alarm.AlarmEventType;
 import com.gavoza.backend.domain.alarm.entity.Alarm;
 import com.gavoza.backend.domain.alarm.repository.AlarmRepository;
 import com.gavoza.backend.domain.alarm.sse.NotificationService;
-import com.gavoza.backend.domain.post.dto.LocationResponseDto;
-import com.gavoza.backend.domain.post.dto.PostInfoResponseDto;
-import com.gavoza.backend.domain.post.dto.PostRequestDto;
-import com.gavoza.backend.domain.post.dto.PostResultDto;
+import com.gavoza.backend.domain.post.dto.*;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.entity.PostImg;
 import com.gavoza.backend.domain.post.repository.PostImgRepository;
@@ -157,6 +154,22 @@ public class PostService {
         return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost,hasScrapped, hasReported));
     }
 
+    //비유저 상세 게시물
+    public PostResponse getOnePost2(Long postId) {
+        Post post = findPost(postId);
+        post.increaseViewCount();
+
+        UserResponseDto userResponseDto = new UserResponseDto(post.getUser().getNickname(), post.getUser().getEmail());
+        PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
+        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getLname(), post.getAddress(), post.getLat(), post.getLng(), post.getGu());
+
+        boolean hasLikedPost = false;
+        boolean hasScrapped = false;
+        boolean hasReported = false;
+
+        return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost, hasScrapped, hasReported));
+    }
+
     //게시물 전체 조회
     public PostListResponse getPost(int page, int size, User user) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -225,6 +238,8 @@ public class PostService {
             throw new IllegalArgumentException("해당 게시글의 작성자가 아닙니다.");
         }
     }
+
+
 }
 
 
