@@ -55,7 +55,7 @@ public class PostController {
         return new MessageResponseDto("게시글 삭제 성공");
     }
 
-    //게시글 상세 조회
+    //유저 게시글 상세 조회
     @GetMapping("/auth/{postId}")
     public PostResponse getOnePost(@PathVariable("postId") Long postId,
                                    @AuthenticationPrincipal UserDetailsImpl userDetails){
@@ -66,7 +66,7 @@ public class PostController {
         return postService.getOnePost(postId, user);
     }
 
-    //게시글 상세 조회
+    //비회원 게시글 상세 조회
     @GetMapping("/get/{postId}")
     public PostResponse getOnePost(@PathVariable("postId") Long postId){
         return postService.getOnePost2(postId);

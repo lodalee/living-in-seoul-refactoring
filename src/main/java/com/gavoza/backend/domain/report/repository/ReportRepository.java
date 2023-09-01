@@ -22,4 +22,6 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     Optional<Report> findByPostAndUser(Post post, User user);
 
     Optional<Report> findByReCommentAndUser(ReComment reComment, User user);
+
+    boolean existsReportByReComment(ReComment reComment);
 }
