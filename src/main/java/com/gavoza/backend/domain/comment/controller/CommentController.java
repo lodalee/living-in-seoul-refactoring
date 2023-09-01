@@ -16,14 +16,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/comment")
 public class CommentController {
     private final CommentService commentService;
-    //comment 상세 조회
-    @GetMapping("/get/{postId}")
+    //유저 comment 상세 조회
+    @GetMapping("/auth/{postId}")
     public CommentListResponse getOneComment(@PathVariable Long postId,
                                              @AuthenticationPrincipal UserDetailsImpl userDetails,
                                              int size,
                                              int page) {
-        User user = userDetails != null ? userDetails.getUser() : null;
+        User user = userDetails.getUser();
         return commentService.getCommentByPostId(page-1, size, postId, user);
+    }
+
+    //비유저 comment 상세 조회
+    @GetMapping("/get/{postId}")
+    public CommentListResponse getOneComment2(@PathVariable Long postId,
+                                             int size,
+                                             int page) {
+        return commentService.getCommentByPostId2(page-1, size, postId);
     }
 
     //댓글 작성

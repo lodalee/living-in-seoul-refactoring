@@ -139,7 +139,7 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    //상세 게시물 조회
+    //유저 상세 게시물 조회
     public PostResponse getOnePost(Long postId, User user) {
         Post post = findPost(postId);
         post.increaseViewCount();
@@ -154,7 +154,7 @@ public class PostService {
         return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost,hasScrapped, hasReported));
     }
 
-    //비유저 상세 게시물
+    //비회원 상세 게시물 조회
     public PostResponse getOnePost2(Long postId) {
         Post post = findPost(postId);
         post.increaseViewCount();
