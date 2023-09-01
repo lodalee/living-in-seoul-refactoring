@@ -15,6 +15,7 @@ public class SocialLoginResponseDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private Date expirationDate;
     private String message;
+    private boolean hasSignup;
 
 }
 

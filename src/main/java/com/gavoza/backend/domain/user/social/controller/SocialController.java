@@ -1,6 +1,7 @@
 package com.gavoza.backend.domain.user.social.controller;
 
 import com.gavoza.backend.domain.user.all.entity.RefreshToken;
+import com.gavoza.backend.domain.user.all.repository.UserRepository;
 import com.gavoza.backend.domain.user.all.validator.TokenValidator;
 import com.gavoza.backend.domain.user.social.dto.SocialAuthCodeRequestDto;
 import com.gavoza.backend.domain.user.social.dto.SocialLoginResponseDto;
@@ -25,6 +26,7 @@ public class SocialController {
     private final SocialTokenService socialTokenService;
     private final JwtUtil jwtUtil;
     private final TokenValidator tokenValidator;
+    private final UserRepository userRepository;
 
     @PostMapping("/login/kakao")
     public ResponseEntity<SocialLoginResponseDto> signInWithKakao(@RequestBody SocialAuthCodeRequestDto kakaoAuthCodeRequestDto) {
@@ -72,6 +74,12 @@ public class SocialController {
         Date expirationDate = jwtUtil.getExpirationDateFromToken(customAccessToken);
 
         SocialLoginResponseDto loginResponseDto = new SocialLoginResponseDto();
+
+        // 이미 가입한 유저라면 true 반환
+        boolean hasSignup = userRepository.existsByEmail(email);
+
+        loginResponseDto.setHasSignup(hasSignup);
+
         loginResponseDto.setEmail(email);
         loginResponseDto.setAccessToken(customAccessToken);
         loginResponseDto.setRefreshToken(refreshTokenEntity.getToken());
@@ -80,5 +88,6 @@ public class SocialController {
 
         return ResponseEntity.ok(loginResponseDto);
     }
+
 
 }
