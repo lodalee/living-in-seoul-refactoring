@@ -1,5 +1,6 @@
 package com.gavoza.backend.global.config;
 
+import com.gavoza.backend.domain.user.all.repository.UserRepository;
 import com.gavoza.backend.domain.user.all.validator.TokenValidator;
 import com.gavoza.backend.global.filter.JwtAuthenticationFilter;
 import com.gavoza.backend.global.filter.JwtAuthorizationFilter;
@@ -25,12 +26,14 @@ public class WebSecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final TokenValidator tokenValidator;
+    private final UserRepository userRepository;
 
-    public WebSecurityConfig(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, AuthenticationConfiguration authenticationConfiguration, TokenValidator tokenValidator) {
+    public WebSecurityConfig(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, AuthenticationConfiguration authenticationConfiguration, TokenValidator tokenValidator, UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
         this.authenticationConfiguration = authenticationConfiguration;
         this.tokenValidator = tokenValidator;
+        this.userRepository = userRepository;
     }
 
     @Bean
@@ -40,7 +43,7 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, tokenValidator);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, tokenValidator, userRepository);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
