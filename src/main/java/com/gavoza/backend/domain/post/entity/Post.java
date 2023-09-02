@@ -37,8 +37,6 @@ public class Post extends Auditing {
     @JoinColumn(name = "user_id")
     private User user;
 
-
-
     @JsonManagedReference
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE})
     private List<PostImg> postImgList = new ArrayList<>();
