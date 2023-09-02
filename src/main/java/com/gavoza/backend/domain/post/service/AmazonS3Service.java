@@ -79,9 +79,12 @@ public class AmazonS3Service {
                             .withCannedAcl(CannedAccessControlList.PublicRead)
             );
         } else {
-            // 이미지가 500px 이하이면 그대로 S2에 업로드
+            // 여기서 inputStream 을 그대로 사용하기 보다 byte array 로 변환하여 사용
+            byte[] fileBytes = photo.getBytes();
+            objectMetadata.setContentLength(fileBytes.length);
+
             amazonS3Client.putObject(
-                    new PutObjectRequest(bucketName, bucketFilePath, inputStream, objectMetadata)
+                    new PutObjectRequest(bucketName, bucketFilePath, new ByteArrayInputStream(fileBytes), objectMetadata)
                             .withCannedAcl(CannedAccessControlList.PublicRead)
             );
         }
