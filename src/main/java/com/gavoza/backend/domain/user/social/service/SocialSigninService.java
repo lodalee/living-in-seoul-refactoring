@@ -167,6 +167,18 @@ public class SocialSigninService {
         String name = googleUserInfo.getName() != null ?
                 googleUserInfo.getName() : "소셜유저";
 
-        return new User(googleUserInfo.getEmail(), name, encodedPassword);
+        String uniqueNickname = generateUniqueNickname(name);
+
+        return new User(googleUserInfo.getEmail(), uniqueNickname, encodedPassword);
+    }
+
+    private String generateUniqueNickname(String baseName) {
+        int count = 1;
+
+        while(userRepository.existsByNickname(baseName + count)) {
+            count++;
+        }
+
+        return baseName + count;
     }
 }
