@@ -65,10 +65,13 @@ public class SocialSigninService {
             User newUser = new User(email, nickname, encodedPassword);
             newUser.setIsNew(true);  // 신규 가입 여부 표시
 
-            return userRepository.save(newUser);  // DB에 저장 후 반환
+            return userRepository.save(newUser);
         }
 
-        return existingUserOptional.get();  // 이미 존재하는 유저 정보 반환
+        User existingUser = existingUserOptional.get();
+        existingUser.setIsNew(false);  // 기존 유저의 isNew 필드를 false로 설정
+        userRepository.save(existingUser);  // 변경된 정보를 DB에 저장
+        return existingUser;  // 이미 존재하는 유저 정보 반환
     }
 
 
@@ -115,10 +118,13 @@ public class SocialSigninService {
             User newUser = new User(email, nickname, encodedPassword);
             newUser.setIsNew(true);  // 신규 가입 여부 표시
 
-            return userRepository.save(newUser);  // DB에 저장 후 반환
+            return userRepository.save(newUser);
         }
 
-        return existingUserOptional.get();
+        User existingUser = existingUserOptional.get();
+        existingUser.setIsNew(false);  // 기존 유저의 isNew 필드를 false로 설정
+        userRepository.save(existingUser);  // 변경된 정보를 DB에 저장
+        return existingUser;  // 이미 존재하는 유저 정보 반환
     }
 
     public User signInWithGoogle(String accessToken) {
@@ -153,7 +159,10 @@ public class SocialSigninService {
             return userRepository.save(newUser);
         }
 
-        return existingUserOptional.get();
+        User existingUser = existingUserOptional.get();
+        existingUser.setIsNew(false);  // 기존 유저의 isNew 필드를 false로 설정
+        userRepository.save(existingUser);  // 변경된 정보를 DB에 저장
+        return existingUser;  // 이미 존재하는 유저 정보 반환
     }
 
 
