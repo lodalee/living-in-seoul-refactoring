@@ -35,81 +35,65 @@ public class TagService {
     private final PostScrapRepository postScrapRepository;
     private final ReportRepository reportRepository;
 
-    //전체 - 태그 순위
-    public List<String> allRankNumber() {
-        List<Post> postList = postRepository.findAll();
-        List<String> rankedIds = getHashTagsFromPosts(postList);
+    // 태그 인기순위
+    public List<String> rankNumber(String category) {
+        List<Post> postList;
 
-        return getTopRankedTags(rankedIds, 6);
-    }
-
-    //카테고리 - 태그 순위
-    public List<String> categoryRankNumer (String category) {
-        List<Post> postList = postRepository.findAllBycategory(category);
-        List<String> rankedIds = getHashTagsFromPosts(postList);
-
-        return getTopRankedTags(rankedIds, 6);
-    }
-
-    //전체 - 태그별 post
-    public PostListResponse hashtagPostResponseDtos (int size, int page, String hashtagName, String type, User user
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        //인기순/최신순
-        Page<Post> postPage = type.equals("popular")
-                ? postRepository.findAllByHashtagContainingOrderByPostViewCountDesc(hashtagName, pageable)
-                : postRepository.findAllByHashtagContainingOrderByCreatedAtDesc(hashtagName, pageable);
-
-        if (!postPage.hasContent()) {
-            throw new IllegalArgumentException("존재하지 않는 태그입니다.");
+        if (category == null || category.isEmpty()) {
+            postList = postRepository.findAll();
+        } else {
+            postList = postRepository.findAllBycategory(category);
         }
 
-        List<PostResultDto> postResultDtos =
-                postPage.getContent().stream()
-                        .map(post -> mapToPostResultDto(post,user))
-                        .collect(Collectors.toList());
-        return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size, postResultDtos);
+        List<String> rankedIds = getHashTagsFromPosts(postList);
+        return getTopRankedTags(rankedIds, 6);
     }
 
-    //전체 - 태그별 post - +위치
-    public PostListResponse postLocationResponseDtos(int size, int page, String gu, User user) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Post> postPage = postRepository.findAllByGu(gu, pageable);
-
-        List<PostResultDto> postResultDtos =
-                postPage.getContent().stream()
-                        .map(post -> mapToPostResultDto(post,user))
-                        .collect(Collectors.toList());
-        return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size, postResultDtos);
-    }
-
-    //카테고리 - 태그별 포스트
-    public PostListResponse categoryHashtagPostResponseDtos (int size, int page, String hashtagName, String category, String type, User user) {
+    // 태그별 포스트
+    public PostListResponse tagsPosts(int size, int page, String hashtagName, String type, String category, User user) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Post> postPage = type.equals("popular")
-                ? postRepository.findAllByCategoryAndHashtagContainingOrderByPostViewCountDesc(category, hashtagName, pageable)
-                : postRepository.findAllByCategoryAndHashtagContainingOrderByCreatedAtDesc(category, hashtagName, pageable);
+        Page<Post> postPage;
+
+        if (category == null || category.isEmpty()) {
+            postPage = type.equals("popular")
+                    ? postRepository.findAllByHashtagContainingOrderByPostViewCountDesc(hashtagName, pageable)
+                    : postRepository.findAllByHashtagContainingOrderByCreatedAtDesc(hashtagName, pageable);
+        } else {
+            postPage = type.equals("popular")
+                    ? postRepository.findAllByCategoryAndHashtagContainingOrderByPostViewCountDesc(category, hashtagName, pageable)
+                    : postRepository.findAllByCategoryAndHashtagContainingOrderByCreatedAtDesc(category, hashtagName, pageable);
+        }
 
         if (!postPage.hasContent()) {
-            throw new IllegalArgumentException("존재하지 않는 태그 혹은 존재하지 않는 카테고리 입니다.");
+            throw new IllegalArgumentException("해당 게시물은 존재하지 않습니다.");
         }
 
         List<PostResultDto> postResultDtos = postPage.stream()
-                .map(post -> mapToPostResultDto(post,user))
+                .map(post -> mapToPostResultDto(post, user))
                 .collect(Collectors.toList());
         return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size, postResultDtos);
     }
 
-    //카테고리 - 태그별 포스트 - +위치
-    public PostListResponse categoryLocationPostResponseDtos(int size, int page, String gu, String category, User user) {
+    // 태그별 포스트 - +위치
+    public PostListResponse postLocation(int size, int page, String gu, String category, User user) {
+        System.out.println("gu " + gu);
+        System.out.println("category " + category);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Post> postPage = postRepository.findAllByGuAndCategory(gu,category, pageable);
+        Page<Post> postPage;
+
+        if (category == null || category.isEmpty()) {
+            postPage = postRepository.findAllByGu(gu, pageable);
+            System.out.println("카테고리 없을 때");
+        } else {
+            postPage = postRepository.findAllByGuAndCategory(gu, category, pageable);
+            System.out.println("카테고리 있을 때");
+        }
 
         List<PostResultDto> postResultDtos =
                 postPage.getContent().stream()
-                        .map(post -> mapToPostResultDto(post,user))
+                        .map(post -> mapToPostResultDto(post, user))
                         .collect(Collectors.toList());
+
         return new PostListResponse("검색 조회 성공", postPage.getTotalPages(), postPage.getTotalElements(), size, postResultDtos);
     }
 
