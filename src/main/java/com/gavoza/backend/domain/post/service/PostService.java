@@ -63,12 +63,17 @@ public class PostService {
         //본문에서 해시태그 추출
         List<String> hashtags = extractHashtagsFromContent(requestDto);
 
-        List<PostImg> postImgList = amazonS3Service.uploadPhotosToS3AndCreatePostImages(photos);
+        List<PostImg> postImgList = null;
+        if (photos != null && !photos.isEmpty()) {
+            postImgList = amazonS3Service.uploadPhotosToS3AndCreatePostImages(photos);
+        }
 
         Post post = new Post(requestDto, user);
         postRepository.save(post);
 
-        associatePostImagesWithPost(post, postImgList);
+        if (postImgList != null) {
+            associatePostImagesWithPost(post, postImgList);
+        }
 
         // 게시물에 연결된 해시태그를 구독하는 사용자 찾기
         for (String hashtag : hashtags) {

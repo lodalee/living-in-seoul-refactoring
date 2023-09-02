@@ -34,8 +34,8 @@ public class AmazonS3Service {
     public List<PostImg> uploadPhotosToS3AndCreatePostImages(List<MultipartFile> photos) throws IOException {
         List<PostImg> postImgList = new ArrayList<>();
 
-        if (photos != null && !photos.isEmpty()) {
-            for (MultipartFile photo : photos) {
+        for (MultipartFile photo : photos) {
+            if (!photo.isEmpty()) { // 파일이 비어있지 않은 경우에만 업로드 진행
                 String fileName = uploadPhotoToS3AndGetFileName(photo);
                 PostImg postImg = new PostImg(fileNameToURL(fileName), null);
                 postImgList.add(postImg);
