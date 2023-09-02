@@ -42,7 +42,7 @@ public class SignupService {
 
         userRepository.save(user);
 
-        return jwtUtil.createAccessToken(email);
+        return user.getEmail();
     }
 
     @Transactional
