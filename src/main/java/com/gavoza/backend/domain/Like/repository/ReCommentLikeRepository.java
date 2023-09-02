@@ -12,4 +12,6 @@ public interface ReCommentLikeRepository extends JpaRepository<ReCommentLike, Lo
     boolean existsLikeByReCommentAndUser(ReComment reComment, User user);
 
     Optional<ReCommentLike> findByReCommentAndUser(ReComment reComment, User user);
+
+    boolean existsLikeByReComment(ReComment reComment);
 }

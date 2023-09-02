@@ -61,11 +61,11 @@ public class AmazonS3Service {
 
         BufferedImage originalImage = ImageIO.read(inputStream);
 
-        int targetHeight = 500; // 세로 길이를 500px로 설정
+        int targetWidth = 500; // 가로 길이를 500px로 설정
 
         // 이미지가 500px보다 크면 리사이즈
-        if (originalImage.getHeight() > targetHeight) {
-            BufferedImage resizedImage = resizeImage(originalImage, targetHeight);
+        if (originalImage.getWidth() > targetWidth) {
+            BufferedImage resizedImage = resizeImage(originalImage, targetWidth);
 
             // 리사이즈된 이미지를 S2에 업로드
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -89,20 +89,21 @@ public class AmazonS3Service {
         return fileName;
     }
 
-    public BufferedImage resizeImage(BufferedImage originalImage, int targetHeight) {
-        double aspectRatio = (double) originalImage.getWidth() / originalImage.getHeight();
-        int targetWidth = (int) (targetHeight * aspectRatio);
+    public BufferedImage resizeImage(BufferedImage originalImage, int targetWidth) {
+        double aspectRatio = (double) originalImage.getHeight() / originalImage.getWidth();
+        int targetHeight= (int) (targetWidth * aspectRatio);
 
-        BufferedImage scaledImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        BufferedImage scaledImge= new BufferedImage(targetWidth,targetHeight ,BufferedImage.TYPE_INT_RGB);
 
-        Graphics2D g2d = scaledImage.createGraphics();
+        Graphics2D g2d= scaledImge.createGraphics();
 
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2d.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.drawImage(originalImage ,0 ,0 ,targetWidth,targetHeight,null );
 
         g2d.dispose();
 
-        return scaledImage;
+        return scaledImge;
     }
 
     private String fileNameToURL(String fileName) {
