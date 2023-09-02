@@ -15,14 +15,14 @@ public class NotificationService {
 
     public static Map<Long, SseEmitter> sseEmitters = new ConcurrentHashMap<>();
 
-    public void notifyAddCommentEvent(User user, boolean check) {
+    public void notifyAddEvent(User user, boolean check) {
         Long userId = user.getId();
 
         if (sseEmitters.containsKey(userId)) {
             if(check){
                 SseEmitter sseEmitter = sseEmitters.get(userId);
                 try {
-                    sseEmitter.send(SseEmitter.event().name("addComment").data("새로운 알림"));
+                    sseEmitter.send(SseEmitter.event().name("addNotification").data("새로운 알림"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

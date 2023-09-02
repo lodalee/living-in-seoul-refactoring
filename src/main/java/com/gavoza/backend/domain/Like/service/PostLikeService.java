@@ -55,8 +55,8 @@ public class PostLikeService {
             if (!post.getUser().getId().equals(user.getId())) {
                 Alarm likeNotification = new Alarm(post, post.getUser(), eventType, isRead, notificationMessage, registeredAt, userImg);
                 alarmRepository.save(likeNotification);
+                notificationService.notifyAddEvent(post.getUser(), post.getUser().isLikeAlarm());
             }
-            notificationService.notifyAddCommentEvent(post.getUser(), post.getUser().isLikeAlarm());
             return new MessageResponseDto("좋아요");
         }
 
@@ -86,8 +86,8 @@ public class PostLikeService {
             if (!comment.getUser().getId().equals(user.getId())) {
                 Alarm likeNotification = new Alarm(comment.getPost(), comment.getUser(), eventType, isRead, notificationMessage, registeredAt,userImg);
                 alarmRepository.save(likeNotification);
+                notificationService.notifyAddEvent(comment.getUser(), comment.getUser().isLikeAlarm());
             }
-            notificationService.notifyAddCommentEvent(comment.getUser(), comment.getUser().isLikeAlarm());
             return new MessageResponseDto("댓글 좋아요");
         }
 
@@ -117,8 +117,8 @@ public class PostLikeService {
             if (!reComment.getUser().getId().equals(user.getId())) {
                 Alarm likeNotification = new Alarm(reComment.getComment().getPost() ,reComment.getUser(), eventType, isRead, notificationMessage, registeredAt, userImg);
                 alarmRepository.save(likeNotification);
+                notificationService.notifyAddEvent(reComment.getUser(), reComment.getUser().isLikeAlarm());
             }
-            notificationService.notifyAddCommentEvent(reComment.getUser(), reComment.getUser().isLikeAlarm());
             return new MessageResponseDto("댓글 좋아요");
         }
 

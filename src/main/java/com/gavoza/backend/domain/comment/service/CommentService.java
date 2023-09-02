@@ -129,8 +129,8 @@ public class CommentService {
         if (!post.getUser().getId().equals(user.getId())) {
             Alarm commentNotification = new Alarm(post ,post.getUser(), eventType, isRead, notificationMessage, registeredAt,userImg);
             alarmRepository.save(commentNotification);
+            notificationService.notifyAddEvent(post.getUser(), post.getUser().isCommentAlarm());
         }
-        notificationService.notifyAddCommentEvent(post.getUser(), post.getUser().isCommentAlarm());
         return new CommentResponseDto(newComment); // ReCommentResponseDto로 변경
     }
 
@@ -149,8 +149,8 @@ public class CommentService {
         if (!comment.getUser().getId().equals(user.getId())) {
             Alarm commentNotification = new Alarm(comment.getPost(),comment.getUser(), eventType, isRead, notificationMessage, registeredAt,userImg);
             alarmRepository.save(commentNotification);
+            notificationService.notifyAddEvent(comment.getUser(), comment.getUser().isCommentAlarm());
         }
-        notificationService.notifyAddCommentEvent(comment.getUser(), comment.getUser().isCommentAlarm());
         return new ReCommentResponseDto(newReComment);
     }
 

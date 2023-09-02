@@ -59,9 +59,6 @@ public class PostController {
     @GetMapping("/auth/{postId}")
     public PostResponse getOnePost(@PathVariable("postId") Long postId,
                                    @AuthenticationPrincipal UserDetailsImpl userDetails){
-        if(Objects.isNull(userDetails)){
-            return postService.getOnePost(postId, null);
-        }
         User user = userDetails.getUser();
         return postService.getOnePost(postId, user);
     }
