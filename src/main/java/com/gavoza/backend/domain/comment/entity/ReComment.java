@@ -40,9 +40,10 @@ public class ReComment extends Auditing {
     @Transient
     private boolean reCommentHasLiked;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
 
     @OneToMany(mappedBy = "reComment", cascade = {CascadeType.REMOVE})
     private List<ReCommentLike> reCommentLikes = new ArrayList<>();
