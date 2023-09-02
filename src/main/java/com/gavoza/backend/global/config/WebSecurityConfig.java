@@ -75,7 +75,7 @@ public class WebSecurityConfig {
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 
-                        .requestMatchers("/auth/**","/sign/**","/social/**","/token/**","/profile/**", "/signup/**","/hc", "/tags/**", "/posts/get/**","/search/**", "/comment/get/**" ).permitAll()
+                        .requestMatchers("/auth/**","/social/**","/token/**","/profile/**", "/signup/**","/hc", "/tags/**", "/posts/get/**","/search/**", "/comment/get/**" ).permitAll()
 
                         .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
