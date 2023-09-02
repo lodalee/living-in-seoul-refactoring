@@ -86,7 +86,7 @@ public class PostService {
 
                     Alarm alarm = new Alarm(post, subscriber, eventType, isRead, notificationMessage, registeredAt, userImg, hashtagName);
                     alarmRepository.save(alarm);
-                    notificationService.notifyAddCommentEvent(subscriber, subscriber.isHashtagAlarm());
+                    notificationService.notifyAddEvent(subscriber, subscriber.isHashtagAlarm());
                 }
             }
         }
