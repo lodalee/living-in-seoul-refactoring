@@ -1,6 +1,6 @@
 package com.gavoza.backend.domain.user.all.validator;
 
-import com.gavoza.backend.domain.user.all.entity.CityScraper;
+import com.gavoza.backend.domain.user.all.scrap.CityScraper;
 import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.domain.user.all.repository.UserRepository;
 import org.springframework.stereotype.Service;
