@@ -1,5 +1,6 @@
 package com.gavoza.backend.domain.user.all.entity;
 
+import com.gavoza.backend.domain.scrap.entity.PostScrap;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,8 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    private Boolean isNew = false;
+
     private String hometown;
 
     private String movedDate;
@@ -44,8 +47,12 @@ public class User {
     private boolean commentAlarm;
     private boolean hashtagAlarm;
 
-    @OneToMany(mappedBy="user", cascade=CascadeType.ALL)
+    @OneToMany(mappedBy="user", cascade={CascadeType.ALL, CascadeType.REMOVE})
     private List<FavoriteLocation> favoriteLocations = new ArrayList<>();
+
+    @OneToMany(mappedBy="user", cascade={CascadeType.ALL, CascadeType.REMOVE})
+    private List<PostScrap> postScraps = new ArrayList<>();
+
 
     public User(String email, String nickname, String password, String hometown, String movedDate, String gender, String birthDate) {
         this.email = email;
@@ -55,12 +62,14 @@ public class User {
         this.movedDate = movedDate;
         this.gender = gender;
         this.birthDate = birthDate;
+        this.isNew= false;
     }
 
     public User(String email, String nickname, String password) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
+        this.isNew= false;
     }
 
     public User(Long id) {
@@ -78,4 +87,5 @@ public class User {
     public void changeHashtagAlarm() {
         this.hashtagAlarm = !this.hashtagAlarm;
     }
+    public void setIsNew(Boolean isNew) { this.isNew=isNew; }
 }

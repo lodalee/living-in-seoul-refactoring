@@ -1,6 +1,7 @@
 package com.gavoza.backend.domain.user.social.controller;
 
 import com.gavoza.backend.domain.user.all.entity.RefreshToken;
+import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.domain.user.all.repository.UserRepository;
 import com.gavoza.backend.domain.user.all.validator.TokenValidator;
 import com.gavoza.backend.domain.user.social.dto.SocialAuthCodeRequestDto;
@@ -26,7 +27,6 @@ public class SocialController {
     private final SocialTokenService socialTokenService;
     private final JwtUtil jwtUtil;
     private final TokenValidator tokenValidator;
-    private final UserRepository userRepository;
 
     @PostMapping("/login/kakao")
     public ResponseEntity<SocialLoginResponseDto> signInWithKakao(@RequestBody SocialAuthCodeRequestDto kakaoAuthCodeRequestDto) {
@@ -39,11 +39,10 @@ public class SocialController {
 
         String accessToken = socialTokenService.getAccessTokenFromKakaoAuthCode(authCode);
 
-        String email = socialSigninService.signInWithKakao(accessToken);
+        User user = socialSigninService.signInWithKakao(accessToken);
 
-        return processSocialLogin(email, "카카오 로그인에 성공하셨습니다.");
+        return processSocialLogin(user, "카카오 로그인에 성공하셨습니다.");
     }
-
 
     @PostMapping("/login/naver")
     public ResponseEntity<SocialLoginResponseDto> signInWithNaver(@RequestBody SocialAuthCodeRequestDto naverAuthCodeRequestDto) {
@@ -57,11 +56,10 @@ public class SocialController {
         // 인가 코드로 액세스 토큰 발급
         String accessToken = socialTokenService.getAccessTokenFromNaverAuthCode(authCode);
         // 네이버 로그인
-        String email = socialSigninService.signInWithNaver(accessToken);
+        User user = socialSigninService.signInWithNaver(accessToken);
 
-        return processSocialLogin(email, "네이버 로그인에 성공하셨습니다.");
+        return processSocialLogin(user, "네이버 로그인에 성공하셨습니다.");
     }
-
     @PostMapping("/login/google")
     public ResponseEntity<SocialLoginResponseDto> signInWithGoogle(@RequestBody SocialAuthCodeRequestDto googleAuthCodeRequestDto) {
         String authCode = googleAuthCodeRequestDto.getAuthCode();
@@ -75,30 +73,29 @@ public class SocialController {
         String accessToken = socialTokenService.getAccessTokenFromGoogleAuthCode(authCode);
 
         // 구글 로그인
-        String email = socialSigninService.signInWithGoogle(accessToken);
+        User user = socialSigninService.signInWithGoogle(accessToken);
 
-        return processSocialLogin(email, "구글 로그인에 성공하셨습니다.");
+        return processSocialLogin(user, "구글 로그인에 성공하셨습니다.");
     }
 
-
-    private ResponseEntity<SocialLoginResponseDto> processSocialLogin(String email, String successMessage) {
+    private ResponseEntity<SocialLoginResponseDto> processSocialLogin(User user, String successMessage) {
         // 액세스 토큰 생성
-        String customAccessToken = jwtUtil.createAccessToken(email);
+        String customAccessToken = jwtUtil.createAccessToken(user.getEmail());
 
         // 리프레시 토큰 저장 및 생성
-        RefreshToken refreshTokenEntity = tokenValidator.createAndSaveRefreshToken(email);
+        RefreshToken refreshTokenEntity = tokenValidator.createAndSaveRefreshToken(user.getEmail());
 
         // 액세스 토큰의 만료 시간 가져오기
         Date expirationDate = jwtUtil.getExpirationDateFromToken(customAccessToken);
 
         SocialLoginResponseDto loginResponseDto = new SocialLoginResponseDto();
 
-        // 이미 가입한 유저라면 true 반환
-        boolean hasSignup = userRepository.existsByEmail(email);
+        // 신규 가입 여부 체크. isNew가 true라면 false 반환 (아직 가입되지 않음)
+        boolean hasSignup = !user.getIsNew();
 
         loginResponseDto.setHasSignup(hasSignup);
 
-        loginResponseDto.setEmail(email);
+        loginResponseDto.setNickname(user.getNickname());
         loginResponseDto.setAccessToken(customAccessToken);
         loginResponseDto.setRefreshToken(refreshTokenEntity.getToken());
         loginResponseDto.setExpirationDate(expirationDate);

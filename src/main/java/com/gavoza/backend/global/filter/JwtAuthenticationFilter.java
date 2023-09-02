@@ -77,7 +77,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         TokenResMsgDto responseBody =
                 new TokenResMsgDto(user.getNickname(), "로그인에 성공하셨습니다.", accessToken,
-                        refreshTokenEntity.getToken(), expirationDate);  // 응답 바디에 만료시간 추가
+                        refreshTokenEntity.getToken(), expirationDate);
 
         response.setContentType("application/json; charset=UTF-8");
         try {

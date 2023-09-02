@@ -25,7 +25,7 @@ public class SocialSigninService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public String signInWithKakao(String accessToken) {
+    public User signInWithKakao(String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -63,14 +63,16 @@ public class SocialSigninService {
             String encodedPassword = passwordEncoder.encode(password);  // 비밀번호 암호화
 
             User newUser = new User(email, nickname, encodedPassword);
-            userRepository.save(newUser);  // DB에 저장
+            newUser.setIsNew(true);  // 신규 가입 여부 표시
+
+            return userRepository.save(newUser);  // DB에 저장 후 반환
         }
 
-        return email;
+        return existingUserOptional.get();  // 이미 존재하는 유저 정보 반환
     }
 
 
-    public String signInWithNaver(String accessToken) {
+    public User signInWithNaver(String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -111,15 +113,15 @@ public class SocialSigninService {
             String encodedPassword = passwordEncoder.encode(password);
 
             User newUser = new User(email, nickname, encodedPassword);
+            newUser.setIsNew(true);  // 신규 가입 여부 표시
 
-            userRepository.save(newUser);  // DB에 저장
-
+            return userRepository.save(newUser);  // DB에 저장 후 반환
         }
 
-        return email;
+        return existingUserOptional.get();
     }
 
-    public String signInWithGoogle(String accessToken) {
+    public User signInWithGoogle(String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -146,17 +148,25 @@ public class SocialSigninService {
         Optional<User> existingUserOptional = userRepository.findByEmail(email);
         if (!existingUserOptional.isPresent()) {
             User newUser = createUser(googleUser);
-            userRepository.save(newUser);
+            newUser.setIsNew(true);  	//신규 가입 여부 표시
+
+            return userRepository.save(newUser);
         }
 
-        return email;
+        return existingUserOptional.get();
     }
+
 
     private User createUser(GoogleUserResponseDto googleUserInfo) {
         // 임시 비밀번호 생성 (랜덤 UUID)
         String password = UUID.randomUUID().toString();
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(password);
-        return new User(googleUserInfo.getEmail(), googleUserInfo.getName(), encodedPassword);
+
+        // 이름 설정 (null 체크)
+        String name = googleUserInfo.getName() != null ?
+                googleUserInfo.getName() : "소셜유저";
+
+        return new User(googleUserInfo.getEmail(), name, encodedPassword);
     }
 }
