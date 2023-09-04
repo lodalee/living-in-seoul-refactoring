@@ -19,11 +19,11 @@ public class PostScrap {
     @Column(name = "post_scrap_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
     @JoinColumn(name = "post_id")
     private Post post;
 
