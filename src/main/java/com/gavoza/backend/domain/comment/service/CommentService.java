@@ -62,17 +62,23 @@ public class CommentService {
                     .map(reComment -> getOneReComment(reComment.getId(), user))
                     .collect(Collectors.toList());
 
+            boolean hasLikeComment;
+            boolean hasReported;
+
             if(Objects.isNull(user)){
-                commentResponseDtos.add(new CommentResponseDto(comment, false, reComments,false));
+                hasLikeComment = false;
+                hasReported = false;
+            } else {
+                hasLikeComment = commentLikeRepository.existsLikeByCommentAndUser(comment, user);
+                hasReported = reportRepository.existsReportByCommentAndUser(comment,user);
             }
 
-            boolean hasLikeComment = commentLikeRepository.existsLikeByCommentAndUser(comment, user);
-            boolean hasReported = reportRepository.existsReportByCommentAndUser(comment,user);
-
             commentResponseDtos.add(new CommentResponseDto(comment, hasLikeComment, reComments,hasReported));
+
         }
 
-        return new CommentListResponse(commentResponseDtos,commentPages.getTotalPages(), commentPages.getTotalElements(), size);
+        return new CommentListResponse(commentResponseDtos,commentPages.getTotalPages(),
+                commentPages.getTotalElements(), size);
     }
 
     @Transactional(readOnly = true)
