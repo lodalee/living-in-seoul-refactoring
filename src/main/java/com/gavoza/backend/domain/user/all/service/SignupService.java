@@ -74,13 +74,13 @@ public class SignupService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
+        commentLikeRepository.deleteByUserId(user.getId());
         alarmRepository.deleteByUserId(user.getId());
         favoriteLocationRepository.deleteByUserId(user.getId());
         subscribeHashtagRepository.deleteByUserId(user.getId());
         postScrapRepository.deleteByUserId(user.getId());
         reCommentLikeRepository.deleteByUserId(user.getId());
         reCommentRepository.deleteByUserId(user.getId());
-        commentLikeRepository.deleteByUserId(user.getId());
         commentRepository.deleteByUserId(user.getId());
         postLikeRepository.deleteByUserId(user.getId());
         postRepository.deleteByUserId(user.getId());
