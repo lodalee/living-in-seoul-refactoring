@@ -56,37 +56,37 @@ public class User {
     private boolean commentAlarm;
     private boolean hashtagAlarm;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
     private List<FavoriteLocation> favoriteLocations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
     private List<PostScrap> postScraps = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
     private List<Alarm> alarms = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
     private List<SubscribeHashtag> subscribeHashtags = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
     private List<ReComment> reComments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
     private List<Commentlike> commentLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
     private List<Postlike> postLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
     private List<ReCommentLike> reCommentLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
     private List<Report> reports = new ArrayList<>();
 
 
