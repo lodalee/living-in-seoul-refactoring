@@ -10,4 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AlarmRepository extends JpaRepository<Alarm, Integer> {
     Page<Alarm> findAllByUser(User user, Pageable pageable);
+
+
+    void deleteByUserId(Long id);
 }
