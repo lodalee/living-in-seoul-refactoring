@@ -7,6 +7,7 @@ import com.gavoza.backend.domain.alarm.repository.AlarmRepository;
 import com.gavoza.backend.domain.alarm.repository.SubscribeHashtagRepository;
 import com.gavoza.backend.domain.alarm.response.AlarmListResponse;
 import com.gavoza.backend.domain.alarm.response.AlarmResponse;
+import com.gavoza.backend.domain.alarm.response.SubAlarmResponseDto;
 import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.domain.user.all.repository.UserRepository;
 import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -85,6 +87,11 @@ public class AlarmService {
         return new MessageResponseDto(alarmType + " 구독이 변경 완료되었습니다.");
     }
 
+    //알림 구독 조회
+    public SubAlarmResponseDto getSubscribeAlarm(User user) {
+        return new SubAlarmResponseDto(user);
+    }
+
     //해시 태그 구독
     public MessageResponseDto subscribeHashtag(String hashtag, Long userId) {
         User user = userRepository.findById(userId)
@@ -111,6 +118,18 @@ public class AlarmService {
         }
     }
 
+    //구독된 해시태그 조회
+    public List<String> subscribeHashtagList(User user) {
+        List<SubscribeHashtag> subscribeHashtagList = subscribeHashtagRepository.findAllByUser(user);
+
+        List<String> hashtagNames = new ArrayList<>();
+        for (SubscribeHashtag subscribeHashtag : subscribeHashtagList) {
+            hashtagNames.add(subscribeHashtag.getHashtag());
+        }
+
+        return hashtagNames;
+    }
+
     // 알림 클릭 후 알림 읽음 처리
     public MessageResponseDto markNotificationAsRead(@PathVariable Integer notificationId, User user) {
         // 알림 조회
@@ -128,6 +147,8 @@ public class AlarmService {
 
         return new MessageResponseDto("알림을 읽음 처리했습니다.");
     }
+
+
 }
 
 

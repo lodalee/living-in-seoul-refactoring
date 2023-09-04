@@ -21,7 +21,6 @@ public class TagController {
 
     private final TagService tagService;
 
-
     //태그 인기순위
     @GetMapping("/rank")
     public List<String> rankNumber(@RequestParam String category){

@@ -2,6 +2,7 @@ package com.gavoza.backend.domain.alarm.controller;
 
 import com.gavoza.backend.domain.alarm.AlarmType;
 import com.gavoza.backend.domain.alarm.response.AlarmListResponse;
+import com.gavoza.backend.domain.alarm.response.SubAlarmResponseDto;
 import com.gavoza.backend.domain.alarm.service.AlarmService;
 import com.gavoza.backend.domain.user.all.entity.User;
 import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
@@ -9,6 +10,8 @@ import com.gavoza.backend.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/alarm")
@@ -33,6 +36,13 @@ public class AlarmController {
         return alarmService.subscribeAlarm(alarmType,userId);
     }
 
+    //알림 구독 조회
+    @GetMapping("/subscribe")
+    public SubAlarmResponseDto getSubscribeAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        User user = userDetails.getUser();
+        return alarmService.getSubscribeAlarm(user);
+    }
+
     //해시태그 구독
     @PostMapping("/hashtag")
     public MessageResponseDto subscribeHashtag(@RequestParam String hashtag,
@@ -47,6 +57,14 @@ public class AlarmController {
                                                      @AuthenticationPrincipal UserDetailsImpl userDetails){
         Long userId = userDetails.getUser().getId();
         return alarmService.unsubscribeHashtag(hashtag, userId);
+    }
+
+    //구독된 해시태그 조회
+    @GetMapping("/hashtag")
+    public List<String> subscribeHashtagList(@AuthenticationPrincipal UserDetailsImpl userDetails){
+
+        User user = userDetails.getUser();
+        return alarmService.subscribeHashtagList(user);
     }
 
     //알림 눌렀을 때 is read true로
