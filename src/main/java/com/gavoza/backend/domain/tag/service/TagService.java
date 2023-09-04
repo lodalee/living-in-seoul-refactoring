@@ -1,6 +1,7 @@
 package com.gavoza.backend.domain.tag.service;
 
 import com.gavoza.backend.domain.Like.repository.PostLikeRepository;
+import com.gavoza.backend.domain.alarm.repository.SubscribeHashtagRepository;
 import com.gavoza.backend.domain.post.dto.LocationResponseDto;
 import com.gavoza.backend.domain.post.dto.PostInfoResponseDto;
 import com.gavoza.backend.domain.post.dto.PostResultDto;
@@ -34,6 +35,7 @@ public class TagService {
     private final PostLikeRepository postLikeRepository;
     private final PostScrapRepository postScrapRepository;
     private final ReportRepository reportRepository;
+    private final SubscribeHashtagRepository subscribeHashtagRepository;
 
     // 태그 인기순위
     public List<String> rankNumber(String category) {
