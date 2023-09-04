@@ -5,6 +5,7 @@ import com.gavoza.backend.domain.alarm.AlarmEventType;
 import com.gavoza.backend.domain.alarm.entity.Alarm;
 import com.gavoza.backend.domain.alarm.repository.AlarmRepository;
 import com.gavoza.backend.domain.alarm.sse.NotificationService;
+import com.gavoza.backend.domain.comment.dto.ReCommentResponseDto;
 import com.gavoza.backend.domain.post.dto.*;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.entity.PostImg;
@@ -153,26 +154,14 @@ public class PostService {
         PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
         LocationResponseDto locationResponseDto = new LocationResponseDto(post.getLname(), post.getAddress(), post.getLat(), post.getLng(), post.getGu());
 
+        if(Objects.isNull(user)){
+            return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto,false,false, false));
+        }
+
         boolean hasLikedPost = postLikeRepository.existsLikeByPostAndUser(post, user);
         boolean hasScrapped = postScrapRepository.existsScrapByPostAndUser(post, user);
         boolean hasReported = reportRepository.existsReportByPostAndUser(post,user);
         return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost,hasScrapped, hasReported));
-    }
-
-    //비회원 상세 게시물 조회
-    public PostResponse getOnePost2(Long postId) {
-        Post post = findPost(postId);
-        post.increaseViewCount();
-
-        UserResponseDto userResponseDto = new UserResponseDto(post.getUser().getNickname(), post.getUser().getEmail());
-        PostInfoResponseDto postInfoResponseDto = new PostInfoResponseDto(post);
-        LocationResponseDto locationResponseDto = new LocationResponseDto(post.getLname(), post.getAddress(), post.getLat(), post.getLng(), post.getGu());
-
-        boolean hasLikedPost = false;
-        boolean hasScrapped = false;
-        boolean hasReported = false;
-
-        return new PostResponse("게시글 조회 성공", new PostResultDto(userResponseDto, postInfoResponseDto, locationResponseDto, hasLikedPost, hasScrapped, hasReported));
     }
 
     //게시물 전체 조회

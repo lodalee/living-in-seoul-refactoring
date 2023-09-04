@@ -56,19 +56,17 @@ public class PostController {
     }
 
     //유저 게시글 상세 조회
-    @GetMapping("/auth/{postId}")
+    @GetMapping("/get/{postId}")
     public PostResponse getOnePost(@PathVariable("postId") Long postId,
                                    @AuthenticationPrincipal UserDetailsImpl userDetails){
+
+        if(Objects.isNull(userDetails)){
+            return postService.getOnePost(postId, null);
+        }
+
         User user = userDetails.getUser();
         return postService.getOnePost(postId, user);
     }
-
-    //비회원 게시글 상세 조회
-    @GetMapping("/get/{postId}")
-    public PostResponse getOnePost(@PathVariable("postId") Long postId){
-        return postService.getOnePost2(postId);
-    }
-
 
     //게시글 전체 조회(커뮤티니)
     @GetMapping("/get")

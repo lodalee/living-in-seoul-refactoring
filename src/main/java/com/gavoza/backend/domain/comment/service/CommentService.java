@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -61,56 +62,34 @@ public class CommentService {
                     .map(reComment -> getOneReComment(reComment.getId(), user))
                     .collect(Collectors.toList());
 
-            boolean hasLikeComment = user != null && commentLikeRepository.existsLikeByCommentAndUser(comment, user);
-            boolean hasReported = reportRepository.existsReportByCommentAndUser(comment,user);
+            boolean hasLikeComment;
+            boolean hasReported;
+
+            if(Objects.isNull(user)){
+                hasLikeComment = false;
+                hasReported = false;
+            } else {
+                hasLikeComment = commentLikeRepository.existsLikeByCommentAndUser(comment, user);
+                hasReported = reportRepository.existsReportByCommentAndUser(comment,user);
+            }
 
             commentResponseDtos.add(new CommentResponseDto(comment, hasLikeComment, reComments,hasReported));
+
         }
 
-        return new CommentListResponse(commentResponseDtos,commentPages.getTotalPages(), commentPages.getTotalElements(), size);
-    }
-
-    //비유저 comment 조회
-    public CommentListResponse getCommentByPostId2(int page, int size, Long postId) {
-        // postId 유효성 확인
-        if (!postRepository.existsById(postId)) {
-            throw new IllegalArgumentException("해당 게시물이 존재하지 않습니다.");
-        }
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Comment> commentPages = commentRepository.findAllByPostId(postId, pageable);
-        List<CommentResponseDto> commentResponseDtos = new ArrayList<>();
-
-        for (Comment comment : commentPages) {
-            List<ReCommentResponseDto> reComments = comment.getReCommentList().stream()
-                    .map(reComment -> getOneReComment2(reComment.getId()))
-                    .collect(Collectors.toList());
-
-            boolean hasLikeComment = false;
-            boolean hasReported = false;
-
-            commentResponseDtos.add(new CommentResponseDto(comment, hasLikeComment, reComments,hasReported));
-        }
-        return new CommentListResponse(commentResponseDtos,commentPages.getTotalPages(), commentPages.getTotalElements(), size);
+        return new CommentListResponse(commentResponseDtos,commentPages.getTotalPages(),
+                commentPages.getTotalElements(), size);
     }
 
     @Transactional(readOnly = true)
     public ReCommentResponseDto getOneReComment(Long id, User user) {
         ReComment reComment = reCommentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
-
+        if(Objects.isNull(user)){
+            return new ReCommentResponseDto(reComment, false,false);
+        }
         boolean reCommentHasLiked = reCommentLikeRepository.existsLikeByReCommentAndUser(reComment, user);
         boolean hasReported = reportRepository.existsReportByReCommentAndUser(reComment,user);
-        return new ReCommentResponseDto(reComment, reCommentHasLiked,hasReported);
-    }
-
-    @Transactional(readOnly = true)
-    public ReCommentResponseDto getOneReComment2(Long id) {
-        ReComment reComment = reCommentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
-
-        boolean reCommentHasLiked = reCommentLikeRepository.existsLikeByReComment(reComment);
-        boolean hasReported = reportRepository.existsReportByReComment(reComment);
         return new ReCommentResponseDto(reComment, reCommentHasLiked,hasReported);
     }
 

@@ -12,6 +12,7 @@ import com.gavoza.backend.domain.report.repository.ReportRepository;
 import com.gavoza.backend.domain.scrap.repository.PostScrapRepository;
 import com.gavoza.backend.domain.user.all.dto.request.SignupRequestDto;
 import com.gavoza.backend.domain.user.all.entity.User;
+import com.gavoza.backend.domain.user.all.repository.FavoriteLocationRepository;
 import com.gavoza.backend.domain.user.all.repository.UserRepository;
 import com.gavoza.backend.domain.user.all.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class SignupService {
     private final PostRepository postRepository;
     private final ReportRepository reportRepository;
     private final PostScrapRepository postScrapRepository;
+    private final FavoriteLocationRepository favoriteLocationRepository;
 
 
 
@@ -73,16 +75,16 @@ public class SignupService {
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         alarmRepository.deleteByUserId(user.getId());
+        favoriteLocationRepository.deleteByUserId(user.getId());
         subscribeHashtagRepository.deleteByUserId(user.getId());
-        commentRepository.deleteByUserId(user.getId());
+        postScrapRepository.deleteByUserId(user.getId());
+        reCommentLikeRepository.deleteByUserId(user.getId());
         reCommentRepository.deleteByUserId(user.getId());
         commentLikeRepository.deleteByUserId(user.getId());
+        commentRepository.deleteByUserId(user.getId());
         postLikeRepository.deleteByUserId(user.getId());
-        reCommentLikeRepository.deleteByUserId(user.getId());
         postRepository.deleteByUserId(user.getId());
         reportRepository.deleteByUserId(user.getId());
-        postScrapRepository.deleteByUserId(user.getId());
-
         
         userRepository.delete(user);
     }

@@ -15,5 +15,5 @@ public interface ReCommentLikeRepository extends JpaRepository<ReCommentLike, Lo
 
     boolean existsLikeByReComment(ReComment reComment);
 
-    void deleteByUserId(Long id);
+    void deleteByUserId(Long userId);
 }

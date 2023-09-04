@@ -33,5 +33,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAllByGuAndCategory(String gu, String category, Pageable pageable);
 
 
-    void deleteByUserId(Long id);
+    void deleteByUserId(Long userId);
 }

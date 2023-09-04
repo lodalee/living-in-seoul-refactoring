@@ -11,27 +11,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/comment")
 public class CommentController {
     private final CommentService commentService;
-    //유저 comment 상세 조회
-    @GetMapping("/auth/{postId}")
+    //comment 조회
+    @GetMapping("/get/{postId}")
     public CommentListResponse getOneComment(@PathVariable Long postId,
                                              @AuthenticationPrincipal UserDetailsImpl userDetails,
                                              int size,
                                              int page) {
+
+        if(Objects.isNull(userDetails)){
+            return commentService.getCommentByPostId(page-1, size, postId, null);
+        }
+
         User user = userDetails.getUser();
         return commentService.getCommentByPostId(page-1, size, postId, user);
-    }
-
-    //비유저 comment 상세 조회
-    @GetMapping("/get/{postId}")
-    public CommentListResponse getOneComment2(@PathVariable Long postId,
-                                             int size,
-                                             int page) {
-        return commentService.getCommentByPostId2(page-1, size, postId);
     }
 
     //댓글 작성

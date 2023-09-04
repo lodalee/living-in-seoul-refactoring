@@ -17,5 +17,5 @@ public interface PostScrapRepository extends JpaRepository<PostScrap, Long> {
 
     boolean existsScrapByPostAndUser(Post post, User user);
 
-    void deleteByUserId(Long id);
+    void deleteByUserId(Long userId);
 }

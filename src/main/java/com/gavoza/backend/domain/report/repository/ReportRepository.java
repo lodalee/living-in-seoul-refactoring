@@ -25,5 +25,5 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     boolean existsReportByReComment(ReComment reComment);
 
-    void deleteByUserId(Long id);
+    void deleteByUserId(Long userId);
 }

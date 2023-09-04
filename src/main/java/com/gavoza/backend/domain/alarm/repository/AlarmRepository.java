@@ -12,5 +12,5 @@ public interface AlarmRepository extends JpaRepository<Alarm, Integer> {
     Page<Alarm> findAllByUser(User user, Pageable pageable);
 
 
-    void deleteByUserId(Long id);
+    void deleteByUserId(Long userId);
 }
