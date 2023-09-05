@@ -1,6 +1,7 @@
 package com.gavoza.backend.domain.alarm.controller;
 
 import com.gavoza.backend.domain.alarm.AlarmType;
+import com.gavoza.backend.domain.alarm.requestDto.HashtagRequestDto;
 import com.gavoza.backend.domain.alarm.response.AlarmListResponse;
 import com.gavoza.backend.domain.alarm.response.SubAlarmResponseDto;
 import com.gavoza.backend.domain.alarm.service.AlarmService;
@@ -44,11 +45,11 @@ public class AlarmController {
     }
 
     //해시태그 구독
-    @GetMapping("/hashtag")
-    public MessageResponseDto subscribeHashtag(@RequestParam String hashtag,
+    @PostMapping("/hashtag")
+    public MessageResponseDto subscribeHashtag(@RequestBody HashtagRequestDto requestDto,
                                                @AuthenticationPrincipal UserDetailsImpl userDetails){
         Long userId = userDetails.getUser().getId();
-        return alarmService.subscribeHashtag(hashtag, userId);
+        return alarmService.subscribeHashtag(requestDto, userId);
     }
 
     //해시태그 구독 취소
