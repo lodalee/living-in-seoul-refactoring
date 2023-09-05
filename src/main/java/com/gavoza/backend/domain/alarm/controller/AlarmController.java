@@ -54,10 +54,10 @@ public class AlarmController {
 
     //해시태그 구독 취소
     @DeleteMapping("/hashtag")
-    public MessageResponseDto deleteSubscribeHashtag(@RequestParam String hashtag,
+    public MessageResponseDto deleteSubscribeHashtag(@RequestBody HashtagRequestDto requestDto,
                                                      @AuthenticationPrincipal UserDetailsImpl userDetails){
         Long userId = userDetails.getUser().getId();
-        return alarmService.unsubscribeHashtag(hashtag, userId);
+        return alarmService.unsubscribeHashtag(requestDto, userId);
     }
 
     //구독된 해시태그 조회

@@ -100,7 +100,7 @@ public class AlarmService {
 
         String hashtagName = requestDto.getHashtagName();
 
-        // 해시태그 이름이 #으로 시작하지 않거나, #이 두 개 이상 포함되거나, #포함 5글자 초과면 에러처리
+        // 해시태그 이름이 #으로 시작하지 않거나, #이 두 개 이상 포함되어 있거나, 5글자를 초과하면 예외를 발생시킵니다.
         if (!hashtagName.startsWith("#") || hashtagName.chars().filter(ch -> ch == '#').count() > 1 || hashtagName.length() > 5) {
             throw new IllegalArgumentException("잘못된 해시태그 형식입니다.");
         }
@@ -117,12 +117,12 @@ public class AlarmService {
     }
 
     // 해시태그 구독 취소
-    public MessageResponseDto unsubscribeHashtag(String hashtag, Long userId) {
+    public MessageResponseDto unsubscribeHashtag(HashtagRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
 
         // 사용자가 해당 해시태그를 구독한 레코드를 찾아서 삭제
-        SubscribeHashtag subscribeHashtag = subscribeHashtagRepository.findByUserAndHashtag(user, hashtag);
+        SubscribeHashtag subscribeHashtag = subscribeHashtagRepository.findByUserAndHashtag(user, requestDto.getHashtagName());
         if (subscribeHashtag != null) {
             subscribeHashtagRepository.delete(subscribeHashtag);
             return new MessageResponseDto("해시태그 구독 취소 완료");
