@@ -93,12 +93,24 @@ public class AlarmService {
         return new SubAlarmResponseDto(user);
     }
 
-    //해시 태그 구독
+    //해시태그 구독
     public MessageResponseDto subscribeHashtag(HashtagRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
 
-        SubscribeHashtag subscribeHashtag = new SubscribeHashtag(user, requestDto.getHashtagName());
+        String hashtagName = requestDto.getHashtagName();
+
+        // 해시태그 이름이 #으로 시작하지 않거나, #이 두 개 이상 포함되거나, #포함 5글자 초과면 에러처리
+        if (!hashtagName.startsWith("#") || hashtagName.chars().filter(ch -> ch == '#').count() > 1 || hashtagName.length() > 5) {
+            throw new IllegalArgumentException("잘못된 해시태그 형식입니다.");
+        }
+
+        // 이미 구독한 해시태그인 경우 예외를 발생시킵니다.
+        if (subscribeHashtagRepository.existsByUserAndHashtag(user, requestDto.getHashtagName())) {
+            throw new IllegalArgumentException("이미 구독한 해시태그입니다.");
+        }
+
+        SubscribeHashtag subscribeHashtag = new SubscribeHashtag(user, hashtagName);
         subscribeHashtagRepository.save(subscribeHashtag);
 
         return new MessageResponseDto("해시태그 구독 완료");
