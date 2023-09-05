@@ -5,6 +5,7 @@ import com.gavoza.backend.domain.alarm.entity.Alarm;
 import com.gavoza.backend.domain.alarm.entity.SubscribeHashtag;
 import com.gavoza.backend.domain.alarm.repository.AlarmRepository;
 import com.gavoza.backend.domain.alarm.repository.SubscribeHashtagRepository;
+import com.gavoza.backend.domain.alarm.requestDto.HashtagRequestDto;
 import com.gavoza.backend.domain.alarm.response.AlarmListResponse;
 import com.gavoza.backend.domain.alarm.response.AlarmResponse;
 import com.gavoza.backend.domain.alarm.response.SubAlarmResponseDto;
@@ -93,11 +94,11 @@ public class AlarmService {
     }
 
     //해시 태그 구독
-    public MessageResponseDto subscribeHashtag(String hashtag, Long userId) {
+    public MessageResponseDto subscribeHashtag(HashtagRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
 
-        SubscribeHashtag subscribeHashtag = new SubscribeHashtag(user, hashtag);
+        SubscribeHashtag subscribeHashtag = new SubscribeHashtag(user, requestDto.getHashtagName());
         subscribeHashtagRepository.save(subscribeHashtag);
 
         return new MessageResponseDto("해시태그 구독 완료");
