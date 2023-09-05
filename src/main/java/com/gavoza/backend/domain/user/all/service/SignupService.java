@@ -68,7 +68,7 @@ public class SignupService {
     }
 
     @Transactional
-    public void delete(String email) {
+    public void delete(String email) throws IllegalArgumentException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 

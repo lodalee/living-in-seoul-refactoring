@@ -22,7 +22,7 @@ public class ProfileEditService {
     private final ImageEditService s3Service;
 
 
-    public User findUserProfileByEmail(String email) {
+    public User findUserProfileByEmail(String email) throws IllegalArgumentException{
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
@@ -93,7 +93,7 @@ public class ProfileEditService {
 
 
     @Transactional
-    public void deleteProfileImage(String email) {
+    public void deleteProfileImage(String email) throws UserNotFoundException{
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("이메일 주소 " + email + "에 해당하는 사용자를 찾을 수 없습니다."));
