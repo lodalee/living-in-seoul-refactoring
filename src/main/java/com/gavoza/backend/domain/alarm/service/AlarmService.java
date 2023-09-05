@@ -117,12 +117,12 @@ public class AlarmService {
     }
 
     // 해시태그 구독 취소
-    public MessageResponseDto unsubscribeHashtag(String hashtag, Long userId) {
+    public MessageResponseDto unsubscribeHashtag(HashtagRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
 
         // 사용자가 해당 해시태그를 구독한 레코드를 찾아서 삭제
-        SubscribeHashtag subscribeHashtag = subscribeHashtagRepository.findByUserAndHashtag(user, hashtag);
+        SubscribeHashtag subscribeHashtag = subscribeHashtagRepository.findByUserAndHashtag(user, requestDto.getHashtagName());
         if (subscribeHashtag != null) {
             subscribeHashtagRepository.delete(subscribeHashtag);
             return new MessageResponseDto("해시태그 구독 취소 완료");
