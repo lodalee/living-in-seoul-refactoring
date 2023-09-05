@@ -42,7 +42,7 @@ public class SignupService {
 
 
     @Transactional
-    public String signup(SignupRequestDto requestDto) throws IllegalArgumentException {
+    public String signup(SignupRequestDto requestDto) {
         String email = requestDto.getEmail();
         String nickname = requestDto.getNickname();
         String password = requestDto.getPassword();

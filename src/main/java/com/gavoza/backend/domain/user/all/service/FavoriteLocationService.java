@@ -14,7 +14,7 @@ public class FavoriteLocationService {
     private final UserRepository userRepository;
     private final FavoriteLocationRepository favoriteLocationRepository;
 
-    public FavoriteLocation addFavoriteLocation(String email, String gu, String dong) {
+    public FavoriteLocation addFavoriteLocation(String email, String gu, String dong) throws IllegalArgumentException {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         // 이미 존재하는 즐겨찾기 위치인지 확인
@@ -30,7 +30,7 @@ public class FavoriteLocationService {
         return favoriteLocationRepository.save(favoriteLocation);
     }
 
-    public void removeFavoriteLocation(String email, Long locationId) {
+    public void removeFavoriteLocation(String email, Long locationId) throws IllegalArgumentException {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         FavoriteLocation favorite = favoriteLocationRepository.findByIdAndUserId(locationId, user.getId())
