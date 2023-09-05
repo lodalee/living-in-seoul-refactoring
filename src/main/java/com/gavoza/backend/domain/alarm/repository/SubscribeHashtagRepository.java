@@ -9,6 +9,7 @@ import java.util.List;
 public interface SubscribeHashtagRepository extends JpaRepository<SubscribeHashtag, Integer> {
     SubscribeHashtag findByUserAndHashtag(User user, String hashtag);
 
+    boolean existsByUserAndHashtag(User user, String hashtagName);
 
     void deleteByUserId(Long userId);
 
