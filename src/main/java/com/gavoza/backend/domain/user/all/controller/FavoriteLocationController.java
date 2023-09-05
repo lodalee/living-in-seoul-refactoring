@@ -1,7 +1,6 @@
 package com.gavoza.backend.domain.user.all.controller;
 
 import com.gavoza.backend.domain.user.all.dto.request.AddFavoriteRequestDto;
-import com.gavoza.backend.domain.user.all.dto.request.FavoriteLocationRequestDto;
 import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
 import com.gavoza.backend.domain.user.all.entity.FavoriteLocation;
 import com.gavoza.backend.domain.user.all.service.FavoriteLocationService;

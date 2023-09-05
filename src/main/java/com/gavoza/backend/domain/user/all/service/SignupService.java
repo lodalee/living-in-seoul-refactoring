@@ -41,8 +41,6 @@ public class SignupService {
     private final FavoriteLocationRepository favoriteLocationRepository;
 
 
-
-
     @Transactional
     public String signup(SignupRequestDto requestDto) throws IllegalArgumentException {
         String email = requestDto.getEmail();
@@ -85,7 +83,7 @@ public class SignupService {
         postLikeRepository.deleteByUserId(user.getId());
         postRepository.deleteByUserId(user.getId());
         reportRepository.deleteByUserId(user.getId());
-        
+
         userRepository.delete(user);
     }
 }
