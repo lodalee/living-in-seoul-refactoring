@@ -50,10 +50,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
     private List<FavoriteLocation> favoriteLocations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Commentlike> commentLikes;
-
-
     public User(String email, String nickname, String password, String hometown, String movedDate, String gender, String birthDate) {
         this.email = email;
         this.nickname = nickname;

@@ -16,12 +16,18 @@ public class FavoriteLocationService {
 
     public FavoriteLocation addFavoriteLocation(String email, String district, String neighborhood) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-        FavoriteLocation favoriteLocation= new FavoriteLocation(district, neighborhood,user);
+
+        // 이미 존재하는 즐겨찾기 위치인지 확인
+        if (favoriteLocationRepository.findByUserIdAndGuAndDong(user.getId(), district, neighborhood).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 즐겨찾기 위치입니다.");
+        }
+
+        FavoriteLocation favoriteLocation = new FavoriteLocation(district, neighborhood,user);
         user.getFavoriteLocations().add(favoriteLocation);
 
         userRepository.save(user);
 
-        return favoriteLocationRepository.save(favoriteLocation);
+        return favoriteLocation;
     }
 
     public void removeFavoriteLocation(String email, Long locationId) {

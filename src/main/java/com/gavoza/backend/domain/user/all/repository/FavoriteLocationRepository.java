@@ -11,5 +11,6 @@ public interface FavoriteLocationRepository extends JpaRepository<FavoriteLocati
     Optional<FavoriteLocation> findByIdAndUserId(Long id, Long userId);
 
     void deleteByUserId(Long userId);
+    Optional<FavoriteLocation> findByUserIdAndGuAndDong(Long userId, String gu, String dong);
 
 }
