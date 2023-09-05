@@ -44,7 +44,7 @@ public class AlarmController {
     }
 
     //해시태그 구독
-    @PostMapping("/hashtag")
+    @GetMapping("/hashtag")
     public MessageResponseDto subscribeHashtag(@RequestParam String hashtag,
                                                @AuthenticationPrincipal UserDetailsImpl userDetails){
         Long userId = userDetails.getUser().getId();
