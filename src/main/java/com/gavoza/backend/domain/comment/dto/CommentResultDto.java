@@ -16,5 +16,4 @@ public class CommentResultDto {
          this.commentHasLiked = commentHasLiked;
          this.hasReported = hasReported;
     }
-
 }
