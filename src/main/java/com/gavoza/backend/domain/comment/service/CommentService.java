@@ -12,6 +12,7 @@ import com.gavoza.backend.domain.comment.entity.ReComment;
 import com.gavoza.backend.domain.comment.repository.CommentRepository;
 import com.gavoza.backend.domain.comment.repository.ReCommentRepository;
 import com.gavoza.backend.domain.comment.responseDto.CommentListResponse;
+import com.gavoza.backend.domain.post.dto.PostResultDto;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.report.repository.ReportRepository;
@@ -66,14 +67,35 @@ public class CommentService {
         UserResponseDto userResponseDto = new UserResponseDto(comment.getUser());
         CommentResponseDto commentResponseDto = new CommentResponseDto(comment);
 
+        List<ReCommentResponseDto> reComments = comment.getReCommentList().stream()
+                .map(recomment -> getOneReComment(recomment.getId(), user))
+                .collect(Collectors.toList());
+
+        // Set the reComments list to the comment response DTO
+        commentResponseDto.setReComments(reComments);
+
         if (Objects.isNull(user)) {
-            return new CommentResultDto(userResponseDto,commentResponseDto,false,false);
+            return new CommentResultDto(userResponseDto ,commentResponseDto ,false,false);
         }
 
         boolean commentHasLiked = commentLikeRepository.existsLikeByCommentAndUser(comment, user);
         boolean hasReported = reportRepository.existsReportByCommentAndUser(comment,user);
 
-        return new CommentResultDto(userResponseDto, commentResponseDto, commentHasLiked, hasReported);
+        return new CommentResultDto(userResponseDto ,commentResponseDto ,commentHasLiked ,hasReported);
+    }
+
+    @Transactional
+    public ReCommentResponseDto getOneReComment(Long id, User user) {
+        ReComment reComment = reCommentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+
+        if (Objects.isNull(user)) {
+            return new ReCommentResponseDto(reComment, false,false);
+        }
+
+        boolean reCommentHasLiked = reCommentLikeRepository.existsLikeByReCommentAndUser(reComment, user);
+        boolean hasReported = reportRepository.existsReportByReCommentAndUser(reComment,user);
+        return new ReCommentResponseDto(reComment, reCommentHasLiked,hasReported);
     }
 
     // 댓글 생성
