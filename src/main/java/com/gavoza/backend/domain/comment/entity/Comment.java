@@ -60,6 +60,7 @@ public class Comment extends Auditing {
         this.nickname = nickname;
         this.comment = requestDto.getComment();
         this.post = post;
+        this.userImg = user.getProfileImageUrl();
     }
 
     public void update(CommentRequestDto requestDto) {
