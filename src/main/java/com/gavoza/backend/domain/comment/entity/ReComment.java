@@ -53,6 +53,7 @@ public class ReComment extends Auditing {
         this.reComment = requestDto.getReComment();
         this.comment = comment;
         this.user = user;
+        this.userImg = user.getProfileImageUrl();
     }
 
     public void update(ReCommentRequestDto requestDto) {

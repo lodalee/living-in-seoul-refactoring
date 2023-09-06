@@ -1,26 +1,32 @@
-package com.gavoza.backend.domain.comment.dto;
+package com.gavoza.backend.domain.comment.responseDto;
 
+import com.gavoza.backend.domain.comment.dto.CommentResultDto;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
 public class CommentListResponse {
+    private String msg;
     private PostPageable pageable;
-    private List<CommentResponseDto> comments;
+    private List<CommentResultDto> result;
+
 
 
     public CommentListResponse(
-            List<CommentResponseDto> comments,
+            String msg,
 
             int totalPages,
 
             long totalElements,
 
-            int size
+            int size,
+
+            List<CommentResultDto> commentResultDto
     ){
-        this.comments = comments;
+        this.msg = msg;
         this.pageable = new PostPageable(totalPages, totalElements, size);
+        this.result = commentResultDto;
     }
 
     @Getter

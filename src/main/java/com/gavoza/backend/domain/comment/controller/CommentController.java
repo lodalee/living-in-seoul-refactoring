@@ -1,6 +1,6 @@
 package com.gavoza.backend.domain.comment.controller;
 
-import com.gavoza.backend.domain.comment.dto.CommentListResponse;
+import com.gavoza.backend.domain.comment.responseDto.CommentListResponse;
 import com.gavoza.backend.domain.comment.dto.CommentRequestDto;
 import com.gavoza.backend.domain.comment.dto.ReCommentRequestDto;
 import com.gavoza.backend.domain.comment.service.CommentService;

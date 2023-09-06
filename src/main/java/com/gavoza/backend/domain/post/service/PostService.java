@@ -5,8 +5,10 @@ import com.gavoza.backend.domain.alarm.AlarmEventType;
 import com.gavoza.backend.domain.alarm.entity.Alarm;
 import com.gavoza.backend.domain.alarm.repository.AlarmRepository;
 import com.gavoza.backend.domain.alarm.sse.NotificationService;
-import com.gavoza.backend.domain.comment.dto.ReCommentResponseDto;
-import com.gavoza.backend.domain.post.dto.*;
+import com.gavoza.backend.domain.post.dto.LocationResponseDto;
+import com.gavoza.backend.domain.post.dto.PostInfoResponseDto;
+import com.gavoza.backend.domain.post.dto.PostRequestDto;
+import com.gavoza.backend.domain.post.dto.PostResultDto;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.entity.PostImg;
 import com.gavoza.backend.domain.post.repository.PostImgRepository;
@@ -173,7 +175,7 @@ public class PostService {
                 .map(post -> mapToPostResultDto(post, user))
                 .collect(Collectors.toList());
 
-        return new PostListResponse("검색 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
+        return new PostListResponse("게시물 조회 성공", postPages.getTotalPages(), postPages.getTotalElements(), size, postResultDtos);
     }
 
     //내가 쓴 글

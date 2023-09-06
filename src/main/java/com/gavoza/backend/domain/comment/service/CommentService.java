@@ -11,13 +11,12 @@ import com.gavoza.backend.domain.comment.entity.Comment;
 import com.gavoza.backend.domain.comment.entity.ReComment;
 import com.gavoza.backend.domain.comment.repository.CommentRepository;
 import com.gavoza.backend.domain.comment.repository.ReCommentRepository;
+import com.gavoza.backend.domain.comment.responseDto.CommentListResponse;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
-
 import com.gavoza.backend.domain.report.repository.ReportRepository;
-
+import com.gavoza.backend.domain.user.ToPost.UserResponseDto;
 import com.gavoza.backend.domain.user.all.entity.User;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -55,42 +53,27 @@ public class CommentService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Comment> commentPages = commentRepository.findAllByPostId(postId, pageable);
-        List<CommentResponseDto> commentResponseDtos = new ArrayList<>();
 
-        for (Comment comment : commentPages) {
-            List<ReCommentResponseDto> reComments = comment.getReCommentList().stream()
-                    .map(reComment -> getOneReComment(reComment.getId(), user))
-                    .collect(Collectors.toList());
+        List<CommentResultDto> commentResultDtos = commentPages.stream()
+                .map(comment -> mapToCommentResultDto(comment, user))
+                .collect(Collectors.toList());
 
-            boolean hasLikeComment;
-            boolean hasReported;
-
-            if(Objects.isNull(user)){
-                hasLikeComment = false;
-                hasReported = false;
-            } else {
-                hasLikeComment = commentLikeRepository.existsLikeByCommentAndUser(comment, user);
-                hasReported = reportRepository.existsReportByCommentAndUser(comment,user);
-            }
-
-            commentResponseDtos.add(new CommentResponseDto(comment, hasLikeComment, reComments,hasReported));
-
-        }
-
-        return new CommentListResponse(commentResponseDtos,commentPages.getTotalPages(),
-                commentPages.getTotalElements(), size);
+        return new CommentListResponse("댓글 조회 성공", commentPages.getTotalPages(),
+                commentPages.getTotalElements(), size, commentResultDtos);
     }
 
-    @Transactional(readOnly = true)
-    public ReCommentResponseDto getOneReComment(Long id, User user) {
-        ReComment reComment = reCommentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
-        if(Objects.isNull(user)){
-            return new ReCommentResponseDto(reComment, false,false);
+    private CommentResultDto mapToCommentResultDto(Comment comment, User user) {
+        UserResponseDto userResponseDto = new UserResponseDto(comment.getUser());
+        CommentResponseDto commentResponseDto = new CommentResponseDto(comment);
+
+        if (Objects.isNull(user)) {
+            return new CommentResultDto(userResponseDto,commentResponseDto,false,false);
         }
-        boolean reCommentHasLiked = reCommentLikeRepository.existsLikeByReCommentAndUser(reComment, user);
-        boolean hasReported = reportRepository.existsReportByReCommentAndUser(reComment,user);
-        return new ReCommentResponseDto(reComment, reCommentHasLiked,hasReported);
+
+        boolean commentHasLiked = commentLikeRepository.existsLikeByCommentAndUser(comment, user);
+        boolean hasReported = reportRepository.existsReportByCommentAndUser(comment,user);
+
+        return new CommentResultDto(userResponseDto, commentResponseDto, commentHasLiked, hasReported);
     }
 
     // 댓글 생성
@@ -106,7 +89,7 @@ public class CommentService {
         String userImg = user.getProfileImageUrl();
 
         if (!post.getUser().getId().equals(user.getId())) {
-            Alarm commentNotification = new Alarm(post ,post.getUser(), eventType, isRead, notificationMessage, registeredAt,userImg);
+            Alarm commentNotification = new Alarm(post ,post.getUser(), eventType, isRead, notificationMessage, registeredAt, userImg);
             alarmRepository.save(commentNotification);
             notificationService.notifyAddEvent(post.getUser(), post.getUser().isCommentAlarm());
         }
