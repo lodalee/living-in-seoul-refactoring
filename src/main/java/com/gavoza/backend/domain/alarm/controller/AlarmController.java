@@ -31,7 +31,7 @@ public class AlarmController {
 
     //알림 구독
     @PostMapping("/subscribe")
-    public MessageResponseDto subscribeAlarm(@RequestParam AlarmType alarmType,
+    public MessageResponseDto subscribeAlarm(@RequestBody AlarmType alarmType,
                                              @AuthenticationPrincipal UserDetailsImpl userDetails){
         Long userId = userDetails.getUser().getId();
         return alarmService.subscribeAlarm(alarmType,userId);
