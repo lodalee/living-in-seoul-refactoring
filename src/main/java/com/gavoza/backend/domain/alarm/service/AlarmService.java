@@ -43,6 +43,7 @@ public class AlarmService {
                             || alarm.getAlarmEventType().getAlarmType().equals(AlarmType.COMMENT))
                     .map(alarm -> new AlarmResponse(
                             alarm.getId(),
+                            (alarm.getPost() != null ? alarm.getPost().getId() : null),
                             alarm.getAlarmEventType(),
                             alarm.getNotificationMessage(),
                             alarm.getIsRead(),
@@ -56,6 +57,7 @@ public class AlarmService {
                     .filter(alarm -> alarm.getAlarmEventType().getAlarmType().equals(AlarmType.HASHTAG))
                     .map(alarm -> new AlarmResponse(
                             alarm.getId(),
+                            (alarm.getPost() != null ? alarm.getPost().getId() : null),
                             alarm.getAlarmEventType(),
                             alarm.getNotificationMessage(),
                             alarm.getIsRead(),
