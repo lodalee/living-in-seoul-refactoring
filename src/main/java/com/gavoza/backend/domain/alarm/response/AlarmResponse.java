@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Getter
 public class AlarmResponse {
     private Long id;
+    private Long postId;
     private AlarmEventType alarmEventType;
     //알림의 내용
     private String text;
@@ -15,8 +16,9 @@ public class AlarmResponse {
     private String userImg;
     private String hashTagName;
 
-    public AlarmResponse(Long id, AlarmEventType alarmEventType, String text, Boolean isRead, LocalDateTime registeredAt, String userImg) {
+    public AlarmResponse(Long id, Long postId, AlarmEventType alarmEventType, String text, Boolean isRead, LocalDateTime registeredAt, String userImg) {
         this.id = id;
+        this.postId = postId;
         this.alarmEventType = alarmEventType;
         this.text = text;
         this.isRead = isRead;
@@ -24,8 +26,9 @@ public class AlarmResponse {
         this.userImg = userImg;
     }
 
-    public AlarmResponse(Long id, AlarmEventType alarmEventType, String text, Boolean isRead, LocalDateTime registeredAt, String userImg, String hashTagName) {
+    public AlarmResponse(Long id, Long postId, AlarmEventType alarmEventType, String text, Boolean isRead, LocalDateTime registeredAt, String userImg, String hashTagName) {
         this.id = id;
+        this.postId = postId;
         this.alarmEventType = alarmEventType;
         this.text = text;
         this.isRead = isRead;
