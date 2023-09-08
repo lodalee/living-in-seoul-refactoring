@@ -58,18 +58,25 @@ Spring Boot, JPA, JWT, Spring Security, SSE Emitter, BufferedImage, JSON Web Tok
 <br/>
 
 # 기술적 의사 결정
-<p>스프링의 다양한 기능을 자동화하여 개발 속도를 크게 향상시켜줌</p>
 <p>Spring Boot</p>
-<p>Spring</p>
+<p>스프링의 다양한 기능을 자동화하여 개발 속도를 크게 향상시켜줌</p>
+<br />
+
 <p>SSE Emitter</p>
-<p>JPA</p>
 <p>실시간 알림 및 업데이트를 사용자에게 효과적으로 전달</p>
-<p>BufferedImage</p>
+<br />
+<p>JPA</p>
 <p>데이터베이스 작업을 효율적으로 처리</p>
-<p>사용자 인증 및 권한 관리 시스템을 구축</p>
+<br />
+<p>BufferedImage</p>
+<p>스프링에서 제공하는 클래스로 코드 이식성이 높아 적용이 간단하고, resizeImage 메서드와 같이 크기를 변경하는 작업을 간단하게 구현할 수 있기 때문</p>
+<br />
 <p>JWT</p>
-<p>인증 및 권한 부여와 같은 보안 관련 기능을 수행</p>
+<p>사용자 인증 및 권한 관리 시스템을 구축</p>
+<br />
 <p>Spring Security</p>
+<p>인증 및 권한 부여와 같은 보안 관련 기능을 수행</p>
+
 
 
   <br />
