@@ -1,13 +1,12 @@
 package com.gavoza.backend.global.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gavoza.backend.domain.user.all.dto.request.LoginRequestDto;
-import com.gavoza.backend.domain.user.all.entity.RefreshToken;
-import com.gavoza.backend.domain.user.all.entity.User;
-import com.gavoza.backend.domain.user.all.repository.UserRepository;
-import com.gavoza.backend.domain.user.all.service.LoginService;
-import com.gavoza.backend.domain.user.all.dto.response.TokenResMsgDto;
-import com.gavoza.backend.domain.user.all.validator.TokenValidator;
+import com.gavoza.backend.domain.auth.dto.request.LoginRequestDto;
+import com.gavoza.backend.domain.user.entity.RefreshToken;
+import com.gavoza.backend.domain.user.entity.User;
+import com.gavoza.backend.domain.user.repository.UserRepository;
+import com.gavoza.backend.domain.auth.dto.response.TokenResMsgDto;
+import com.gavoza.backend.domain.auth.validator.TokenValidator;
 import com.gavoza.backend.global.jwt.JwtUtil;
 import com.gavoza.backend.global.security.UserDetailsImpl;
 import jakarta.servlet.FilterChain;

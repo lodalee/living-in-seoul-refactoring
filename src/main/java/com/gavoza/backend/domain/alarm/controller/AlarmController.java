@@ -1,12 +1,12 @@
 package com.gavoza.backend.domain.alarm.controller;
 
-import com.gavoza.backend.domain.alarm.AlarmType;
-import com.gavoza.backend.domain.alarm.requestDto.HashtagRequestDto;
-import com.gavoza.backend.domain.alarm.response.AlarmListResponse;
-import com.gavoza.backend.domain.alarm.response.SubAlarmResponseDto;
+import com.gavoza.backend.domain.alarm.type.AlarmType;
+import com.gavoza.backend.domain.alarm.dto.request.HashtagRequestDto;
+import com.gavoza.backend.domain.alarm.dto.response.AlarmListResponse;
+import com.gavoza.backend.domain.alarm.dto.response.SubAlarmResponseDto;
 import com.gavoza.backend.domain.alarm.service.AlarmService;
-import com.gavoza.backend.domain.user.all.entity.User;
-import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
+import com.gavoza.backend.domain.user.entity.User;
+import com.gavoza.backend.global.dto.MessageResponseDto;
 import com.gavoza.backend.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

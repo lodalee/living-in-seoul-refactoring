@@ -2,7 +2,7 @@ package com.gavoza.backend.domain.scrap.repository;
 
 import com.gavoza.backend.domain.scrap.entity.PostScrap;
 import com.gavoza.backend.domain.post.entity.Post;
-import com.gavoza.backend.domain.user.all.entity.User;
+import com.gavoza.backend.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

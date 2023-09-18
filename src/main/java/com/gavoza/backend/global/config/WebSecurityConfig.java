@@ -1,7 +1,7 @@
 package com.gavoza.backend.global.config;
 
-import com.gavoza.backend.domain.user.all.repository.UserRepository;
-import com.gavoza.backend.domain.user.all.validator.TokenValidator;
+import com.gavoza.backend.domain.user.repository.UserRepository;
+import com.gavoza.backend.domain.auth.validator.TokenValidator;
 import com.gavoza.backend.global.filter.JwtAuthenticationFilter;
 import com.gavoza.backend.global.filter.JwtAuthorizationFilter;
 import com.gavoza.backend.global.jwt.JwtUtil;

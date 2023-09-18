@@ -1,11 +1,11 @@
 package com.gavoza.backend.domain.comment.controller;
 
-import com.gavoza.backend.domain.comment.responseDto.CommentListResponse;
-import com.gavoza.backend.domain.comment.dto.CommentRequestDto;
-import com.gavoza.backend.domain.comment.dto.ReCommentRequestDto;
+import com.gavoza.backend.domain.comment.dto.response.CommentListResponse;
+import com.gavoza.backend.domain.comment.dto.request.CommentRequestDto;
+import com.gavoza.backend.domain.comment.dto.request.ReCommentRequestDto;
 import com.gavoza.backend.domain.comment.service.CommentService;
-import com.gavoza.backend.domain.user.all.entity.User;
-import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
+import com.gavoza.backend.domain.user.entity.User;
+import com.gavoza.backend.global.dto.MessageResponseDto;
 import com.gavoza.backend.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

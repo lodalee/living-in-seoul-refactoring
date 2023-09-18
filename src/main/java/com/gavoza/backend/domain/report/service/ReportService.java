@@ -6,12 +6,12 @@ import com.gavoza.backend.domain.comment.repository.CommentRepository;
 import com.gavoza.backend.domain.comment.repository.ReCommentRepository;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
-import com.gavoza.backend.domain.report.ReportType;
+import com.gavoza.backend.domain.report.type.ReportType;
 import com.gavoza.backend.domain.report.entity.Report;
 import com.gavoza.backend.domain.report.repository.ReportRepository;
 
-import com.gavoza.backend.domain.user.all.entity.User;
-import com.gavoza.backend.domain.user.ToPost.MessageResponseDto;
+import com.gavoza.backend.global.dto.MessageResponseDto;
+import com.gavoza.backend.domain.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

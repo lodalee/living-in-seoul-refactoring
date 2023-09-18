@@ -1,11 +1,11 @@
 package com.gavoza.backend.domain.post.controller;
 
-import com.gavoza.backend.domain.post.dto.PostRequestDto;
-import com.gavoza.backend.domain.post.response.PostListResponse;
-import com.gavoza.backend.domain.post.response.PostResponse;
+import com.gavoza.backend.domain.post.dto.request.PostRequestDto;
+import com.gavoza.backend.domain.post.dto.response.PostListResponse;
+import com.gavoza.backend.domain.post.dto.response.PostResponse;
 import com.gavoza.backend.domain.post.service.PostService;
-import com.gavoza.backend.domain.user.all.entity.User;
-import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
+import com.gavoza.backend.domain.user.entity.User;
+import com.gavoza.backend.global.dto.MessageResponseDto;
 import com.gavoza.backend.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

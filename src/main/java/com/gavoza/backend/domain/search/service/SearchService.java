@@ -1,18 +1,18 @@
 package com.gavoza.backend.domain.search.service;
 
 import com.gavoza.backend.domain.Like.repository.PostLikeRepository;
-import com.gavoza.backend.domain.post.dto.LocationResponseDto;
-import com.gavoza.backend.domain.post.dto.PostInfoResponseDto;
-import com.gavoza.backend.domain.post.dto.PostResultDto;
+import com.gavoza.backend.domain.post.dto.response.LocationResponseDto;
+import com.gavoza.backend.domain.post.dto.response.PostInfoResponseDto;
+import com.gavoza.backend.domain.post.dto.response.PostResultDto;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
-import com.gavoza.backend.domain.post.response.PostListResponse;
+import com.gavoza.backend.domain.post.dto.response.PostListResponse;
 import com.gavoza.backend.domain.report.repository.ReportRepository;
 import com.gavoza.backend.domain.scrap.repository.PostScrapRepository;
 import com.gavoza.backend.domain.search.entity.SearchLog;
 import com.gavoza.backend.domain.search.repository.SearchRepository;
-import com.gavoza.backend.domain.user.ToPost.UserResponseDto;
-import com.gavoza.backend.domain.user.all.entity.User;
+import com.gavoza.backend.domain.post.dto.response.UserResponseDto;
+import com.gavoza.backend.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

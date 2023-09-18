@@ -1,9 +1,9 @@
 package com.gavoza.backend.domain.report.controller;
 
-import com.gavoza.backend.domain.report.ReportType;
+import com.gavoza.backend.domain.report.type.ReportType;
 import com.gavoza.backend.domain.report.service.ReportService;
-import com.gavoza.backend.domain.user.all.entity.User;
-import com.gavoza.backend.domain.user.ToPost.MessageResponseDto;
+import com.gavoza.backend.global.dto.MessageResponseDto;
+import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
