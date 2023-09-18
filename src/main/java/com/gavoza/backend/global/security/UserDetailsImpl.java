@@ -1,6 +1,6 @@
 package com.gavoza.backend.global.security;
 
-import com.gavoza.backend.domain.user.all.entity.User;
+import com.gavoza.backend.domain.user.entity.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

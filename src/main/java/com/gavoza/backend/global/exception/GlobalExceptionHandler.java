@@ -1,6 +1,6 @@
 package com.gavoza.backend.global.exception;
 
-import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
+import com.gavoza.backend.global.dto.MessageResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

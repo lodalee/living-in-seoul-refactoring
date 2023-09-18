@@ -1,17 +1,17 @@
 package com.gavoza.backend.domain.alarm.service;
 
-import com.gavoza.backend.domain.alarm.AlarmType;
+import com.gavoza.backend.domain.alarm.type.AlarmType;
 import com.gavoza.backend.domain.alarm.entity.Alarm;
 import com.gavoza.backend.domain.alarm.entity.SubscribeHashtag;
 import com.gavoza.backend.domain.alarm.repository.AlarmRepository;
 import com.gavoza.backend.domain.alarm.repository.SubscribeHashtagRepository;
-import com.gavoza.backend.domain.alarm.requestDto.HashtagRequestDto;
-import com.gavoza.backend.domain.alarm.response.AlarmListResponse;
-import com.gavoza.backend.domain.alarm.response.AlarmResponse;
-import com.gavoza.backend.domain.alarm.response.SubAlarmResponseDto;
-import com.gavoza.backend.domain.user.all.entity.User;
-import com.gavoza.backend.domain.user.all.repository.UserRepository;
-import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
+import com.gavoza.backend.domain.alarm.dto.request.HashtagRequestDto;
+import com.gavoza.backend.domain.alarm.dto.response.AlarmListResponse;
+import com.gavoza.backend.domain.alarm.dto.response.AlarmResponse;
+import com.gavoza.backend.domain.alarm.dto.response.SubAlarmResponseDto;
+import com.gavoza.backend.domain.user.entity.User;
+import com.gavoza.backend.domain.user.repository.UserRepository;
+import com.gavoza.backend.global.dto.MessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;

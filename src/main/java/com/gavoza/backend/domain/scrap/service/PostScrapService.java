@@ -4,8 +4,8 @@ import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.scrap.entity.PostScrap;
 import com.gavoza.backend.domain.scrap.repository.PostScrapRepository;
-import com.gavoza.backend.domain.user.all.entity.User;
-import com.gavoza.backend.domain.user.all.dto.response.MessageResponseDto;
+import com.gavoza.backend.domain.user.entity.User;
+import com.gavoza.backend.global.dto.MessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
