@@ -47,7 +47,6 @@ public class TokenValidator {
         }
     }
 
-
     public String validateRefreshTokenAndReturnEmail(String refreshTokenValue) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenValue)
                 .orElseThrow(() -> new IllegalArgumentException("토큰이 유효하지 않습니다."));
@@ -61,5 +60,4 @@ public class TokenValidator {
 
         return refreshToken.getUserEmail();
     }
-
 }

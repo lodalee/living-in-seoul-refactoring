@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class PostResultDto {
-    UserResponseDto user;
+    PostUserDto user;
     LocationResponseDto location;
     PostInfoResponseDto post;
     private boolean hasLiked;
@@ -13,8 +13,8 @@ public class PostResultDto {
 
 
 
-    public PostResultDto(UserResponseDto userResponseDto, PostInfoResponseDto postInfoResponseDto, LocationResponseDto locationResponseDto, boolean hasLiked, boolean hasScrapped, boolean hasReported) {
-        this.user = userResponseDto;
+    public PostResultDto(PostUserDto postUserDto, PostInfoResponseDto postInfoResponseDto, LocationResponseDto locationResponseDto, boolean hasLiked, boolean hasScrapped, boolean hasReported) {
+        this.user = postUserDto;
         this.post = postInfoResponseDto;
         this.location = locationResponseDto;
         this.hasLiked = hasLiked;

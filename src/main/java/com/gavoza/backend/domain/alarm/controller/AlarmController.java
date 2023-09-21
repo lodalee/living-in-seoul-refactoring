@@ -1,10 +1,10 @@
 package com.gavoza.backend.domain.alarm.controller;
 
-import com.gavoza.backend.domain.alarm.type.AlarmType;
 import com.gavoza.backend.domain.alarm.dto.request.HashtagRequestDto;
-import com.gavoza.backend.domain.alarm.dto.response.AlarmListResponse;
-import com.gavoza.backend.domain.alarm.dto.response.SubAlarmResponseDto;
+import com.gavoza.backend.domain.alarm.dto.response.AlarmSubscriptionStatusDto;
+import com.gavoza.backend.domain.alarm.dto.response.AlarmsResponseDto;
 import com.gavoza.backend.domain.alarm.service.AlarmService;
+import com.gavoza.backend.domain.alarm.type.AlarmType;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.dto.MessageResponseDto;
 import com.gavoza.backend.global.security.UserDetailsImpl;
@@ -21,7 +21,7 @@ public class AlarmController {
     private final AlarmService alarmService;
     //활동 및 해시태그 알림 조회
     @GetMapping("/activity")
-    public AlarmListResponse getNotification(@RequestParam int page,
+    public AlarmsResponseDto getNotification(@RequestParam int page,
                                              @RequestParam int size,
                                              @RequestParam String alarmCategory,
                                              @AuthenticationPrincipal UserDetailsImpl userDetails){
@@ -39,7 +39,7 @@ public class AlarmController {
 
     //알림 구독 조회
     @GetMapping("/subscribe")
-    public SubAlarmResponseDto getSubscribeAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public AlarmSubscriptionStatusDto getSubscribeAlarm(@AuthenticationPrincipal UserDetailsImpl userDetails){
         User user = userDetails.getUser();
         return alarmService.getSubscribeAlarm(user);
     }

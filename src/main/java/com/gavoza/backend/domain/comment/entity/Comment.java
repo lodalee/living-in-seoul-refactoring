@@ -2,7 +2,6 @@ package com.gavoza.backend.domain.comment.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.gavoza.backend.domain.Like.entity.Commentlike;
 import com.gavoza.backend.domain.comment.dto.request.CommentRequestDto;
 import com.gavoza.backend.domain.post.entity.Post;
 import com.gavoza.backend.domain.user.entity.User;

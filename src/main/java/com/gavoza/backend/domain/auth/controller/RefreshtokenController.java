@@ -45,5 +45,4 @@ public class RefreshtokenController {
             return ResponseEntity.badRequest().body(new RefreshResMsgDto(e.getMessage(), null, null));
         }
     }
-
 }
