@@ -1,12 +1,10 @@
 package com.gavoza.backend.domain.post.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.gavoza.backend.domain.Like.entity.Postlike;
 import com.gavoza.backend.domain.alarm.entity.Alarm;
 import com.gavoza.backend.domain.comment.entity.Comment;
 import com.gavoza.backend.domain.post.dto.request.PostRequestDto;
 import com.gavoza.backend.domain.report.entity.Report;
-import com.gavoza.backend.domain.scrap.entity.PostScrap;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.global.config.Auditing;
 import jakarta.persistence.*;

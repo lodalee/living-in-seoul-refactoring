@@ -1,15 +1,15 @@
 package com.gavoza.backend.domain.auth.controller;
 
 import com.gavoza.backend.domain.auth.dto.request.LoginRequestDto;
-import com.gavoza.backend.domain.user.dto.request.SignupRequestDto;
-import com.gavoza.backend.global.dto.MessageResponseDto;
 import com.gavoza.backend.domain.auth.dto.response.TokenResMsgDto;
+import com.gavoza.backend.domain.auth.service.LoginService;
+import com.gavoza.backend.domain.auth.validator.TokenValidator;
+import com.gavoza.backend.domain.user.dto.request.SignupRequestDto;
 import com.gavoza.backend.domain.user.entity.RefreshToken;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.domain.user.repository.UserRepository;
-import com.gavoza.backend.domain.auth.service.LoginService;
 import com.gavoza.backend.domain.user.service.SignupService;
-import com.gavoza.backend.domain.auth.validator.TokenValidator;
+import com.gavoza.backend.global.dto.MessageResponseDto;
 import com.gavoza.backend.global.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,6 @@ public class LoginController {
     private final LoginService loginService;
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
-
 
     @PostMapping("/login")
     public ResponseEntity<TokenResMsgDto> login(@RequestBody LoginRequestDto loginRequestDto) {
@@ -57,8 +56,6 @@ public class LoginController {
 
         return ResponseEntity.ok(tokenResponseDto);
     }
-
-
 
     @PostMapping("/logout")
     public ResponseEntity<MessageResponseDto> logout(HttpServletRequest request) {
@@ -94,7 +91,4 @@ public class LoginController {
             return ResponseEntity.badRequest().body(new TokenResMsgDto(null, e.getMessage(), null, null, null));
         }
     }
-
-
-
 }

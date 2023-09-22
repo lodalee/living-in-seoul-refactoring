@@ -6,9 +6,9 @@ import com.gavoza.backend.domain.alarm.entity.SubscribeHashtag;
 import com.gavoza.backend.domain.alarm.repository.AlarmRepository;
 import com.gavoza.backend.domain.alarm.repository.SubscribeHashtagRepository;
 import com.gavoza.backend.domain.alarm.dto.request.HashtagRequestDto;
-import com.gavoza.backend.domain.alarm.dto.response.AlarmListResponse;
-import com.gavoza.backend.domain.alarm.dto.response.AlarmResponse;
-import com.gavoza.backend.domain.alarm.dto.response.SubAlarmResponseDto;
+import com.gavoza.backend.domain.alarm.dto.response.AlarmsResponseDto;
+import com.gavoza.backend.domain.alarm.dto.response.AlarmResponseDto;
+import com.gavoza.backend.domain.alarm.dto.response.AlarmSubscriptionStatusDto;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.domain.user.repository.UserRepository;
 import com.gavoza.backend.global.dto.MessageResponseDto;
@@ -30,18 +30,18 @@ public class AlarmService {
     private final SubscribeHashtagRepository subscribeHashtagRepository;
 
     //알림 조회
-    public AlarmListResponse getNotification(int page, int size, String alarmCategory, User user) {
+    public AlarmsResponseDto getNotification(int page, int size, String alarmCategory, User user) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registeredAt"));
         Page<Alarm> alarmPages = alarmRepository.findAllByUser(user, pageable);
 
-        List<AlarmResponse> alarmResponses;
+        List<AlarmResponseDto> alarmResponsDtos;
 
         if (alarmCategory.equals("activity")) {
             // activity일 때 필터링
-            alarmResponses = alarmPages.stream()
+            alarmResponsDtos = alarmPages.stream()
                     .filter(alarm -> alarm.getAlarmEventType().getAlarmType().equals(AlarmType.LIKE)
                             || alarm.getAlarmEventType().getAlarmType().equals(AlarmType.COMMENT))
-                    .map(alarm -> new AlarmResponse(
+                    .map(alarm -> new AlarmResponseDto(
                             alarm.getId(),
                             (alarm.getPost() != null ? alarm.getPost().getId() : null),
                             alarm.getAlarmEventType(),
@@ -53,9 +53,9 @@ public class AlarmService {
                     .collect(Collectors.toList());
         } else if (alarmCategory.equals("hashtag")) {
             // hashtag일 때 필터링
-            alarmResponses = alarmPages.stream()
+            alarmResponsDtos = alarmPages.stream()
                     .filter(alarm -> alarm.getAlarmEventType().getAlarmType().equals(AlarmType.HASHTAG))
-                    .map(alarm -> new AlarmResponse(
+                    .map(alarm -> new AlarmResponseDto(
                             alarm.getId(),
                             (alarm.getPost() != null ? alarm.getPost().getId() : null),
                             alarm.getAlarmEventType(),
@@ -70,7 +70,7 @@ public class AlarmService {
             throw new IllegalArgumentException("알림 타입이 존재하지 않습니다.");
         }
 
-        return new AlarmListResponse("조회 성공", alarmPages.getTotalPages(), alarmPages.getTotalElements(), size, alarmResponses);
+        return new AlarmsResponseDto("조회 성공", alarmPages.getTotalPages(), alarmPages.getTotalElements(), size, alarmResponsDtos);
     }
 
 
@@ -91,8 +91,8 @@ public class AlarmService {
     }
 
     //알림 구독 조회
-    public SubAlarmResponseDto getSubscribeAlarm(User user) {
-        return new SubAlarmResponseDto(user);
+    public AlarmSubscriptionStatusDto getSubscribeAlarm(User user) {
+        return new AlarmSubscriptionStatusDto(user);
     }
 
     //해시태그 구독
@@ -162,8 +162,6 @@ public class AlarmService {
 
         return new MessageResponseDto("알림을 읽음 처리했습니다.");
     }
-
-
 }
 
 

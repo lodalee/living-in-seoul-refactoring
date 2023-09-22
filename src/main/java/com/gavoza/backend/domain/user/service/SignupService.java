@@ -1,15 +1,15 @@
 package com.gavoza.backend.domain.user.service;
 
-import com.gavoza.backend.domain.Like.repository.CommentLikeRepository;
-import com.gavoza.backend.domain.Like.repository.PostLikeRepository;
-import com.gavoza.backend.domain.Like.repository.ReCommentLikeRepository;
+import com.gavoza.backend.domain.comment.repository.CommentLikeRepository;
+import com.gavoza.backend.domain.post.repository.PostLikeRepository;
+import com.gavoza.backend.domain.comment.repository.ReCommentLikeRepository;
 import com.gavoza.backend.domain.alarm.repository.AlarmRepository;
 import com.gavoza.backend.domain.alarm.repository.SubscribeHashtagRepository;
 import com.gavoza.backend.domain.comment.repository.CommentRepository;
 import com.gavoza.backend.domain.comment.repository.ReCommentRepository;
 import com.gavoza.backend.domain.post.repository.PostRepository;
 import com.gavoza.backend.domain.report.repository.ReportRepository;
-import com.gavoza.backend.domain.scrap.repository.PostScrapRepository;
+import com.gavoza.backend.domain.post.repository.PostScrapRepository;
 import com.gavoza.backend.domain.user.dto.request.SignupRequestDto;
 import com.gavoza.backend.domain.user.entity.User;
 import com.gavoza.backend.domain.user.repository.FavoriteLocationRepository;

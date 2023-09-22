@@ -1,7 +1,7 @@
 package com.gavoza.backend.domain.comment.dto.response;
 
 import com.gavoza.backend.domain.comment.entity.ReComment;
-import com.gavoza.backend.domain.post.dto.response.UserResponseDto;
+import com.gavoza.backend.domain.post.dto.response.PostUserDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ReCommentResponseDto {
-    private UserResponseDto user;
+    private PostUserDto user;
     private Long reCommentId;
     private String reComment;
     private LocalDateTime createdAt;
@@ -22,7 +22,7 @@ public class ReCommentResponseDto {
         this.reComment = newReComment.getReComment();
         this.createdAt = newReComment.getCreatedAt();
         this.reCommentId = newReComment.getId();
-        this.user = new UserResponseDto(newReComment.getUser());
+        this.user = new PostUserDto(newReComment.getUser());
     }
 
     public ReCommentResponseDto(ReComment reComment, boolean reCommentHasLiked, boolean hasReported) {
@@ -30,7 +30,7 @@ public class ReCommentResponseDto {
         this.createdAt = reComment.getCreatedAt();
         this.reCommentId = reComment.getId();
         this.hasReported = hasReported;
-        this.user = new UserResponseDto(reComment.getUser());
+        this.user = new PostUserDto(reComment.getUser());
         this.reCommentHasLiked = reCommentHasLiked;
         this.reCommentLikeSize = reComment.getReCommentLikes().size();
     }
